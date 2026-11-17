@@ -84,7 +84,7 @@
     let language = savedLanguage();
     const t = (key, values = {}) => translate(language, key, values);
     const date = (stamp) => new Date(stamp).toLocaleString(t("locale"), {dateStyle: "medium", timeStyle: "short"});
-    const request = (url, options = {}) => transport(url, {...options, headers: {...options.headers, "Accept-Language": language}});
+    const request = (url, options = {}) => transport(url, {...options, headers: {"Content-Type": "application/json", ...options.headers, "Accept-Language": language}});
     let data = {tasks: [], comments: [], events: [], progress: {total: 0, done: 0, percent: 0}};
     let selected = null, filter = "all", query = "", showDone = false, pending = false, disposed = false;
     // Drafts belong to a form and retain the revision of their first edit.

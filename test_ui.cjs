@@ -30,6 +30,7 @@ async function setup() {
   const writes = [];
   const transport = async (url, options = {}) => {
     if (options.method) {
+      assert.equal(options.headers["Content-Type"], "application/json", "Hermes SDK forwards headers without adding a JSON content type");
       const body = JSON.parse(options.body), id = decodeURIComponent(url.split("/").at(-1));
       writes.push({id, ...body});
       if (failNext) {failNext = false; throw new Error("failed write");}
@@ -130,6 +131,6 @@ async function tests() {
   h.server.tasks[0].title = "Recovered after failed GET"; await h.tick();
   assert.equal(h.field("title").value, "Recovered after failed GET");
   h = await setup(); h.delay(); await h.tick(); h.dispose(); await h.release(); assert.equal(h.root.children.length, 0);
-  console.log("PASS: BUG-01–04 draft revisions, preservation, polling, response ordering, and disposal");
+  console.log("PASS: BUG-01–04 editor regressions, Hermes JSON headers, polling, ordering, and disposal");
 }
 tests().catch(error => {console.error(error); process.exitCode = 1;});

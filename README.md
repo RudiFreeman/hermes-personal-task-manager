@@ -1,6 +1,6 @@
 # Hermes Personal Task Manager
 
-![Version 0.1.1](https://img.shields.io/badge/version-0.1.1-4c9b59)
+![Version 0.1.2](https://img.shields.io/badge/version-0.1.2-4c9b59)
 ![Python 3.10 or newer](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![Vanilla JavaScript](https://img.shields.io/badge/JavaScript-vanilla-F7DF1E?logo=javascript&logoColor=black)
 ![React via Hermes SDK](https://img.shields.io/badge/React-Hermes_SDK-61DAFB?logo=react&logoColor=black)
@@ -39,10 +39,10 @@ starts an agent, schedules a job, or executes the task itself.
 - Persistent local SQLite storage.
 - An English interface by default, with an optional Russian translation.
 
-**Integration status:** The Dashboard extension and Hermes tool entry points are
-implemented. Connection to a running Hermes installation and compatibility with
-its installed version still need verification. The local preview works independently
-for development and testing.
+**Integration status:** Tools, the Dashboard API, and the browser UI have been
+checked against Hermes v0.23.1 in a disposable VPS profile. This includes real
+model tool calls and browser checks using the installed Hermes ASGI app and SDK.
+See [VPS validation](VPS_VALIDATION.md) for scope and remaining limitations.
 
 **Possible future extensions:** Project organization, richer step-by-step
 checklists, Kanban views, task dependencies, and export/backup with restoration.
@@ -53,7 +53,7 @@ deliberately focuses on a simple personal checklist.
 
 ## Current version
 
-Version 0.1.1 is a local prototype with one personal task list and one level of
+Version 0.1.2 is a local prototype with one personal task list and one level of
 subtasks. Tasks can be completed, reopened, starred, searched, and grouped into
 active and completed sections. Completing a task records its completion time.
 Comments and change events record their author and timestamp.
@@ -62,8 +62,8 @@ Overall progress counts completed top-level tasks. Each task also shows how many
 of its subtasks are complete. SQLite stores the data with a schema version, and
 revision checks prevent stale edits from overwriting newer changes.
 
-The plugin has not been installed on the production VPS. Its compatibility with
-the installed Hermes version has not been verified. The source repository is
+The plugin has been tested on a VPS in a separate disposable profile; it has not
+been enabled in the working profile. The source repository is
 [RudiFreeman/hermes-personal-task-manager](https://github.com/RudiFreeman/hermes-personal-task-manager).
 
 ## Technology stack
@@ -77,17 +77,21 @@ the installed Hermes version has not been verified. The source repository is
 | Storage | SQLite 3 through Python's `sqlite3` module | Persistent tasks, comments, and change events |
 | Testing | pytest and Node.js assertions | Storage/API behavior and translation checks |
 
-The current version is **0.1.1** (local prototype), declared in `plugin.yaml` and
+The current version is **0.1.2** (local prototype), declared in `plugin.yaml` and
 `dashboard/manifest.json`. The preview uses only the Python standard library;
 FastAPI, Pydantic, and the host React SDK are used when running inside Hermes.
 No npm installation or frontend build step is required. Node.js is optional and
-used only for the translation checks. Specific FastAPI and React versions depend
-on the target Hermes installation and have not yet been verified there.
+used for translation and UI regression checks. Host dependencies vary; the tested
+installation used FastAPI 0.133.1 and Pydantic 2.14.1.
 
 Version 0.1.1 fixes editor draft preservation and revision tracking, live detail
 refreshes, out-of-order responses, and concurrent SQLite schema initialization.
 It adds permanent regression tests for all five fixes; the database schema stays
 at version 1.
+
+Version 0.1.2 explicitly sends JSON content headers when using the Hermes SDK,
+fixing HTTP 422 responses to UI writes. Integration checks passed on Hermes
+v0.23.1 with FastAPI 0.133.1 and Pydantic 2.14.1 in a disposable profile.
 
 ## Local preview on Windows
 
@@ -190,8 +194,8 @@ messages follow the browser's language settings.
 The target Hermes version must provide `ctx.register_tool`,
 `window.__HERMES_PLUGIN_SDK__`, discovery of `dashboard/manifest.json`, plugin
 FastAPI routes, and `plugins.plugin_storage.plugin_data_dir`. The API adapter
-requires Pydantic 2. A minimum Hermes version has not been established;
-compatibility with v0.23.1 is unverified.
+requires Pydantic 2. Compatibility was checked with v0.23.1; a minimum Hermes
+version has not been established.
 
 Deployment requires separate approval. The project directory is placed at
 `<active HERMES_HOME>/plugins/personal-task-manager/`, and the plugin is enabled
@@ -228,8 +232,9 @@ directory is reserved for disposable test data and excluded from Git.
 Tests use temporary databases and do not modify real tasks. They cover persistence,
 subtasks, progress, Hermes comments, revision conflicts, concurrent writes, tool
 invocation through the registration contract, and the protected local HTTP API.
-Hermes Plugin Doctor and the real Dashboard still need to be tested in a Hermes
-environment; the registration contract test is not a replacement for those checks.
+Hermes Plugin Doctor, real model tool calls, and Dashboard integration passed in
+the tested VPS environment. The local registration contract test alone is not a
+replacement for those checks on another installation.
 
 If Node.js is available, run the translation checks with `node test_i18n.cjs`.
 These check language coverage, interpolation, English defaults, saved preferences,

@@ -32,7 +32,22 @@ now declare **0.1.1**; the SQLite schema version remains **1**. The release chec
 `python -m pytest -q --basetemp=.local/release-0.1.1-tests` passed all **16 tests**;
 `node test_i18n.cjs`, `node test_ui.cjs`, and `git diff --check` also passed.
 
-## Instructions for the implementation model
+## VPS follow-up — BUG-06 fixed in 0.1.2
+
+Real Hermes v0.23.1 browser testing found that SDK `fetchJSON` does not add a JSON
+content header. UI POST/PATCH bodies were sent as browser string bodies and
+FastAPI returned HTTP 422. The preview's own transport added this header, masking
+the integration error. The shared UI request wrapper now explicitly sends
+`Content-Type: application/json`. The permanent `test_ui.cjs` transport asserts
+the header on every write; real browser creation and saving passed after the fix.
+
+VPS checks passed all 16 Python tests, both Node suites, Plugin Doctor, the actual
+FastAPI adapter, authenticated session access, real model invocation of all three
+tools, browser draft/polling/conflict scenarios, and snapshot persistence after a
+test-server restart. See [VPS validation](VPS_VALIDATION.md) for precise scope,
+the host Dashboard ownership incident and restoration, and remaining limitations.
+
+## Original implementation instructions
 
 Fix the five confirmed bugs below. Application code was not changed during this review. Work on one bug at a time, add the specified regression coverage, and preserve existing task completion rules, revision checks, translations, and tool contracts. Do not disable optimistic concurrency to make UI tests pass. Do not modify real task data, deploy, or publish anything.
 
