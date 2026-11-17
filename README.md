@@ -72,7 +72,7 @@ been enabled in the working profile. The source repository is
 ## Technology stack
 
 | Component | Technology | Role |
-|---|---|---|
+| --- | --- | --- |
 | Backend and tools | Python 3.10+ | Task storage, validation, Hermes tools, and local preview |
 | Web interface | Shared JavaScript, React view and CSS | Compact tree, editors, Archive, Trash, language and responsive layout |
 | Host integration | Dashboard SDK and Desktop Plugin SDK | Native host controls, React and theme tokens; WebApp uses the Desktop SDK |
@@ -115,7 +115,7 @@ cd C:\python\Personal_Task_Manager
 python preview.py
 ```
 
-Open **http://127.0.0.1:8765**. Press Ctrl+C to stop the server.
+Open **<http://127.0.0.1:8765>**. Press Ctrl+C to stop the server.
 To use a different port, run `python preview.py --port 8766`.
 
 The server listens on this computer only and is intended for development, not
@@ -132,7 +132,7 @@ Full export/import and a dedicated backup workflow are not part of this version.
 Once the plugin is installed and enabled, Hermes receives three tools:
 
 | Tool | Purpose |
-|---|---|
+| --- | --- |
 | `personal_tasks_list` | Read tasks, subtasks, comments, and progress |
 | `personal_tasks_add` | Record a task with described subtasks, or add a single subtask |
 | `personal_tasks_update` | Edit, complete/reopen, star, comment, or explicitly trash/restore/purge an item |
