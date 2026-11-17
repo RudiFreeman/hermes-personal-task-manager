@@ -1,0 +1,27 @@
+# Render with scripts/prepare_catalog.py after committing the tested source.
+# This template is not an installable catalog entry.
+name: personal-task-manager
+title: Hermes Personal Task Manager
+repo: https://github.com/RudiFreeman/hermes-personal-task-manager
+sha: "@SHA@"
+version: "@VERSION@"
+description: Personal tasks and subtasks shared between Hermes chat, Dashboard and WebApp, with Archive and restorable Trash.
+maintainer: RudiFreeman
+tier: community
+category: tools
+requires_hermes: ">=0.23.1"
+docs_url: https://github.com/RudiFreeman/hermes-personal-task-manager/blob/@SHA@/README.md
+readme: true
+screenshots:
+  - https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/dashboard-light.png
+  - https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/dashboard-dark.png
+  - https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/webapp-light.png
+  - https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/webapp-mobile.png
+capabilities:
+  provides_tools:
+    - personal_tasks_list
+    - personal_tasks_add
+    - personal_tasks_update
+  provides_hooks: []
+  provides_middleware: []
+  requires_env: []

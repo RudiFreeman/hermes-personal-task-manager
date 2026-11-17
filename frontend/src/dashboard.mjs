@@ -6,6 +6,11 @@ export {translations, savedLanguage, translate};
 if (typeof window !== "undefined" && window.__HERMES_PLUGIN_SDK__ && window.__HERMES_PLUGINS__) {
   const SDK = window.__HERMES_PLUGIN_SDK__, React = SDK.React;
   const kit = {...SDK.components};
+  if (kit.Button) {
+    const HostButton = kit.Button;
+    kit.Button = ({className, ...props}) => React.createElement(HostButton, {...props,
+      className: ["ptm-compact-button", className].filter(Boolean).join(" ")});
+  }
   if (SDK.components?.ConfirmDialog) {
     // Dashboard uses an AlertDialog with onCancel; Desktop/WebApp uses onClose.
     kit.ConfirmDialog = ({onClose, ...props}) => React.createElement(SDK.components.ConfirmDialog, {...props, onCancel: onClose});

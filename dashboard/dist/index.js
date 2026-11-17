@@ -418,7 +418,11 @@ var PTMDashboard = (() => {
   // frontend/src/view.mjs
   function createTasksView(React, kit = {}) {
     const h = React.createElement;
-    const Button = kit.Button || "button", Input = kit.Input || "input", Textarea = kit.Textarea || "textarea";
+    const Input = kit.Input || "input", Textarea = kit.Textarea || "textarea";
+    const Button = ({ className, ...props }) => h(kit.Button || "button", {
+      ...props,
+      className: [!kit.Button && "ptm-button", className].filter(Boolean).join(" ") || void 0
+    });
     const act = (label, onClick, props = {}) => h(Button, { type: "button", onClick, ...props }, label);
     function Confirmation({ state, controller, t }) {
       const ref = React.useRef(null), previous = React.useRef(null);
@@ -748,6 +752,13 @@ var PTMDashboard = (() => {
     };
     const SDK = window.__HERMES_PLUGIN_SDK__, React = SDK.React;
     const kit = { ...SDK.components };
+    if (kit.Button) {
+      const HostButton = kit.Button;
+      kit.Button = ({ className, ...props }) => React.createElement(HostButton, {
+        ...props,
+        className: ["ptm-compact-button", className].filter(Boolean).join(" ")
+      });
+    }
     if (SDK.components?.ConfirmDialog) {
       kit.ConfirmDialog = ({ onClose, ...props }) => React.createElement(SDK.components.ConfirmDialog, { ...props, onCancel: onClose });
     }

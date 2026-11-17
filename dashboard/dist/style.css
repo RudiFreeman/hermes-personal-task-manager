@@ -4,7 +4,7 @@
 .ptm button,.ptm input,.ptm textarea,.ptm select {font:inherit; color:inherit; max-width:100%;}
 .ptm button {cursor:pointer;}
 .ptm button:disabled,.ptm input:disabled {cursor:default; opacity:.55;}
-.ptm button:not([data-slot]):not(.ptm-task-title) {background:transparent;border:1px solid var(--ptm-line);border-radius:6px;padding:5px 9px;min-height:32px;}
+.ptm .ptm-button,.ptm .ptm-compact-button {background:transparent;border:1px solid var(--ptm-line);border-radius:6px;padding:5px 9px;min-height:32px;}
 .ptm button:hover:not(:disabled),.ptm summary:hover {background:var(--ptm-soft);}
 .ptm :focus-visible {outline:2px solid var(--ptm-accent);outline-offset:2px;}
 .ptm-header,.ptm-header-actions,.ptm-toolbar,.ptm-add,.ptm-progress,.ptm-editor-header,.ptm-subtask-add {display:flex;align-items:center;gap:8px;min-width:0;}
@@ -43,7 +43,7 @@
 .ptm-important {color:var(--ptm-accent);font-size:12px;}
 .ptm .is-done .ptm-title-text {text-decoration:line-through;color:var(--ptm-muted);}
 .ptm-children {margin-left:24px;border-left:1px solid var(--ptm-line);padding-left:7px;}
-.ptm .ptm-add-child {border:0!important;color:var(--ptm-muted);font-size:12px;margin:4px 0 4px 32px;}
+.ptm .ptm-add-child {background:transparent;border:0!important;color:var(--ptm-muted);font-size:12px;margin:4px 0 4px 32px;}
 .ptm-menu {position:relative;flex:0 0 32px;}
 .ptm-menu summary {list-style:none;text-align:center;cursor:pointer;border-radius:4px;min-width:32px;min-height:36px;font-size:20px;}
 .ptm-menu summary::-webkit-details-marker {display:none;}

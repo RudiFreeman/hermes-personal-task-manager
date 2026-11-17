@@ -1,0 +1,18 @@
+Hermes Personal Task Manager
+Copyright (c) 2026 RudiFreeman
+
+SPDX-License-Identifier: MIT OR Apache-2.0
+
+Unless a file states otherwise, the original code and documentation in this
+repository are dual-licensed under either of the following, at your option:
+
+  * MIT License (LICENSE-MIT)
+  * Apache License, Version 2.0 (LICENSE-APACHE)
+
+You may choose either license; you do not need to accept both simultaneously.
+The full texts are included in this repository.
+
+Third-party code remains under its respective license. In particular, the
+React packages bundled in the optional standalone preview retain their MIT
+licenses and copyright notices; see THIRD_PARTY_NOTICES.md. This dual-license
+statement does not relicense those dependencies or grant trademark rights.

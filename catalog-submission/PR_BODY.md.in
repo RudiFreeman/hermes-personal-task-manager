@@ -1,0 +1,55 @@
+Add **Hermes Personal Task Manager @VERSION@** as a community plugin in the tools
+category. It records personal tasks, one level of subtasks, notes and confirmed
+results in one profile-scoped SQLite database shared by chat tools, Dashboard
+and Desktop/WebApp. It does not execute tasks.
+
+Pinned source: https://github.com/RudiFreeman/hermes-personal-task-manager/tree/@SHA@
+
+## Surfaces and behavior
+
+- Three native tools: personal_tasks_list, personal_tasks_add and personal_tasks_update.
+- Dashboard manifest/API and native host React components.
+- Desktop SDK route/sidebar, ctx.rest and lifecycle cleanup. No core overrides,
+  raw native bridge, remote executable imports or self-updater.
+- English-first UI and documentation, optional Russian translation.
+- Explicit parent completion atomically completes active children; reopening
+  preserves child completion. Trash is restorable; purge requires confirmation.
+- Hermes tool instructions require explicit user requests and completion evidence;
+  revisions prevent stale writes. The evidence text is not independently audited.
+
+## Disclosures (catalog rule 13)
+
+- Storage: task titles/descriptions, completion timestamps, notes, revisions and
+  events in the active profile's plugin data directory. No credentials stored.
+- Network: authenticated requests only to the current Hermes instance's plugin
+  API. No third-party runtime service, telemetry, fonts or CDN. README badges
+  request static images from shields.io when a Markdown client renders them.
+- Outside data: no normal runtime reads outside the plugin's source/data. The
+  optional, non-secret PTM_DATA_DIR development override chooses another storage
+  directory and must not be shared across profiles accidentally.
+- Execution: no shell commands, task executors, background workers, scheduled
+  jobs, token refresh, credential-store access or approval bypass. Visible UI
+  polls every three seconds; timers/listeners are removed on unload.
+- Optional development preview binds loopback and generates an in-memory token.
+  Optional browser checks read operator-supplied authentication-state files;
+  these test files are not loaded by the runtime or shipped with credentials.
+- Schema 1 migrates atomically to 2. Upgrade all writers together and back up the
+  stopped database plus WAL first; older plugin versions refuse schema 2.
+- Prebuilt readable JavaScript is committed with sources/build script/lockfile.
+  Host surfaces use host React; preview includes React under the notices in
+  THIRD_PARTY_NOTICES.md. No bundled native executable or Python bytecode.
+
+## Validation and owner acceptance
+
+@VALIDATION@
+
+@OWNER_ACCEPTANCE@
+
+@LICENSE_STATUS@
+
+## Screenshots (synthetic example tasks)
+
+![Dashboard light](https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/dashboard-light.png)
+![Dashboard dark](https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/dashboard-dark.png)
+![WebApp light](https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/webapp-light.png)
+![WebApp mobile](https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/webapp-mobile.png)

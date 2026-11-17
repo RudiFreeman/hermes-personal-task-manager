@@ -1,8 +1,14 @@
 name: personal-task-manager
-version: 0.2.0
+version: 0.2.1
 description: Personal tasks and subtasks shared between the user and Hermes. No task execution.
+author: RudiFreeman
+license: MIT OR Apache-2.0
+homepage: https://github.com/RudiFreeman/hermes-personal-task-manager
+requires_hermes: ">=0.23.1"
 provides_tools:
   - personal_tasks_list
   - personal_tasks_add
   - personal_tasks_update
 provides_hooks: []
+provides_middleware: []
+requires_env: []

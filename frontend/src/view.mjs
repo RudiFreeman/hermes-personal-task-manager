@@ -3,7 +3,10 @@ import {translate} from "./i18n.mjs";
 
 export function createTasksView(React, kit = {}) {
   const h = React.createElement;
-  const Button = kit.Button || "button", Input = kit.Input || "input", Textarea = kit.Textarea || "textarea";
+  const Input = kit.Input || "input", Textarea = kit.Textarea || "textarea";
+  // Own the fallback styling explicitly; never inspect host component markup.
+  const Button = ({className, ...props}) => h(kit.Button || "button", {...props,
+    className: [!kit.Button && "ptm-button", className].filter(Boolean).join(" ") || undefined});
   const act = (label, onClick, props = {}) => h(Button, {type: "button", onClick, ...props}, label);
 
   function Confirmation({state, controller, t}) {

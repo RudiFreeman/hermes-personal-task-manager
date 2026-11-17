@@ -77,7 +77,18 @@ async function domTests(){
  await click('[data-task-id="a"] > .ptm-row .ptm-menu [role="menuitem"]:last-child');assert.ok(one('[role="alertdialog"]'));const before=s.writes.length;
  await click('[role="alertdialog"] button');assert.equal(s.writes.length,before);assert.ok(!document.querySelector('[role="alertdialog"]'));
  await click('[data-task-id="a"] > .ptm-row .ptm-menu [role="menuitem"]:last-child');await click('[role="alertdialog"] button:last-child');assert.equal(s.writes.at(-1).action,"trash");assert.equal(s.data.trash.length,2);
- await flush(()=>root.unmount());assert.equal(timers.size,0);dom.window.close();
+ assert.equal(document.querySelectorAll(".ptm-button").length,0,"Host buttons must not use the standalone fallback class");
+ assert.ok(document.querySelector(".ptm-add button.ptm-compact-button"),"Dashboard compact styling uses its own class");
+ await flush(()=>root.unmount());assert.equal(timers.size,0);
+ const {createTasksView}=await import("./frontend/src/view.mjs");
+ const {createController}=await import("./frontend/src/state.mjs");
+ const fallbackRoot=createRoot(document.getElementById("app"));
+ const fallback=createController({transport:server().transport});
+ await flush(()=>fallbackRoot.render(React.createElement(createTasksView(React),{controller:fallback})));
+ assert.ok(document.querySelector(".ptm-add button.ptm-button"),"Standalone fallback owns its button class");
+ assert.ok(!document.querySelector(".ptm-task-title.ptm-button"),"Task titles retain their dedicated row styling");
+ assert.doesNotMatch(fs.readFileSync("frontend/src/style.css","utf8"),/\[data-slot/);
+ await flush(()=>fallbackRoot.unmount());assert.equal(timers.size,0);dom.window.close();
  delete global.window;delete global.document;delete global.HTMLElement;delete global.Node;
  console.log("PASS: actual Dashboard bundle/React DOM, JSON headers, tree, focus, language, stale saves and confirmed Trash");
 }
