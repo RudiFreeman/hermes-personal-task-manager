@@ -1,0 +1,56 @@
+"""Dashboard mounts this router behind its existing authentication gate."""
+import importlib.util
+from pathlib import Path
+from fastapi import APIRouter, HTTPException, Request
+from pydantic import BaseModel, ConfigDict, Field
+
+# Dashboard imports API files independently of native plugin packages.
+# Load our own standalone storage module by path, without modifying sys.path.
+spec = importlib.util.spec_from_file_location("ptm_dashboard_store", Path(__file__).resolve().parents[1] / "store.py")
+storage = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(storage)
+router = APIRouter()
+
+
+class Child(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    title: str = Field(min_length=1, max_length=300)
+    description: str = Field(default="", max_length=20000)
+
+
+class NewTask(Child):
+    parent_id: str | None = None
+    subtasks: list[Child] = Field(default_factory=list, max_length=100)
+
+
+class UpdateTask(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    revision: int = Field(ge=1)
+    title: str = Field(default="", max_length=300)
+    description: str = Field(default="", max_length=20000)
+    done: bool = False
+    starred: bool = False
+    comment: str = Field(default="", max_length=10000)
+
+
+def execute(action, request):
+    try:
+        return action(storage.Store())
+    except storage.TaskError as exc:
+        raise HTTPException(status_code=409, detail=exc.localized(request.headers.get("Accept-Language", "en"))) from exc
+
+
+@router.get("/tasks")
+def tasks(request: Request):
+    return execute(lambda store: store.snapshot(), request)
+
+
+@router.post("/tasks")
+def add(body: NewTask, request: Request):
+    return execute(lambda store: store.add(**body.model_dump()), request)
+
+
+@router.patch("/tasks/{task_id}")
+def update(task_id: str, body: UpdateTask, request: Request):
+    changes = body.model_dump(exclude_unset=True, exclude={"revision"})
+    return execute(lambda store: store.update(task_id, changes, expected_revision=body.revision), request)
