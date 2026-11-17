@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 import os
 from pathlib import Path
 import sqlite3
+import time
 import uuid
 
 
@@ -48,11 +49,14 @@ class Store:
         self.path = Path(path) if path is not None else default_path()
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self.connection() as db:
+            # Serialize first use before checking the version. DDL and version
+            # changes share this transaction and roll back together on failure.
+            db.execute("BEGIN IMMEDIATE")
             version = db.execute("PRAGMA user_version").fetchone()[0]
             if version > 1:
                 raise TaskError("The database was created by a newer plugin version", "База создана более новой версией плагина")
             if version == 0:
-                db.executescript("""
+                schema = """
                     CREATE TABLE tasks (
                         id TEXT PRIMARY KEY,
                         parent_id TEXT REFERENCES tasks(id),
@@ -81,15 +85,27 @@ class Store:
                         created_at TEXT NOT NULL
                     );
                     PRAGMA user_version=1;
-                """)
+                """
+                for statement in schema.split(";"):
+                    if statement.strip():
+                        db.execute(statement.strip())
 
     @contextmanager
     def connection(self):
         db = sqlite3.connect(self.path, timeout=10)
-        db.row_factory = sqlite3.Row
-        db.execute("PRAGMA foreign_keys=ON")
-        db.execute("PRAGMA journal_mode=WAL")
         try:
+            db.row_factory = sqlite3.Row
+            db.execute("PRAGMA foreign_keys=ON")
+            # Initial WAL conversion can return SQLITE_BUSY without waiting for
+            # the connection timeout. Retry only transient locking failures.
+            for attempt in range(6):
+                try:
+                    db.execute("PRAGMA journal_mode=WAL")
+                    break
+                except sqlite3.OperationalError as exc:
+                    if getattr(exc, "sqlite_errorcode", None) not in (sqlite3.SQLITE_BUSY, sqlite3.SQLITE_LOCKED) or attempt == 5:
+                        raise
+                    time.sleep(0.02 * (2 ** attempt))
             with db:
                 yield db
         finally:

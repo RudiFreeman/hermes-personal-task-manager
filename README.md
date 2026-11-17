@@ -1,6 +1,6 @@
 # Hermes Personal Task Manager
 
-![Version 0.1.0](https://img.shields.io/badge/version-0.1.0-4c9b59)
+![Version 0.1.1](https://img.shields.io/badge/version-0.1.1-4c9b59)
 ![Python 3.10 or newer](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![Vanilla JavaScript](https://img.shields.io/badge/JavaScript-vanilla-F7DF1E?logo=javascript&logoColor=black)
 ![React via Hermes SDK](https://img.shields.io/badge/React-Hermes_SDK-61DAFB?logo=react&logoColor=black)
@@ -53,7 +53,7 @@ deliberately focuses on a simple personal checklist.
 
 ## Current version
 
-Version 0.1.0 is a local prototype with one personal task list and one level of
+Version 0.1.1 is a local prototype with one personal task list and one level of
 subtasks. Tasks can be completed, reopened, starred, searched, and grouped into
 active and completed sections. Completing a task records its completion time.
 Comments and change events record their author and timestamp.
@@ -77,12 +77,17 @@ the installed Hermes version has not been verified. The source repository is
 | Storage | SQLite 3 through Python's `sqlite3` module | Persistent tasks, comments, and change events |
 | Testing | pytest and Node.js assertions | Storage/API behavior and translation checks |
 
-The current version is **0.1.0** (local prototype), declared in `plugin.yaml` and
+The current version is **0.1.1** (local prototype), declared in `plugin.yaml` and
 `dashboard/manifest.json`. The preview uses only the Python standard library;
 FastAPI, Pydantic, and the host React SDK are used when running inside Hermes.
 No npm installation or frontend build step is required. Node.js is optional and
 used only for the translation checks. Specific FastAPI and React versions depend
 on the target Hermes installation and have not yet been verified there.
+
+Version 0.1.1 fixes editor draft preservation and revision tracking, live detail
+refreshes, out-of-order responses, and concurrent SQLite schema initialization.
+It adds permanent regression tests for all five fixes; the database schema stays
+at version 1.
 
 ## Local preview on Windows
 
@@ -155,6 +160,7 @@ dashboard/
 preview.py                 Local preview without extra dependencies
 test_tasks.py              Behavior tests
 test_i18n.cjs              Translation and language preference tests
+test_ui.cjs                Editor drafts, polling, and request ordering tests
 pytest.ini                 Local test configuration
 .local/                    Local data; excluded from Git
 ```
@@ -229,6 +235,13 @@ If Node.js is available, run the translation checks with `node test_i18n.cjs`.
 These check language coverage, interpolation, English defaults, saved preferences,
 and operation when browser storage is unavailable. They do not replace visual
 browser testing.
+
+Run `node test_ui.cjs` for permanent UI regressions using the actual application
+code, a minimal DOM, and controlled transport promises. These cover draft revision
+conflicts, independent form preservation, polling updates, and out-of-order GETs.
+They do not replace a browser smoke check. If the default temporary test directory
+cannot be cleared, use a fresh disposable path, for example
+`python -m pytest -q --basetemp=.local/fix-tests-20261117`.
 
 ## Next steps
 

@@ -4,6 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 import re
+import sqlite3
 import sys
 import threading
 from urllib.error import HTTPError
@@ -189,3 +190,108 @@ def test_validation_errors_default_to_english_and_support_russian(store):
     assert invalid.value.localized("de") == str(invalid.value)
     result = json.loads(tools.personal_tasks_update({"task_id": "unknown"}))
     assert result["error"] == "Read the list first and supply the task revision"
+
+
+def test_concurrent_first_use_initializes_once(tmp_path, monkeypatch):
+    path = tmp_path / "first-use.db"
+    gate = threading.Barrier(8)
+    original_connect = sqlite3.connect
+
+    def connect(*args, **kwargs):
+        # All connections exist before any constructor can configure WAL or
+        # inspect the version. The database has never been initialized.
+        db = original_connect(*args, **kwargs)
+        gate.wait(timeout=10)
+        return db
+
+    def create(i):
+        return Store(path).add(f"First task {i}")
+
+    # add() opens another connection, so both rounds use the same barrier.
+    with monkeypatch.context() as patch:
+        patch.setattr(storage.sqlite3, "connect", connect)
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            results = list(pool.map(create, range(8)))
+    assert len({task["id"] for task in results}) == 8
+    assert len(Store(path).snapshot()["tasks"]) == 8
+    with original_connect(path) as db:
+        assert db.execute("PRAGMA user_version").fetchone()[0] == 1
+
+
+def test_schema_creation_rolls_back_on_failure(tmp_path, monkeypatch):
+    path = tmp_path / "rollback.db"
+    original_connect = sqlite3.connect
+
+    class FailingConnection(sqlite3.Connection):
+        def execute(self, sql, *args):
+            if sql.startswith("CREATE TABLE comments"):
+                raise sqlite3.OperationalError("injected schema failure")
+            return super().execute(sql, *args)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(storage.sqlite3, "connect", lambda *a, **kw: original_connect(*a, **kw, factory=FailingConnection))
+        with pytest.raises(sqlite3.OperationalError, match="injected schema failure"):
+            Store(path)
+    with original_connect(path) as db:
+        assert db.execute("PRAGMA user_version").fetchone()[0] == 0
+        assert db.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall() == []
+    assert Store(path).add("Retry succeeded")["revision"] == 1
+
+
+def test_schema_version_is_read_under_write_lock(tmp_path, monkeypatch):
+    path = tmp_path / "serialized.db"
+    original_connect = sqlite3.connect
+    with original_connect(path) as db:
+        db.execute("PRAGMA journal_mode=WAL")
+    gate = threading.Barrier(4)
+    versions = []
+
+    class CoordinatedConnection(sqlite3.Connection):
+        def execute(self, sql, *args):
+            if sql == "BEGIN IMMEDIATE":
+                gate.wait(timeout=10)
+            if sql == "PRAGMA user_version":
+                assert self.in_transaction, "schema inspection must hold the initialization lock"
+                versions.append(super().execute(sql).fetchone()[0])
+            return super().execute(sql, *args)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(storage.sqlite3, "connect", lambda *a, **kw: original_connect(*a, **kw, factory=CoordinatedConnection))
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            list(pool.map(lambda _: Store(path), range(4)))
+    assert sorted(versions) == [0, 1, 1, 1]
+
+
+def test_schema_version_compatibility(tmp_path):
+    path = tmp_path / "versions.db"
+    task = Store(path).add("Keep existing data")
+    assert Store(path).snapshot()["tasks"][0]["id"] == task["id"]
+    with sqlite3.connect(path) as db:
+        db.execute("PRAGMA user_version=2")
+    with pytest.raises(TaskError, match="newer plugin version"):
+        Store(path)
+    with sqlite3.connect(path) as db:
+        assert db.execute("PRAGMA user_version").fetchone()[0] == 2
+
+
+def test_connection_closes_when_setup_fails(tmp_path, monkeypatch):
+    original_connect = sqlite3.connect
+    connections = []
+
+    class FailingConnection(sqlite3.Connection):
+        def execute(self, sql, *args):
+            if sql == "PRAGMA journal_mode=WAL":
+                raise sqlite3.OperationalError("unrelated setup failure")
+            return super().execute(sql, *args)
+
+    def connect(*args, **kwargs):
+        db = original_connect(*args, **kwargs, factory=FailingConnection)
+        connections.append(db)
+        return db
+
+    monkeypatch.setattr(storage.sqlite3, "connect", connect)
+    with pytest.raises(sqlite3.OperationalError, match="unrelated setup failure"):
+        Store(tmp_path / "setup.db")
+    assert len(connections) == 1
+    with pytest.raises(sqlite3.ProgrammingError, match="closed database"):
+        connections[0].execute("SELECT 1")

@@ -10,6 +10,8 @@
       search: "Search tasks", filters: "Task filters", all: "All tasks", starred: "Important",
       add: "Add", refresh: "Refresh", saveError: "Unable to save changes. Please try again.",
       requestError: "Unable to complete the request. Please try again.",
+      staleDraft: "This item has changed. Your draft is preserved; reload it before retrying.",
+      reloadDraft: "Discard draft and reload",
       reopenLabel: "Reopen: ", completeLabel: "Complete: ", progress: "{done} of {total} completed",
       noResults: "No tasks found", allDone: "All done", start: "Start with one task",
       searchHint: "Try another search or view all tasks.", doneHint: "Take a breath. Add your next plans when you're ready.",
@@ -33,6 +35,8 @@
       search: "Поиск задач", filters: "Фильтр задач", all: "Все задачи", starred: "Важные",
       add: "Добавить", refresh: "Обновить", saveError: "Не удалось сохранить изменения. Повторите попытку.",
       requestError: "Не удалось выполнить запрос. Повторите попытку.",
+      staleDraft: "Этот пункт изменён. Черновик сохранён; загрузите актуальную версию перед повторной попыткой.",
+      reloadDraft: "Удалить черновик и загрузить заново",
       reopenLabel: "Вернуть в активные: ", completeLabel: "Выполнено: ", progress: "{done} из {total} выполнено",
       noResults: "Ничего не найдено", allDone: "Всё сделано", start: "Начните с одной задачи",
       searchHint: "Попробуйте другой поиск или откройте все задачи.", doneHint: "Можно выдохнуть. Новые планы — когда будете готовы.",
@@ -83,6 +87,33 @@
     const request = (url, options = {}) => transport(url, {...options, headers: {...options.headers, "Accept-Language": language}});
     let data = {tasks: [], comments: [], events: [], progress: {total: 0, done: 0, percent: 0}};
     let selected = null, filter = "all", query = "", showDone = false, pending = false, disposed = false;
+    // Drafts belong to a form and retain the revision of their first edit.
+    const drafts = new Map(), expanded = new Map();
+    let refreshSequence = 0, mutationGeneration = 0;
+    function bindDraft(key, task, fields, initial) {
+      const draft = drafts.get(key);
+      for (const [name, field] of Object.entries(fields)) {
+        field.value = draft?.values[name] ?? initial[name];
+        field.addEventListener("input", () => {
+          const previous = drafts.get(key);
+          const values = {...previous?.values, [name]: field.value};
+          if (field.value === initial[name] && (!previous || previous.revision === task.revision)) delete values[name];
+          if (Object.keys(values).length) drafts.set(key, {revision: previous?.revision ?? task.revision, values});
+          else drafts.delete(key);
+        });
+      }
+      return async action => {
+        const submitted = drafts.get(key);
+        await action(submitted?.revision ?? task.revision, submitted?.values ?? initial);
+        // Typing during the request creates a different draft; do not erase it.
+        if (drafts.get(key) === submitted) drafts.delete(key);
+      };
+    }
+    function draftWarning(key, task) {
+      const draft = drafts.get(key);
+      return draft && draft.revision !== task.revision ? el("p", {className: "ptm-muted", role: "status"},
+        t("staleDraft"), " ", button(t("reloadDraft"), () => {drafts.delete(key); renderDetail();})) : null;
+    }
     root.classList.add("ptm");
     const message = el("div", {className: "ptm-message", role: "status", "aria-live": "polite"});
     const list = el("div", {className: "ptm-list"});
@@ -135,9 +166,6 @@
     }
     function changeLanguage(next) {
       if (!Object.hasOwn(translations, next)) return;
-      // Preserve unsaved task text and expanded subtask editors across a language change.
-      const fields = new Map(Array.from(detail.querySelectorAll("[data-draft-key]"), field => [field.dataset.draftKey, field.value]));
-      const expanded = new Map(Array.from(detail.querySelectorAll("details[data-subtask]"), node => [node.dataset.subtask, node.open]));
       language = next;
       try { localStorage.setItem(LANGUAGE_KEY, language); } catch (_) { /* Storage may be disabled. */ }
       applyLanguage();
@@ -151,8 +179,6 @@
       for (const tab of tabButtons) tab.textContent = t(tab.dataset.filter);
       message.textContent = "";
       renderList(); renderDetail();
-      detail.querySelectorAll("[data-draft-key]").forEach(field => {if (fields.has(field.dataset.draftKey)) field.value = fields.get(field.dataset.draftKey);});
-      detail.querySelectorAll("details[data-subtask]").forEach(node => {node.open = expanded.get(node.dataset.subtask) || false;});
     }
     applyLanguage();
 
@@ -160,16 +186,18 @@
       message.textContent = error instanceof TypeError ? t("requestError") : error.message || t("saveError");
       message.classList.add("ptm-error");
     }
-    async function refresh(renderDetailToo = true) {
+    async function refresh() {
+      const sequence = ++refreshSequence, generation = mutationGeneration;
       const next = await request(API);
-      if (disposed) return;
+      if (disposed || sequence !== refreshSequence || generation !== mutationGeneration) return;
       data = next;
       renderList();
-      if (renderDetailToo) renderDetail();
+      renderDetail();
     }
     async function mutate(action) {
       if (pending) return;
       pending = true;
+      ++mutationGeneration;
       root.setAttribute("aria-busy", "true");
       message.textContent = "";
       message.classList.remove("ptm-error");
@@ -235,9 +263,11 @@
       }
       const title = el("input", {value: task.title, "data-draft-key": "title", "aria-label": t("taskTitle"), maxlength: "300", required: ""});
       const description = el("textarea", {"data-draft-key": "description", placeholder: t("descriptionPlaceholder"), "aria-label": t("taskDescription"), rows: "4", maxlength: "20000"}, task.description);
+      const saveEdit = bindDraft(task.id + ":edit", task, {title, description}, {title: task.title, description: task.description});
       const edit = el("form", {className: "ptm-edit", onsubmit: event => {
-        event.preventDefault(); mutate(() => patch(task, {title: title.value, description: description.value}));
+        event.preventDefault(); mutate(() => saveEdit((revision, values) => patch({...task, revision}, values)));
       }}, el("label", {}, t("task"), title), el("label", {}, t("description"), description),
+        draftWarning(task.id + ":edit", task),
         el("button", {type: "submit", className: "ptm-button"}, t("save")));
       const children = data.tasks.filter(child => child.parent_id === task.id);
       const steps = el("section", {className: "ptm-steps"}, el("h3", {}, t("subtasks"),
@@ -245,18 +275,22 @@
       for (const child of children) {
         const childTitle = el("input", {value: child.title, "data-draft-key": child.id + ":title", "aria-label": t("subtaskTitle"), maxlength: "300", required: ""});
         const childDescription = el("textarea", {rows: "2", "data-draft-key": child.id + ":description", "aria-label": t("subtaskDescription"), placeholder: t("stepPlaceholder"), maxlength: "20000"}, child.description);
+        const saveChild = bindDraft(child.id + ":edit", child, {title: childTitle, description: childDescription}, {title: child.title, description: child.description});
         const childEditor = el("details", {className: "ptm-child-editor", "data-subtask": child.id},
           el("summary", {}, child.title),
-          el("form", {onsubmit: event => {event.preventDefault(); mutate(() => patch(child, {title: childTitle.value, description: childDescription.value}));}},
-            childTitle, childDescription, el("button", {type: "submit", className: "ptm-button"}, t("saveStep"))));
+          el("form", {onsubmit: event => {event.preventDefault(); mutate(() => saveChild((revision, values) => patch({...child, revision}, values)));}},
+            childTitle, childDescription, draftWarning(child.id + ":edit", child), el("button", {type: "submit", className: "ptm-button"}, t("saveStep"))));
+        childEditor.open = expanded.get(child.id) || false;
+        childEditor.addEventListener("toggle", () => expanded.set(child.id, childEditor.open));
         const notes = data.comments.filter(comment => comment.task_id === child.id);
         for (const note of notes) childEditor.append(el("p", {className: "ptm-small ptm-child-note"}, `${note.actor === "hermes" ? "Hermes" : t("you")}: ${note.body}`));
         steps.append(el("div", {className: "ptm-subtask" + (child.done ? " is-done" : "")}, checkbox(child), childEditor));
       }
       if (!task.done) {
         const childInput = el("input", {placeholder: t("addStep"), "data-draft-key": "new-subtask", "aria-label": t("newSubtask"), required: "", maxlength: "300"});
+        const saveNewChild = bindDraft(task.id + ":new-subtask", task, {title: childInput}, {title: ""});
         steps.append(el("form", {className: "ptm-subtask-add", onsubmit: event => {
-          event.preventDefault(); mutate(() => request(API, {method: "POST", body: JSON.stringify({title: childInput.value, parent_id: task.id})}));
+          event.preventDefault(); mutate(() => saveNewChild((_, values) => request(API, {method: "POST", body: JSON.stringify({...values, parent_id: task.id})})));
         }}, childInput, el("button", {type: "submit", className: "ptm-button", "aria-label": t("addSubtask")}, "+")));
       }
       const notes = el("section", {className: "ptm-notes"}, el("h3", {}, t("notes")));
@@ -265,8 +299,9 @@
       for (const note of taskNotes) notes.append(el("article", {className: "ptm-note"},
         el("div", {className: "ptm-muted ptm-small"}, `${note.actor === "hermes" ? "Hermes" : t("you")} · ${date(note.created_at)}`), el("p", {}, note.body)));
       const noteInput = el("textarea", {placeholder: t("notePlaceholder"), "data-draft-key": "new-comment", "aria-label": t("newComment"), rows: "2", required: "", maxlength: "10000"});
-      notes.append(el("form", {onsubmit: event => {event.preventDefault(); mutate(() => patch(task, {comment: noteInput.value}));}},
-        noteInput, el("button", {type: "submit", className: "ptm-button"}, t("addNote"))));
+      const saveNote = bindDraft(task.id + ":note", task, {comment: noteInput}, {comment: ""});
+      notes.append(el("form", {onsubmit: event => {event.preventDefault(); mutate(() => saveNote((revision, values) => patch({...task, revision}, values)));}},
+        noteInput, draftWarning(task.id + ":note", task), el("button", {type: "submit", className: "ptm-button"}, t("addNote"))));
       const last = data.events.filter(event => event.task_id === task.id).at(-1);
       detail.replaceChildren(el("div", {className: "ptm-detail-heading"}, el("span", {className: "ptm-eyebrow"}, t(task.done ? "completedHeading" : "detailsHeading")),
         button(t("close"), () => {selected = null; renderList(); renderDetail();}, "ptm-close")), edit, steps, notes,
@@ -276,7 +311,7 @@
     }
     refresh().catch(report);
     // Keep the shared list current while preserving text being edited in the detail panel.
-    const timer = setInterval(() => {if (!pending && !document.hidden) refresh(false).catch(report);}, 10000);
+    const timer = setInterval(() => {if (!pending && !document.hidden) refresh().catch(report);}, 10000);
     return () => {disposed = true; clearInterval(timer); root.replaceChildren();};
   }
 

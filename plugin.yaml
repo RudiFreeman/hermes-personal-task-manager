@@ -1,5 +1,5 @@
 name: personal-task-manager
-version: 0.1.0
+version: 0.1.1
 description: Personal tasks and subtasks shared between the user and Hermes. No task execution.
 provides_tools:
   - personal_tasks_list
