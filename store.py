@@ -53,7 +53,7 @@ class Store:
             # changes share this transaction and roll back together on failure.
             db.execute("BEGIN IMMEDIATE")
             version = db.execute("PRAGMA user_version").fetchone()[0]
-            if version > 1:
+            if version > 2:
                 raise TaskError("The database was created by a newer plugin version", "База создана более новой версией плагина")
             if version == 0:
                 schema = """
@@ -89,6 +89,11 @@ class Store:
                 for statement in schema.split(";"):
                     if statement.strip():
                         db.execute(statement.strip())
+            if version < 2:
+                db.execute("ALTER TABLE tasks ADD COLUMN trashed_at TEXT")
+                db.execute("ALTER TABLE tasks ADD COLUMN trash_batch TEXT")
+                db.execute("CREATE INDEX tasks_trash ON tasks(trashed_at)")
+                db.execute("PRAGMA user_version=2")
 
     @contextmanager
     def connection(self):
@@ -128,9 +133,11 @@ class Store:
         for task in tasks:
             task["done"] = bool(task["done"])
             task["starred"] = bool(task["starred"])
+        trash = [task for task in tasks if task["trashed_at"] is not None]
+        tasks = [task for task in tasks if task["trashed_at"] is None]
         roots = [task for task in tasks if task["parent_id"] is None]
         done = sum(task["done"] for task in roots)
-        return {"tasks": tasks, "comments": comments, "events": events,
+        return {"tasks": tasks, "trash": trash, "comments": comments, "events": events,
                 "progress": {"total": len(roots), "done": done,
                              "percent": round(100 * done / len(roots)) if roots else 0}}
 
@@ -155,6 +162,7 @@ class Store:
             db.execute("BEGIN IMMEDIATE")
             if parent_id is not None:
                 parent = self._get(db, parent_id)
+                self._active(parent)
                 if parent["parent_id"] is not None:
                     raise TaskError("Only one level of subtasks is supported", "Поддерживается один уровень подзадач")
                 if parent["done"]:
@@ -174,6 +182,10 @@ class Store:
             return self._get(db, task_id)
 
     def update(self, task_id, changes, actor="user", expected_revision=None):
+        if isinstance(changes, dict) and "action" in changes:
+            if set(changes) - {"action", "confirmed"}:
+                raise TaskError("Send a lifecycle action separately from edits", "Отправьте действие с корзиной отдельно от редактирования")
+            return self.lifecycle(task_id, changes["action"], actor, expected_revision, changes.get("confirmed", False))
         if not isinstance(changes, dict) or not changes or set(changes) - {
             "title", "description", "done", "starred", "comment"
         }:
@@ -195,13 +207,16 @@ class Store:
         with self.connection() as db:
             db.execute("BEGIN IMMEDIATE")
             task = self._get(db, task_id)
+            self._active(task)
             if expected_revision is not None and expected_revision != task["revision"]:
                 raise TaskError("This task has changed. Refresh the list and try again", "Задача уже изменена. Обновите список и повторите действие")
             if fields.get("done") is True and not task["done"]:
-                pending = db.execute("SELECT count(*) FROM tasks WHERE parent_id=? AND done=0",
-                                     (task_id,)).fetchone()[0]
-                if pending:
-                    raise TaskError("Complete the subtasks first", "Сначала отметьте выполненные подзадачи")
+                children = db.execute("SELECT id FROM tasks WHERE parent_id=? AND done=0 AND trashed_at IS NULL", (task_id,)).fetchall()
+                for child in children:
+                    db.execute("UPDATE tasks SET done=1,completed_at=?,updated_at=?,revision=revision+1 WHERE id=?", (stamp, stamp, child["id"]))
+                    db.execute("INSERT INTO events(task_id,action,actor,created_at) VALUES (?,?,?,?)", (child["id"], "completed", actor, stamp))
+                    if comment:
+                        db.execute("INSERT INTO comments(task_id,body,actor,created_at) VALUES (?,?,?,?)", (child["id"], comment, actor, stamp))
             if fields.get("done") is False and task["done"] and task["parent_id"]:
                 parent = self._get(db, task["parent_id"])
                 if parent["done"]:
@@ -221,3 +236,52 @@ class Store:
                 db.execute("INSERT INTO events(task_id,action,actor,created_at) VALUES (?,?,?,?)",
                            (task_id, action, actor, stamp))
             return self._get(db, task_id)
+
+    @staticmethod
+    def _active(task):
+        if task["trashed_at"] is not None:
+            raise TaskError("Restore this item from Trash first", "Сначала восстановите пункт из корзины")
+
+    def lifecycle(self, task_id, action, actor="user", expected_revision=None, confirmed=False):
+        if action not in ("trash", "restore", "purge") or type(confirmed) is not bool:
+            raise TaskError("Unknown lifecycle action", "Неизвестное действие с корзиной")
+        stamp = now()
+        with self.connection() as db:
+            db.execute("BEGIN IMMEDIATE")
+            task = self._get(db, task_id)
+            if expected_revision is not None and expected_revision != task["revision"]:
+                raise TaskError("This task has changed. Refresh the list and try again", "Задача уже изменена. Обновите список и повторите действие")
+            if action == "trash":
+                if task["trashed_at"] is not None:
+                    return task
+                batch = uuid.uuid4().hex
+                items = db.execute("SELECT id FROM tasks WHERE (id=? OR parent_id=?) AND trashed_at IS NULL", (task_id, task_id)).fetchall()
+                for item in items:
+                    db.execute("UPDATE tasks SET trashed_at=?,trash_batch=?,updated_at=?,revision=revision+1 WHERE id=?", (stamp, batch, stamp, item["id"]))
+            else:
+                if task["trashed_at"] is None:
+                    raise TaskError("This item is not in Trash", "Этот пункт не в корзине")
+                if action == "restore":
+                    if task["parent_id"]:
+                        parent = self._get(db, task["parent_id"])
+                        if parent["trashed_at"] is not None:
+                            raise TaskError("Restore the parent task first", "Сначала восстановите родительскую задачу")
+                        if parent["done"] and not task["done"]:
+                            raise TaskError("Reopen the parent task first", "Сначала верните родительскую задачу в активные")
+                    items = db.execute("SELECT id FROM tasks WHERE (id=? OR parent_id=?) AND trash_batch=?", (task_id, task_id, task["trash_batch"])).fetchall()
+                    for item in items:
+                        db.execute("UPDATE tasks SET trashed_at=NULL,trash_batch=NULL,updated_at=?,revision=revision+1 WHERE id=?", (stamp, item["id"]))
+                else:
+                    if not confirmed:
+                        raise TaskError("Confirm permanent deletion explicitly", "Явно подтвердите окончательное удаление")
+                    items = db.execute("SELECT id FROM tasks WHERE id=? OR parent_id=? ORDER BY parent_id IS NULL", (task_id, task_id)).fetchall()
+                    for item in items:
+                        db.execute("DELETE FROM comments WHERE task_id=?", (item["id"],))
+                        db.execute("DELETE FROM events WHERE task_id=?", (item["id"],))
+                        db.execute("DELETE FROM tasks WHERE id=?", (item["id"],))
+            if action != "purge":
+                for item in items:
+                    db.execute("INSERT INTO events(task_id,action,actor,created_at) VALUES (?,?,?,?)", (item["id"], "trashed" if action == "trash" else "restored", actor, stamp))
+            if task["parent_id"]:
+                db.execute("UPDATE tasks SET revision=revision+1,updated_at=? WHERE id=?", (stamp, task["parent_id"]))
+            return {"id": task_id, "purged": True} if action == "purge" else self._get(db, task_id)

@@ -2,7 +2,7 @@
   "name": "personal-task-manager",
   "label": "My Tasks",
   "description": "A simple personal task list with subtasks. English and Russian interface.",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "icon": "FileText",
   "tab": {"path": "/personal-tasks", "position": "end"},
   "entry": "dist/index.js",

@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
 import secrets
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, parse_qs
 if __package__:
     from .store import Store, TaskError
 else:
@@ -41,10 +41,10 @@ def make_server(port=8765, db_path=None):
                 html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>My Tasks</title>
 <link rel="stylesheet" href="/style.css"><style>body{{margin:0;background:#efeff5;padding:36px 16px}}@media(max-width:600px){{body{{padding:8px}}}}@media(prefers-color-scheme:dark){{body{{background:#17171d}}}}</style>
-</head><body><div id="app"></div><script nonce="{token}">window.__PTM_LOCAL_PREVIEW__={json.dumps(token)};</script><script src="/index.js"></script></body></html>"""
+</head><body><div id="app"></div><script nonce="{token}">window.__PTM_LOCAL_PREVIEW__={json.dumps(token)};</script><script src="/preview.js"></script></body></html>"""
                 self.reply(200, html.encode("utf-8"), "text/html; charset=utf-8")
                 return
-            if self.command == "GET" and path in {"/index.js", "/style.css"}:
+            if self.command == "GET" and path in {"/index.js", "/preview.js", "/style.css"}:
                 asset = ROOT / "dashboard" / "dist" / path[1:]
                 self.reply(200, asset.read_bytes(), "text/javascript; charset=utf-8" if path.endswith(".js") else "text/css; charset=utf-8")
                 return
@@ -83,7 +83,7 @@ def make_server(port=8765, db_path=None):
                     return
                 self.reply(200, result)
             except TaskError as exc:
-                self.reply(409, {"detail": exc.localized(self.headers.get("Accept-Language", "en"))})
+                self.reply(409, {"detail": exc.localized(self.language())})
             except (ValueError, TypeError):
                 self.reply(409, {"detail": self.error("Invalid request data", "Некорректные данные запроса")})
             except Exception:
@@ -91,7 +91,10 @@ def make_server(port=8765, db_path=None):
                 self.reply(500, {"detail": self.error("Unable to save data", "Не удалось сохранить данные")})
 
         def error(self, english, russian):
-            return TaskError(english, russian).localized(self.headers.get("Accept-Language", "en"))
+            return TaskError(english, russian).localized(self.language())
+
+        def language(self):
+            return parse_qs(urlsplit(self.path).query).get("language", [self.headers.get("Accept-Language", "en")])[0]
 
         do_GET = handle_request
         do_POST = handle_request

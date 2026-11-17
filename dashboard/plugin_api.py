@@ -3,6 +3,7 @@ import importlib.util
 from pathlib import Path
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
+from typing import Literal
 
 # Dashboard imports API files independently of native plugin packages.
 # Load our own standalone storage module by path, without modifying sys.path.
@@ -31,13 +32,15 @@ class UpdateTask(BaseModel):
     done: bool = False
     starred: bool = False
     comment: str = Field(default="", max_length=10000)
+    action: Literal["trash", "restore", "purge"] | None = None
+    confirmed: bool = False
 
 
 def execute(action, request):
     try:
         return action(storage.Store())
     except storage.TaskError as exc:
-        raise HTTPException(status_code=409, detail=exc.localized(request.headers.get("Accept-Language", "en"))) from exc
+        raise HTTPException(status_code=409, detail=exc.localized(request.query_params.get("language") or request.headers.get("Accept-Language", "en"))) from exc
 
 
 @router.get("/tasks")

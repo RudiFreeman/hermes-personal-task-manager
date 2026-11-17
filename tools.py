@@ -21,7 +21,7 @@ def schema(name, description, properties, required):
 
 STRING = {"type": "string"}
 SCHEMAS = {
-    "personal_tasks_list": schema("personal_tasks_list", "Read all tasks, subtasks, comments and progress. Read before reconciling completed work.", {}, []),
+    "personal_tasks_list": schema("personal_tasks_list", "Read active and completed tasks, subtasks, Trash, comments and progress. Read before reconciling completed work. Trashed items are separate from tasks.", {}, []),
     "personal_tasks_add": schema("personal_tasks_add", "Record a task with optional described subtasks. Read the list first to avoid duplicates.", {
         "title": {"type": "string", "maxLength": 300},
         "description": STRING,
@@ -29,12 +29,14 @@ SCHEMAS = {
         "subtasks": {"type": "array", "maxItems": 100, "items": {"type": "object", "properties": {
             "title": STRING, "description": STRING}, "required": ["title"], "additionalProperties": False}},
     }, ["title"]),
-    "personal_tasks_update": schema("personal_tasks_update", "Edit a task or add a result comment. To complete, pass done=true and a comment describing the evidence. Complete subtasks first; completing all subtasks does NOT complete the parent. Use the revision from the latest list.", {
+    "personal_tasks_update": schema("personal_tasks_update", "Only on the user's request: edit, complete, reopen, or manage Trash. To complete, pass done=true and a result comment. Completing a parent also completes its active children with the same evidence. Completing children never automatically completes their parent. Use the latest revision. Send action separately from edits: trash moves an item/group to Trash; restore recovers it; purge permanently deletes a trashed item/group and requires confirmed=true after explicit user confirmation. Never purge just because the user asked to move something to Trash.", {
         "task_id": STRING,
         "revision": {"type": "integer", "minimum": 1},
         "title": STRING, "description": STRING,
         "done": {"type": "boolean"}, "starred": {"type": "boolean"},
         "comment": {"type": "string", "description": "What was done and what confirms it; do not invent results."},
+        "action": {"type": "string", "enum": ["trash", "restore", "purge"]},
+        "confirmed": {"type": "boolean", "description": "True only after the user explicitly confirms permanent deletion."},
     }, ["task_id", "revision"]),
 }
 

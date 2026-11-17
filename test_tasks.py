@@ -44,14 +44,14 @@ def test_task_and_subtasks_survive_reopening(store):
     assert snapshot["progress"] == {"done": 0, "total": 1, "percent": 0}
 
 
-def test_completion_requires_children_and_does_not_complete_parent(store):
+def test_parent_completion_cascades_and_children_do_not_complete_parent(store):
     parent = store.add("Почта", subtasks=[{"title": "Доступ"}])
     child = next(t for t in store.snapshot()["tasks"] if t["parent_id"])
-    with pytest.raises(TaskError, match="subtasks first"):
-        store.update(parent["id"], {"done": True})
     store.update(child["id"], {"done": True})
     assert store.snapshot()["progress"]["done"] == 0
+    store.update(child["id"], {"done": False})
     store.update(parent["id"], {"done": True})
+    assert all(t["done"] for t in store.snapshot()["tasks"])
     assert Store(store.path).snapshot()["progress"]["percent"] == 100
     with pytest.raises(TaskError, match="parent task"):
         store.update(child["id"], {"done": False})
@@ -215,7 +215,7 @@ def test_concurrent_first_use_initializes_once(tmp_path, monkeypatch):
     assert len({task["id"] for task in results}) == 8
     assert len(Store(path).snapshot()["tasks"]) == 8
     with original_connect(path) as db:
-        assert db.execute("PRAGMA user_version").fetchone()[0] == 1
+        assert db.execute("PRAGMA user_version").fetchone()[0] == 2
 
 
 def test_schema_creation_rolls_back_on_failure(tmp_path, monkeypatch):
@@ -259,7 +259,7 @@ def test_schema_version_is_read_under_write_lock(tmp_path, monkeypatch):
         patch.setattr(storage.sqlite3, "connect", lambda *a, **kw: original_connect(*a, **kw, factory=CoordinatedConnection))
         with ThreadPoolExecutor(max_workers=4) as pool:
             list(pool.map(lambda _: Store(path), range(4)))
-    assert sorted(versions) == [0, 1, 1, 1]
+    assert sorted(versions) == [0, 2, 2, 2]
 
 
 def test_schema_version_compatibility(tmp_path):
@@ -267,11 +267,11 @@ def test_schema_version_compatibility(tmp_path):
     task = Store(path).add("Keep existing data")
     assert Store(path).snapshot()["tasks"][0]["id"] == task["id"]
     with sqlite3.connect(path) as db:
-        db.execute("PRAGMA user_version=2")
+        db.execute("PRAGMA user_version=3")
     with pytest.raises(TaskError, match="newer plugin version"):
         Store(path)
     with sqlite3.connect(path) as db:
-        assert db.execute("PRAGMA user_version").fetchone()[0] == 2
+        assert db.execute("PRAGMA user_version").fetchone()[0] == 3
 
 
 def test_connection_closes_when_setup_fails(tmp_path, monkeypatch):
@@ -295,3 +295,128 @@ def test_connection_closes_when_setup_fails(tmp_path, monkeypatch):
     assert len(connections) == 1
     with pytest.raises(sqlite3.ProgrammingError, match="closed database"):
         connections[0].execute("SELECT 1")
+
+
+def test_cascade_evidence_and_revisions_are_atomic(store):
+    parent = store.add("Parent", subtasks=[{"title": "Child"}, {"title": "Already done"}])
+    children = [t for t in store.snapshot()["tasks"] if t["parent_id"]]
+    done = store.update(children[1]["id"], {"done": True})
+    with pytest.raises(TaskError, match="supporting evidence"):
+        store.update(parent["id"], {"done": True}, actor="hermes", expected_revision=1)
+    assert not next(t for t in store.snapshot()["tasks"] if t["id"] == parent["id"])["done"]
+    store.update(parent["id"], {"done": True, "comment": "User requested and confirmed this result"}, actor="hermes", expected_revision=1)
+    snapshot = store.snapshot()
+    assert all(t["done"] for t in snapshot["tasks"])
+    assert next(t for t in snapshot["tasks"] if t["id"] == children[0]["id"])["revision"] == 2
+    assert next(t for t in snapshot["tasks"] if t["id"] == done["id"])["completed_at"] == done["completed_at"]
+    assert len(snapshot["comments"]) == 2
+    with pytest.raises(TaskError, match="has changed"):
+        store.update(children[0]["id"], {"description": "old draft"}, expected_revision=1)
+
+
+def test_trash_restores_group_without_resurrecting_earlier_deleted_child(store):
+    parent = store.add("Parent", subtasks=[{"title": "Child"}, {"title": "Previously trashed"}])
+    children = [t for t in store.snapshot()["tasks"] if t["parent_id"]]
+    store.update(children[0]["id"], {"comment": "Keep note"})
+    store.update(children[1]["id"], {"action": "trash"}, expected_revision=1)
+    current = next(t for t in store.snapshot()["tasks"] if t["id"] == parent["id"])
+    trashed = store.update(parent["id"], {"action": "trash"}, expected_revision=current["revision"])
+    assert store.snapshot()["tasks"] == []
+    assert len(store.snapshot()["trash"]) == 3
+    with pytest.raises(TaskError, match="Restore this item"):
+        store.update(parent["id"], {"description": "Not editable"})
+    with pytest.raises(TaskError, match="Restore this item"):
+        store.add("Not allowed", parent_id=parent["id"])
+    with pytest.raises(TaskError, match="Restore the parent"):
+        child = next(t for t in store.snapshot()["trash"] if t["id"] == children[0]["id"])
+        store.update(child["id"], {"action": "restore"}, expected_revision=child["revision"])
+    store.update(parent["id"], {"action": "restore"}, expected_revision=trashed["revision"])
+    snapshot = Store(store.path).snapshot()
+    assert len(snapshot["tasks"]) == 2
+    assert [t["id"] for t in snapshot["trash"]] == [children[1]["id"]]
+    assert snapshot["comments"][0]["body"] == "Keep note"
+
+
+def test_permanent_deletion_requires_trash_confirmation_and_revision(store):
+    parent = store.add("Parent", subtasks=[{"title": "Child"}])
+    child = next(t for t in store.snapshot()["tasks"] if t["parent_id"])
+    store.update(child["id"], {"comment": "Child note"})
+    with pytest.raises(TaskError, match="not in Trash"):
+        store.update(parent["id"], {"action": "purge", "confirmed": True})
+    trashed = store.update(parent["id"], {"action": "trash"}, expected_revision=1)
+    with pytest.raises(TaskError, match="has changed"):
+        store.update(parent["id"], {"action": "purge", "confirmed": True}, expected_revision=1)
+    with pytest.raises(TaskError, match="Confirm permanent"):
+        store.update(parent["id"], {"action": "purge"}, expected_revision=trashed["revision"])
+    store.update(parent["id"], {"action": "purge", "confirmed": True}, expected_revision=trashed["revision"])
+    snapshot = store.snapshot()
+    assert snapshot["tasks"] == snapshot["trash"] == snapshot["comments"] == snapshot["events"] == []
+
+
+def test_version_one_migration_preserves_data_and_rolls_back(tmp_path, monkeypatch):
+    path = tmp_path / "legacy.db"
+    # Reconstruct the genuine v1 DDL from a v2 database without trash columns.
+    original = Store(tmp_path / "template.db")
+    with sqlite3.connect(original.path) as source, sqlite3.connect(path) as db:
+        for name in ("tasks", "comments", "events"):
+            ddl = source.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone()[0]
+            if name == "tasks":
+                ddl = ddl.replace(', trashed_at TEXT', '').replace(', trash_batch TEXT', '')
+            db.execute(ddl)
+        db.execute("INSERT INTO tasks(id,title,created_at,updated_at,revision,done,completed_at) VALUES ('old','Legacy task','stamp','stamp',7,1,'finished')")
+        db.execute("INSERT INTO comments(task_id,body,actor,created_at) VALUES ('old','Keep legacy note','user','stamp')")
+        db.execute("PRAGMA user_version=1")
+    original_connect = sqlite3.connect
+
+    class FailedMigration(sqlite3.Connection):
+        def execute(self, sql, *args):
+            if "ADD COLUMN trash_batch" in sql:
+                raise sqlite3.OperationalError("injected migration failure")
+            return super().execute(sql, *args)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(storage.sqlite3, "connect", lambda *a, **kw: original_connect(*a, **kw, factory=FailedMigration))
+        with pytest.raises(sqlite3.OperationalError, match="injected migration"):
+            Store(path)
+    with sqlite3.connect(path) as db:
+        assert db.execute("PRAGMA user_version").fetchone()[0] == 1
+        assert 'trashed_at' not in [row[1] for row in db.execute("PRAGMA table_info(tasks)")]
+    snapshot = Store(path).snapshot()
+    assert snapshot["tasks"][0]["revision"] == 7
+    assert snapshot["tasks"][0]["completed_at"] == "finished"
+    assert snapshot["comments"][0]["body"] == "Keep legacy note"
+    assert snapshot["trash"] == []
+
+
+def test_stale_parent_completion_cannot_partially_complete_children(store):
+    parent = store.add("Parent", subtasks=[{"title": "Child"}])
+    store.update(parent["id"], {"description": "Remote edit"}, expected_revision=1)
+    before = store.snapshot()
+    with pytest.raises(TaskError, match="has changed"):
+        store.update(parent["id"], {"done": True}, expected_revision=1)
+    assert store.snapshot() == before
+
+
+def test_archive_trash_and_restore_keep_completion_timestamps(store):
+    parent = store.add("Parent", subtasks=[{"title": "Child"}])
+    completed = store.update(parent["id"], {"done": True}, expected_revision=1)
+    stamps = {t["id"]: t["completed_at"] for t in store.snapshot()["tasks"]}
+    trashed = store.update(parent["id"], {"action": "trash"}, expected_revision=completed["revision"])
+    restored = store.update(parent["id"], {"action": "restore"}, expected_revision=trashed["revision"])
+    assert {t["id"]: t["completed_at"] for t in store.snapshot()["tasks"]} == stamps
+    store.update(parent["id"], {"done": False}, expected_revision=restored["revision"])
+    snapshot = store.snapshot()
+    assert next(t for t in snapshot["tasks"] if t["parent_id"])["done"]
+    assert snapshot["progress"]["done"] == 0
+
+
+def test_hermes_contract_manages_trash_only_with_explicit_action(store):
+    parent = store.add("Tool lifecycle")
+    result = json.loads(tools.personal_tasks_update({"task_id": parent["id"], "revision": 1, "action": "trash"}))
+    assert result["ok"]
+    assert json.loads(tools.personal_tasks_list({}))["result"]["trash"][0]["id"] == parent["id"]
+    result = json.loads(tools.personal_tasks_update({"task_id": parent["id"], "revision": 2, "action": "purge"}))
+    assert not result["ok"]
+    result = json.loads(tools.personal_tasks_update({"task_id": parent["id"], "revision": 2, "action": "restore"}))
+    assert result["ok"]
+    assert store.snapshot()["trash"] == []

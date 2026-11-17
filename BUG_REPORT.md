@@ -4,6 +4,30 @@ Review date: 2026-11-17. Project: `C:\python\Personal_Task_Manager`.
 
 ## Implementation status — 2026-11-17
 
+### Version 0.2.0 follow-up
+
+All five fixes remain covered after the shared Dashboard/WebApp UI refactor.
+The permanent tests now use deferred controller requests and the actual React
+DOM instead of the earlier minimal DOM fixture. Native browser checks passed
+against both running Hermes interfaces, including Russian stale saves,
+preserved focus/drafts, cross-interface synchronization, Archive, Trash and
+restoration. Both host themes passed at five viewport widths.
+
+Final checks: **23 local Python tests passed, one optional API module skipped**;
+**25 Python tests passed in Hermes**, including the real API; translation,
+Dashboard/controller and WebApp SDK Node suites all passed. Plugin Doctor and
+explicit model tool calls also passed. See [0.2.0 validation](V020_VALIDATION.md)
+for scope, environment and remaining limits. Historical results below describe
+the corresponding earlier release, not current verification gaps.
+
+The user explicitly changed the completion contract for this version: checking
+a parent completes its active children atomically and archives the group.
+Reopening preserves child checkmarks; finishing the last child still does not
+complete its parent. Revision protection, evidence requirements, translations
+and original Hermes tool names remain intact. Transactional schema migration
+now ends at version **2**, so the historical BUG-05 version-1 acceptance below
+is evaluated with that updated version expectation.
+
 All five reported bugs are fixed. The original findings below are retained as
 historical reproduction evidence; their **Actual** sections describe the reviewed
 code before these fixes.

@@ -1,8 +1,8 @@
 # Hermes Personal Task Manager
 
-![Version 0.1.2](https://img.shields.io/badge/version-0.1.2-4c9b59)
+![Version 0.2.0](https://img.shields.io/badge/version-0.2.0-4c9b59)
 ![Python 3.10 or newer](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
-![Vanilla JavaScript](https://img.shields.io/badge/JavaScript-vanilla-F7DF1E?logo=javascript&logoColor=black)
+![Shared JavaScript UI](https://img.shields.io/badge/JavaScript-shared_UI-F7DF1E?logo=javascript&logoColor=black)
 ![React via Hermes SDK](https://img.shields.io/badge/React-Hermes_SDK-61DAFB?logo=react&logoColor=black)
 ![FastAPI Dashboard API](https://img.shields.io/badge/FastAPI-Dashboard_API-009688?logo=fastapi&logoColor=white)
 ![SQLite 3](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)
@@ -32,17 +32,18 @@ starts an agent, schedules a job, or executes the task itself.
 
 **Available in the local prototype:**
 
-- Tasks and subtasks with descriptions and completion checkboxes.
+- Compact, collapsible task/subtask rows with descriptions and round checkboxes.
 - Progress tracking for the whole list and individual task steps.
-- Important tasks, text search, and a collapsible completed section.
+- Important tasks, text search, an Archive, and a restorable Trash.
 - Notes and result comments attributed to you or Hermes.
 - Persistent local SQLite storage.
 - An English interface by default, with an optional Russian translation.
+- Dashboard and WebApp adapters sharing the same view, controller, API and database.
 
 **Integration status:** Tools, the Dashboard API, and the browser UI have been
 checked against Hermes v0.23.1 in a disposable VPS profile. This includes real
 model tool calls and browser checks using the installed Hermes ASGI app and SDK.
-See [VPS validation](VPS_VALIDATION.md) for scope and remaining limitations.
+See [0.2.0 validation](V020_VALIDATION.md) for scope and remaining limitations.
 
 **Possible future extensions:** Project organization, richer step-by-step
 checklists, Kanban views, task dependencies, and export/backup with restoration.
@@ -53,9 +54,11 @@ deliberately focuses on a simple personal checklist.
 
 ## Current version
 
-Version 0.1.2 is a local prototype with one personal task list and one level of
+Version 0.2.0 is a local prototype with one personal task list and one level of
 subtasks. Tasks can be completed, reopened, starred, searched, and grouped into
-active and completed sections. Completing a task records its completion time.
+active and archived sections. Completing a parent atomically completes its active
+subtasks. Completion records its timestamp; reopening the parent preserves child
+completion. Trash preserves content and completion state until explicitly purged.
 Comments and change events record their author and timestamp.
 
 Overall progress counts completed top-level tasks. Each task also shows how many
@@ -71,17 +74,18 @@ been enabled in the working profile. The source repository is
 | Component | Technology | Role |
 |---|---|---|
 | Backend and tools | Python 3.10+ | Task storage, validation, Hermes tools, and local preview |
-| Web interface | Vanilla JavaScript and CSS | Task list, subtasks, language selection, and responsive layout |
-| Dashboard integration | React from the Hermes Plugin SDK | Mounts the interface inside a Dashboard tab; React is provided by the host |
+| Web interface | Shared JavaScript, React view and CSS | Compact tree, editors, Archive, Trash, language and responsive layout |
+| Host integration | Dashboard SDK and Desktop Plugin SDK | Native host controls, React and theme tokens; WebApp uses the Desktop SDK |
 | Dashboard API | FastAPI and Pydantic 2 | HTTP routes and request validation inside Hermes |
 | Storage | SQLite 3 through Python's `sqlite3` module | Persistent tasks, comments, and change events |
 | Testing | pytest and Node.js assertions | Storage/API behavior and translation checks |
 
-The current version is **0.1.2** (local prototype), declared in `plugin.yaml` and
+The current version is **0.2.0** (local prototype), declared in `plugin.yaml` and
 `dashboard/manifest.json`. The preview uses only the Python standard library;
 FastAPI, Pydantic, and the host React SDK are used when running inside Hermes.
-No npm installation or frontend build step is required. Node.js is optional and
-used for translation and UI regression checks. Host dependencies vary; the tested
+Installation uses committed bundles: no npm installation or build step is needed
+on the Hermes host. Frontend development and DOM tests use npm (see below).
+Host dependencies vary; the tested
 installation used FastAPI 0.133.1 and Pydantic 2.14.1.
 
 Version 0.1.1 fixes editor draft preservation and revision tracking, live detail
@@ -92,6 +96,15 @@ at version 1.
 Version 0.1.2 explicitly sends JSON content headers when using the Hermes SDK,
 fixing HTTP 422 responses to UI writes. Integration checks passed on Hermes
 v0.23.1 with FastAPI 0.133.1 and Pydantic 2.14.1 in a disposable profile.
+
+Version 0.2.0 adds the WebApp adapter, host-native themes and controls, an inline
+task tree, cascading parent completion, and Trash with restoration and confirmed
+permanent deletion. All three original tool names remain unchanged.
+
+The first 0.2.0 storage operation migrates schema 1 to schema 2 in one transaction.
+Existing IDs, content, revisions, comments, events and completion timestamps are
+preserved. Update all processes sharing that database together: an older plugin
+intentionally refuses schema 2. Downgrading the schema is not supported.
 
 ## Local preview on Windows
 
@@ -122,7 +135,7 @@ Once the plugin is installed and enabled, Hermes receives three tools:
 |---|---|
 | `personal_tasks_list` | Read tasks, subtasks, comments, and progress |
 | `personal_tasks_add` | Record a task with described subtasks, or add a single subtask |
-| `personal_tasks_update` | Edit a task, change its completion or starred state, or add a comment |
+| `personal_tasks_update` | Edit, complete/reopen, star, comment, or explicitly trash/restore/purge an item |
 
 Example requests:
 
@@ -141,13 +154,28 @@ A chat request authorizes recording the requested tasks or results; an additiona
 confirmation in the web interface is not required. The plugin does not monitor
 all conversations in the background. Task content is treated as data, not commands.
 
-Complete subtasks first, then explicitly complete the parent task. Finishing the
-last subtask does not automatically complete its parent. To reopen a subtask of a
-completed task, reopen the parent first. Checking an item never executes it.
+An explicit completion of a parent also completes its active subtasks in the
+same transaction. Hermes supplies the result comment as evidence for the whole
+group. Finishing the last child alone does not complete its parent. Reopening a
+parent returns it from the Archive while preserving child checkmarks. To reopen
+a child of a completed parent, reopen the parent first. Checking never executes it.
 
-The list refreshes every 10 seconds while preserving text in the open editing
-form. If an edit conflicts with a newer revision, use the refresh button and
-retry the change.
+The user may authorize changes either through the UI or through an explicit chat
+request such as “add”, “mark complete”, or “review the confirmed results”. There
+are no background task executors, autonomous completion hooks, or “in progress”
+transitions. Hermes must not infer completion from a plan or promise.
+
+“Move to Trash” confirms before hiding an item/group. Restore keeps its notes and
+prior completion state; restoring a parent does not resurrect a child that was
+already trashed independently. Purge requires a second, explicit permanent-delete
+confirmation. Tools use `action: "trash" | "restore" | "purge"`; send these
+separately from edits, with the latest `revision`. Purge also requires
+`confirmed: true` after the user's explicit confirmation. Trash is a separate
+`trash` array in the snapshot; `tasks` continues to contain non-trashed items.
+
+Both interfaces refresh every three seconds while visible, after writes, and on
+focus. Dirty forms retain their original revision, values and focus. On a stale
+edit, review/copy the draft, then explicitly discard/reload before retrying.
 
 ## Project structure
 
@@ -161,10 +189,17 @@ dashboard/
   plugin_api.py            FastAPI router
   dist/index.js            Ready-to-load JS; no npm or bundler required
   dist/style.css           Responsive styles
+  dist/preview.js          Standalone preview with its own React runtime
+desktop/plugin.js          WebApp/Desktop single-file ESM adapter
+frontend/src/              Shared state, view, translations and SDK adapters
+scripts/build_frontend.mjs Rebuilds all committed bundles from those sources
 preview.py                 Local preview without extra dependencies
 test_tasks.py              Behavior tests
 test_i18n.cjs              Translation and language preference tests
 test_ui.cjs                Editor drafts, polling, and request ordering tests
+test_webapp.cjs            Desktop SDK body/profile/unload contract tests
+test_api.py                Real FastAPI routes with temporary databases
+test_browser.py            Authenticated cross-surface browser workflow/layouts
 pytest.ini                 Local test configuration
 .local/                    Local data; excluded from Git
 ```
@@ -196,6 +231,20 @@ The target Hermes version must provide `ctx.register_tool`,
 FastAPI routes, and `plugins.plugin_storage.plugin_data_dir`. The API adapter
 requires Pydantic 2. Compatibility was checked with v0.23.1; a minimum Hermes
 version has not been established.
+
+For WebApp, the same package also supplies `desktop/plugin.js`. Hermes copies
+that half into the host's app-level `desktop-plugins` directory. Turn on its
+Desktop switch in WebApp → Capabilities → Plugins. The page appears as **My Tasks**.
+This is one package with two SDK entry points, not two applications or databases.
+Dashboard uses `SDK.fetchJSON` with explicit JSON headers; WebApp uses the
+profile-aware `ctx.rest` with object bodies. Only host-provided React/UI components
+are used in these adapters. The standalone development preview bundles React.
+
+Select the same profile in both surfaces to see the same list. Different profiles
+retain separate storage and editor state. No task content is stored in the
+app-level Desktop plugin copy. Keep both the agent backend and the Desktop half
+enabled; a UI-only install cannot provide the storage API. Reload Desktop plugins
+after updating the WebApp bundle, and use a new chat session for updated tools.
 
 Deployment requires separate approval. The project directory is placed at
 `<active HERMES_HOME>/plugins/personal-task-manager/`, and the plugin is enabled
@@ -241,12 +290,35 @@ These check language coverage, interpolation, English defaults, saved preference
 and operation when browser storage is unavailable. They do not replace visual
 browser testing.
 
-Run `node test_ui.cjs` for permanent UI regressions using the actual application
-code, a minimal DOM, and controlled transport promises. These cover draft revision
-conflicts, independent form preservation, polling updates, and out-of-order GETs.
+For frontend development and DOM regressions:
+
+Use Node.js 26+, or another version supported by the locked jsdom dependency
+(`^22.22.2 || ^24.15.0 || >=26.0.0`). No Node installation is needed to run the
+prebuilt plugin in Hermes or the Python preview.
+
+```powershell
+npm ci
+npm run build
+npm test
+```
+
+Edit `frontend/src/*`, then rebuild; `dashboard/dist/*` and `desktop/plugin.js`
+are generated deliverables. Development dependencies are lockfile-pinned and
+are not installed into Hermes. `npm test` checks translations, the actual
+Dashboard bundle with React DOM, the shared controller with deferred promises,
+and the WebApp SDK contract, including profile changes and unload cleanup.
 They do not replace a browser smoke check. If the default temporary test directory
 cannot be cleared, use a fresh disposable path, for example
 `python -m pytest -q --basetemp=.local/fix-tests-20261117`.
+
+`test_api.py` runs when FastAPI and httpx are available; otherwise pytest reports
+that module as skipped. Run it in the Hermes runtime to exercise the adapter.
+`test_browser.py --help` describes an optional real-host check (Playwright needed).
+Provide authenticated state files outside Git and URLs explicitly selecting a
+disposable profile. It creates a UUID-named group, verifies edits, synchronization,
+conflicts, Archive/Trash/restore and purge, checks both native host themes at five
+widths, and purges only that newly-created group. `--layout-only` performs no task
+writes. Never commit browser state files: they contain authentication credentials.
 
 ## Next steps
 
