@@ -6,6 +6,7 @@ assert.deepEqual(Object.keys(translations.en).sort(), Object.keys(translations.r
 for (const key of Object.keys(translations.en)) {
   const placeholders = text => (text.match(/\{\w+\}/g) || []).sort();
   assert.deepEqual(placeholders(translations.en[key]), placeholders(translations.ru[key]), key);
+  assert.doesNotMatch(translations.ru[key], /\?{2,}|\uFFFD/, key);
   assert.ok(translations.en[key].trim() && translations.ru[key].trim(), key);
 }
 global.localStorage = {getItem: () => null};
