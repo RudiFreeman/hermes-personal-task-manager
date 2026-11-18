@@ -34,7 +34,7 @@ def make_server(port=8765, db_path=None):
         def handle_request(self):
             authority = f"127.0.0.1:{self.server.server_port}"
             if self.headers.get("Host") != authority:
-                self.reply(403, {"detail": self.error("Use the 127.0.0.1 address", "Используйте адрес 127.0.0.1")})
+                self.reply(403, {"detail": self.error("Use the 127.0.0.1 address")})
                 return
             path = urlsplit(self.path).path
             if self.command == "GET" and path == "/":
@@ -49,49 +49,49 @@ def make_server(port=8765, db_path=None):
                 self.reply(200, asset.read_bytes(), "text/javascript; charset=utf-8" if path.endswith(".js") else "text/css; charset=utf-8")
                 return
             if self.headers.get("X-PTM-Token") != token:
-                self.reply(401, {"detail": self.error("Local API access denied", "Нет доступа к локальному API")})
+                self.reply(401, {"detail": self.error("Local API access denied")})
                 return
             if self.headers.get("Origin") not in {None, f"http://{authority}"}:
-                self.reply(403, {"detail": self.error("Request origin is not allowed", "Недопустимый источник запроса")})
+                self.reply(403, {"detail": self.error("Request origin is not allowed")})
                 return
             try:
                 if self.command == "GET" and path == API:
                     result = store.snapshot()
                 elif self.command in {"POST", "PATCH"}:
                     if self.headers.get("Content-Type", "").split(";")[0] != "application/json":
-                        raise TaskError("Expected application/json", "Ожидается application/json")
+                        raise TaskError("Expected application/json")
                     length = int(self.headers.get("Content-Length", "0"))
                     if not 0 < length <= 3_000_000:
-                        raise TaskError("Invalid request size", "Недопустимый размер запроса")
+                        raise TaskError("Invalid request size")
                     body = json.loads(self.rfile.read(length))
                     if not isinstance(body, dict):
-                        raise TaskError("Expected a JSON object", "Ожидается объект JSON")
+                        raise TaskError("Expected a JSON object")
                     if self.command == "POST" and path == API:
                         if set(body) - {"title", "description", "parent_id", "subtasks"}:
-                            raise TaskError("Unknown field", "Неизвестное поле")
+                            raise TaskError("Unknown field")
                         result = store.add(**body)
                     elif self.command == "PATCH" and path.startswith(API + "/"):
                         revision = body.pop("revision", None)
                         if type(revision) is not int or revision < 1:
-                            raise TaskError("A task revision is required", "Передайте revision задачи")
+                            raise TaskError("A task revision is required")
                         result = store.update(path[len(API) + 1:], body, expected_revision=revision)
                     else:
-                        self.reply(404, {"detail": self.error("Not found", "Не найдено")})
+                        self.reply(404, {"detail": self.error("Not found")})
                         return
                 else:
-                    self.reply(404, {"detail": self.error("Not found", "Не найдено")})
+                    self.reply(404, {"detail": self.error("Not found")})
                     return
                 self.reply(200, result)
             except TaskError as exc:
                 self.reply(409, {"detail": exc.localized(self.language())})
             except (ValueError, TypeError):
-                self.reply(409, {"detail": self.error("Invalid request data", "Некорректные данные запроса")})
+                self.reply(409, {"detail": self.error("Invalid request data")})
             except Exception:
                 self.log_error("Storage operation failed")
-                self.reply(500, {"detail": self.error("Unable to save data", "Не удалось сохранить данные")})
+                self.reply(500, {"detail": self.error("Unable to save data")})
 
-        def error(self, english, russian):
-            return TaskError(english, russian).localized(self.language())
+        def error(self, english):
+            return TaskError(english).localized(self.language())
 
         def language(self):
             return parse_qs(urlsplit(self.path).query).get("language", [self.headers.get("Accept-Language", "en")])[0]

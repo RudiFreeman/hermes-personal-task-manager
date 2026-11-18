@@ -198,7 +198,7 @@ def test_preview_api_auth_create_complete_and_restart(tmp_path):
         with pytest.raises(HTTPError) as cross_origin:
             request(API, origin="https://untrusted.example")
         assert cross_origin.value.code == 403
-        for language, expected in [(None, "title: must contain"), ("ru-RU,ru;q=0.9", "Название: от"), ("fr", "title: must contain")]:
+        for language, expected in [(None, "title: must contain"), ("ru-RU,ru;q=0.9", "Название: от"), ("fr", "titre : doit contenir"), ("xx", "title: must contain")]:
             with pytest.raises(HTTPError) as invalid:
                 request(API, "POST", {"title": " "}, language=language)
             assert expected in json.load(invalid.value)["detail"]
@@ -220,7 +220,8 @@ def test_validation_errors_default_to_english_and_support_russian(store):
     assert str(invalid.value).startswith("title: must contain")
     assert invalid.value.localized("ru").startswith("Название: от")
     assert invalid.value.localized("en-US") == str(invalid.value)
-    assert invalid.value.localized("de") == str(invalid.value)
+    assert invalid.value.localized("de").startswith("Titel: muss")
+    assert invalid.value.localized("xx") == str(invalid.value)
     result = json.loads(tools.personal_tasks_update({"task_id": "unknown"}))
     assert result["error"] == "Read the list first and supply the task revision"
 

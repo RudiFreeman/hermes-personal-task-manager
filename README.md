@@ -4,19 +4,24 @@ A personal checklist shared by **Hermes chat, Dashboard and Desktop/WebApp**.
 Capture tasks with one level of subtasks, keep notes and confirmed results,
 and return to the same list from either interface.
 
-Version **0.2.4**. Requires **Hermes >=0.23.1**. English is the default UI
-language; Russian is optional. This is a community project, not a NousResearch
-maintained or verified plugin. Catalog submission is being prepared; it is not
-currently available by catalog name.
+Version **1.0.0**. Requires **Hermes >=0.23.1**. The UI supports English, Russian, Spanish, Brazilian Portuguese, German, French
+and Polish. Automatic language selection follows Hermes, then the browser/system,
+with English as the fallback. This is a community project, not a NousResearch
+maintained or verified plugin. The catalog submission is tracked in
+[existing PR #157264](https://github.com/NousResearch/hermes-agent/pull/157264).
+Until it is accepted, install from the Git repository with an exact commit ref.
 
 ![Dashboard with example tasks](docs/screenshots/dashboard-light.png)
 
 ## What it does
 
 - Compact task rows with expandable subtasks, round checkboxes and step progress.
+- Resizable task list/details split view; closing details restores the full list.
+- Independent scrolling, preserved drafts and full-width details on narrow screens.
 - Shared persistent storage, search, important tasks, descriptions and notes.
 - Archive for completed groups; Trash with restoration and confirmed deletion.
 - Native host controls and light/dark theme colors; responsive desktop/mobile UI.
+- Seven UI languages, live Hermes language inheritance and a saved app override.
 - Revision checks, protected drafts and conflict warnings across both interfaces.
 
 **You decide what changes.** Creating or checking a task only records a plan or
@@ -62,6 +67,23 @@ Dashboard adapter uses Hermes's FastAPI and Pydantic 2 environment.
 Do not expose the plugin API outside Hermes's authentication gate. Removing the
 plugin's code does not constitute a task-data backup.
 
+## Language settings
+
+Open the gear menu in My Tasks and select **Language**. **Automatic** follows the
+active Hermes UI language through the public `useI18n().locale` SDK hook. On hosts
+without that hook, it uses `navigator.languages`, then English. Unsupported Hermes
+languages fall back to English. Regional tags are matched to a supported language;
+Portuguese variants use the Brazilian Portuguese catalog.
+
+Choosing a language here overrides Hermes for this app and is saved locally for
+future sessions. Choose Automatic to resume following Hermes. Switching is live
+and preserves task drafts, focus and original revisions. Blocked browser storage
+still permits switching for the current page, but cannot preserve the choice.
+Task text, identifiers and product names are never translated.
+
+See [localization architecture and verification](docs/I18N.md) for the source
+contracts, shared catalogs, fallback rules and browser verification command.
+
 ## Ask Hermes to help
 
 The package registers exactly three tools:
@@ -103,9 +125,17 @@ Trash preserves completion state, descriptions and comments. Restoring a group
 does not restore a child previously trashed independently. Permanent deletion
 removes the selected group and its comments/history after confirmation.
 
-![Dashboard dark](docs/screenshots/dashboard-dark.png)
-![WebApp light](docs/screenshots/webapp-light.png)
-![WebApp mobile](docs/screenshots/webapp-mobile.png)
+![Dashboard dark: resizable list and task details](docs/screenshots/dashboard-dark.png)
+![WebApp light: the same task and notes](docs/screenshots/webapp-light.png)
+![WebApp dark](docs/screenshots/webapp-dark.png)
+
+| Dashboard mobile list | WebApp mobile details |
+| --- | --- |
+| ![Dashboard mobile](docs/screenshots/dashboard-mobile.png) | ![WebApp mobile](docs/screenshots/webapp-mobile.png) |
+
+| Dashboard in Russian | WebApp in Russian |
+| --- | --- |
+| ![Dashboard Russian](docs/screenshots/dashboard-ru.png) | ![WebApp Russian](docs/screenshots/webapp-ru.png) |
 
 Screenshots use synthetic example data with API responses intercepted for
 capture. They show the native Hermes host and actual plugin bundle, not user tasks.
@@ -141,7 +171,8 @@ older releases work. The plugin requires host `ctx.register_tool`,
 `plugins.plugin_storage.plugin_data_dir`, Dashboard SDK/manifest/API support,
 and Desktop SDK routes, profile state, REST and lifecycle hooks.
 
-See [release validation](docs/reports/V020_VALIDATION.md), the [initial catalog audit](docs/reports/CATALOG_COMPLIANCE.md)
+See [1.0.0 release validation](docs/reports/V100_VALIDATION.md),
+[earlier 0.2.0 validation](docs/reports/V020_VALIDATION.md), the [initial catalog audit](docs/reports/CATALOG_COMPLIANCE.md)
 and [catalog preparation results](docs/reports/CATALOG_PREPARATION.md) for tested versions,
 commands and limits. Physical iOS/Safari, Firefox and messaging-channel workflows
 are outside the browser checks so far. Human catalog review and the owner's

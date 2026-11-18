@@ -2,211 +2,929 @@
 import React from "react";
 import * as SDK from "@hermes/plugin-sdk";
 
-// frontend/src/i18n.mjs
-var translations = {
-  "en": {
-    "locale": "en-US",
-    "language": "Language",
-    "workspace": "PERSONAL SPACE",
-    "heading": "My Tasks",
-    "subtitle": "Write it down. Break it into steps. Check it off.",
-    "details": "Task details",
-    "overallProgress": "Overall progress",
-    "newTask": "New task",
-    "taskPlaceholder": "What needs to be done?",
-    "search": "Search tasks",
-    "filters": "Task filters",
-    "all": "All tasks",
-    "starred": "Important",
-    "add": "Add",
-    "refresh": "Refresh",
-    "saveError": "Unable to save changes. Please try again.",
-    "requestError": "Unable to complete the request. Please try again.",
-    "staleDraft": "This item has changed. Your draft is preserved; reload it before retrying.",
-    "reloadDraft": "Discard draft and reload",
-    "reopenLabel": "Reopen: ",
-    "completeLabel": "Complete: ",
-    "progress": "{done} of {total} completed",
-    "noResults": "No tasks found",
-    "allDone": "All done",
-    "start": "Start with one task",
-    "searchHint": "Try another search or view all tasks.",
-    "doneHint": "Take a breath. Add your next plans when you're ready.",
-    "startHint": "Add a task above, then break it into small steps.",
-    "completed": "Completed",
-    "stepsProgress": "{done} of {total} steps",
-    "unstar": "Remove from important",
-    "star": "Mark as important",
-    "detailHint": "Every task has a next step",
-    "selectHint": "Select a task to add a description, subtasks, and notes.",
-    "taskTitle": "Task title",
-    "descriptionPlaceholder": "Description, links, or expected result\u2026",
-    "taskDescription": "Task description",
-    "task": "Task",
-    "description": "Description",
-    "save": "Save",
-    "subtasks": "Subtasks",
-    "subtaskTitle": "Subtask title",
-    "subtaskDescription": "Subtask description",
-    "stepPlaceholder": "Describe this step\u2026",
-    "saveStep": "Save step",
-    "you": "You",
-    "addStep": "Add a step\u2026",
-    "newSubtask": "New subtask",
-    "addSubtask": "Add subtask",
-    "notes": "Notes and results",
-    "notesHint": "Keep track of what you have done and where you left off.",
-    "notePlaceholder": "What did you accomplish?",
-    "newComment": "New comment",
-    "addNote": "Add note",
-    "completedHeading": "COMPLETED",
-    "detailsHeading": "DETAILS",
-    "close": "Close",
-    "reopen": "Reopen task",
-    "complete": "Mark as completed",
-    "lastChanged": "Last updated: {actor} \xB7 {date}",
-    "active": "Active",
-    "archive": "Archive",
-    "trash": "Trash",
-    "edit": "Edit",
-    "menu": "Actions",
-    "moveTrash": "Move to Trash",
-    "restore": "Restore",
-    "purge": "Delete permanently",
-    "emptyTrash": "Empty Trash",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "trashQuestion": 'Move "{title}" and its subtasks to Trash? You can restore them later.',
-    "purgeQuestion": 'Permanently delete "{title}" and its subtasks, notes and history? This cannot be undone.',
-    "emptyTrashQuestion": "Permanently delete all {count} groups currently in Trash? This cannot be undone.",
-    "emptyTrashHint": "Deleted items appear here. Restore them or delete them permanently.",
-    "archiveHint": "Completed task groups appear here.",
-    "cascadeHint": "Completing this task also completes its active subtasks.",
-    "restoreParent": "Restore the parent task first",
-    "reopenParent": "Reopen the parent task first",
-    "staleNotice": "This form has changed elsewhere. Your draft keeps its original revision.",
-    "saved": "Saved",
-    "syncing": "Saving?",
-    "noTasks": "No active tasks",
-    "taskNotes": "Notes",
-    "parentTask": "Parent task",
-    "completedAt": "Completed: {date}",
-    "back": "Back",
-    "trashCount": "Trash ({count})"
-  },
-  "ru": {
-    "locale": "ru-RU",
-    "language": "\u042F\u0437\u044B\u043A",
-    "workspace": "\u041B\u0418\u0427\u041D\u041E\u0415 \u041F\u0420\u041E\u0421\u0422\u0420\u0410\u041D\u0421\u0422\u0412\u041E",
-    "heading": "\u041C\u043E\u0438 \u0437\u0430\u0434\u0430\u0447\u0438",
-    "subtitle": "\u0417\u0430\u043F\u0438\u0448\u0438\u0442\u0435. \u0420\u0430\u0437\u0431\u0435\u0439\u0442\u0435 \u043D\u0430 \u0448\u0430\u0433\u0438. \u041E\u0442\u043C\u0435\u0442\u044C\u0442\u0435 \u0441\u0434\u0435\u043B\u0430\u043D\u043D\u043E\u0435.",
-    "details": "\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u043E\u0441\u0442\u0438 \u0437\u0430\u0434\u0430\u0447\u0438",
-    "overallProgress": "\u041E\u0431\u0449\u0438\u0439 \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441",
-    "newTask": "\u041D\u043E\u0432\u0430\u044F \u0437\u0430\u0434\u0430\u0447\u0430",
-    "taskPlaceholder": "\u0427\u0442\u043E \u043D\u0443\u0436\u043D\u043E \u0441\u0434\u0435\u043B\u0430\u0442\u044C?",
-    "search": "\u041F\u043E\u0438\u0441\u043A \u0437\u0430\u0434\u0430\u0447",
-    "filters": "\u0424\u0438\u043B\u044C\u0442\u0440 \u0437\u0430\u0434\u0430\u0447",
-    "all": "\u0412\u0441\u0435 \u0437\u0430\u0434\u0430\u0447\u0438",
-    "starred": "\u0412\u0430\u0436\u043D\u044B\u0435",
-    "add": "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C",
-    "refresh": "\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C",
-    "saveError": "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u044F. \u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u0435 \u043F\u043E\u043F\u044B\u0442\u043A\u0443.",
-    "requestError": "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0432\u044B\u043F\u043E\u043B\u043D\u0438\u0442\u044C \u0437\u0430\u043F\u0440\u043E\u0441. \u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u0435 \u043F\u043E\u043F\u044B\u0442\u043A\u0443.",
-    "staleDraft": "\u042D\u0442\u043E\u0442 \u043F\u0443\u043D\u043A\u0442 \u0438\u0437\u043C\u0435\u043D\u0451\u043D. \u0427\u0435\u0440\u043D\u043E\u0432\u0438\u043A \u0441\u043E\u0445\u0440\u0430\u043D\u0451\u043D; \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0430\u043A\u0442\u0443\u0430\u043B\u044C\u043D\u0443\u044E \u0432\u0435\u0440\u0441\u0438\u044E \u043F\u0435\u0440\u0435\u0434 \u043F\u043E\u0432\u0442\u043E\u0440\u043D\u043E\u0439 \u043F\u043E\u043F\u044B\u0442\u043A\u043E\u0439.",
-    "reloadDraft": "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0447\u0435\u0440\u043D\u043E\u0432\u0438\u043A \u0438 \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044C \u0437\u0430\u043D\u043E\u0432\u043E",
-    "reopenLabel": "\u0412\u0435\u0440\u043D\u0443\u0442\u044C \u0432 \u0430\u043A\u0442\u0438\u0432\u043D\u044B\u0435: ",
-    "completeLabel": "\u0412\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u043E: ",
-    "progress": "{done} \u0438\u0437 {total} \u0432\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u043E",
-    "noResults": "\u041D\u0438\u0447\u0435\u0433\u043E \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u043E",
-    "allDone": "\u0412\u0441\u0451 \u0441\u0434\u0435\u043B\u0430\u043D\u043E",
-    "start": "\u041D\u0430\u0447\u043D\u0438\u0442\u0435 \u0441 \u043E\u0434\u043D\u043E\u0439 \u0437\u0430\u0434\u0430\u0447\u0438",
-    "searchHint": "\u041F\u043E\u043F\u0440\u043E\u0431\u0443\u0439\u0442\u0435 \u0434\u0440\u0443\u0433\u043E\u0439 \u043F\u043E\u0438\u0441\u043A \u0438\u043B\u0438 \u043E\u0442\u043A\u0440\u043E\u0439\u0442\u0435 \u0432\u0441\u0435 \u0437\u0430\u0434\u0430\u0447\u0438.",
-    "doneHint": "\u041C\u043E\u0436\u043D\u043E \u0432\u044B\u0434\u043E\u0445\u043D\u0443\u0442\u044C. \u041D\u043E\u0432\u044B\u0435 \u043F\u043B\u0430\u043D\u044B \u2014 \u043A\u043E\u0433\u0434\u0430 \u0431\u0443\u0434\u0435\u0442\u0435 \u0433\u043E\u0442\u043E\u0432\u044B.",
-    "startHint": "\u0414\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u0437\u0430\u0434\u0430\u0447\u0443 \u0432\u044B\u0448\u0435, \u0430 \u0437\u0430\u0442\u0435\u043C \u0440\u0430\u0437\u0431\u0435\u0439\u0442\u0435 \u0435\u0451 \u043D\u0430 \u043D\u0435\u0431\u043E\u043B\u044C\u0448\u0438\u0435 \u0448\u0430\u0433\u0438.",
-    "completed": "\u0412\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u043D\u044B\u0435",
-    "stepsProgress": "{done} \u0438\u0437 {total} \u0448\u0430\u0433\u043E\u0432",
-    "unstar": "\u0423\u0431\u0440\u0430\u0442\u044C \u0438\u0437 \u0432\u0430\u0436\u043D\u044B\u0445",
-    "star": "\u041E\u0442\u043C\u0435\u0442\u0438\u0442\u044C \u0432\u0430\u0436\u043D\u043E\u0439",
-    "detailHint": "\u0423 \u043A\u0430\u0436\u0434\u043E\u0439 \u0437\u0430\u0434\u0430\u0447\u0438 \u2014 \u0441\u0432\u043E\u0439 \u0441\u043B\u0435\u0434\u0443\u044E\u0449\u0438\u0439 \u0448\u0430\u0433",
-    "selectHint": "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0437\u0430\u0434\u0430\u0447\u0443, \u0447\u0442\u043E\u0431\u044B \u0434\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435, \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438 \u0438 \u0437\u0430\u043C\u0435\u0442\u043A\u0438.",
-    "taskTitle": "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0437\u0430\u0434\u0430\u0447\u0438",
-    "descriptionPlaceholder": "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435, \u0441\u0441\u044B\u043B\u043A\u0438 \u0438\u043B\u0438 \u043E\u0436\u0438\u0434\u0430\u0435\u043C\u044B\u0439 \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u2026",
-    "taskDescription": "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0437\u0430\u0434\u0430\u0447\u0438",
-    "task": "\u0417\u0430\u0434\u0430\u0447\u0430",
-    "description": "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435",
-    "save": "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C",
-    "subtasks": "\u041F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438",
-    "subtaskTitle": "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438",
-    "subtaskDescription": "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438",
-    "stepPlaceholder": "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0448\u0430\u0433\u0430\u2026",
-    "saveStep": "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0448\u0430\u0433",
-    "you": "\u0412\u044B",
-    "addStep": "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0448\u0430\u0433\u2026",
-    "newSubtask": "\u041D\u043E\u0432\u0430\u044F \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0430",
-    "addSubtask": "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0443",
-    "notes": "\u0417\u0430\u043C\u0435\u0442\u043A\u0438 \u0438 \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B",
-    "notesHint": "\u0417\u0434\u0435\u0441\u044C \u043C\u043E\u0436\u043D\u043E \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C, \u0447\u0442\u043E \u0441\u0434\u0435\u043B\u0430\u043D\u043E \u0438 \u043D\u0430 \u0447\u0451\u043C \u043E\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u043B\u0438\u0441\u044C.",
-    "notePlaceholder": "\u0427\u0442\u043E \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u0434\u0435\u043B\u0430\u0442\u044C?",
-    "newComment": "\u041D\u043E\u0432\u044B\u0439 \u043A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439",
-    "addNote": "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0437\u0430\u043C\u0435\u0442\u043A\u0443",
-    "completedHeading": "\u0412\u042B\u041F\u041E\u041B\u041D\u0415\u041D\u041E",
-    "detailsHeading": "\u041F\u041E\u0414\u0420\u041E\u0411\u041D\u041E\u0421\u0422\u0418",
-    "close": "\u0417\u0430\u043A\u0440\u044B\u0442\u044C",
-    "reopen": "\u0412\u0435\u0440\u043D\u0443\u0442\u044C \u0432 \u0430\u043A\u0442\u0438\u0432\u043D\u044B\u0435",
-    "complete": "\u041E\u0442\u043C\u0435\u0442\u0438\u0442\u044C \u0432\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u043D\u043E\u0439",
-    "lastChanged": "\u041F\u043E\u0441\u043B\u0435\u0434\u043D\u0435\u0435 \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0435: {actor} \xB7 {date}",
-    "active": "\u0410\u043A\u0442\u0438\u0432\u043D\u044B\u0435",
-    "archive": "\u0410\u0440\u0445\u0438\u0432",
-    "trash": "\u041A\u043E\u0440\u0437\u0438\u043D\u0430",
-    "edit": "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C",
-    "menu": "\u0414\u0435\u0439\u0441\u0442\u0432\u0438\u044F",
-    "moveTrash": "\u0412 \u043A\u043E\u0440\u0437\u0438\u043D\u0443",
-    "restore": "\u0412\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u044C",
-    "purge": "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043D\u0430\u0432\u0441\u0435\u0433\u0434\u0430",
-    "emptyTrash": "\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C \u043A\u043E\u0440\u0437\u0438\u043D\u0443",
-    "cancel": "\u041E\u0442\u043C\u0435\u043D\u0430",
-    "confirm": "\u041F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044C",
-    "trashQuestion": "\u041F\u0435\u0440\u0435\u043C\u0435\u0441\u0442\u0438\u0442\u044C \xAB{title}\xBB \u0438 \u0435\u0451 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438 \u0432 \u043A\u043E\u0440\u0437\u0438\u043D\u0443? \u0418\u0445 \u043C\u043E\u0436\u043D\u043E \u0432\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u044C.",
-    "purgeQuestion": "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043D\u0430\u0432\u0441\u0435\u0433\u0434\u0430 \xAB{title}\xBB, \u0435\u0451 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438, \u0437\u0430\u043C\u0435\u0442\u043A\u0438 \u0438 \u0438\u0441\u0442\u043E\u0440\u0438\u044E? \u042D\u0442\u043E \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435 \u043D\u0435\u043B\u044C\u0437\u044F \u043E\u0442\u043C\u0435\u043D\u0438\u0442\u044C.",
-    "emptyTrashQuestion": "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043D\u0430\u0432\u0441\u0435\u0433\u0434\u0430 \u0432\u0441\u0435 \u0437\u0430\u0434\u0430\u0447\u0438 \u0438\u0437 \u043A\u043E\u0440\u0437\u0438\u043D\u044B ({count})? \u042D\u0442\u043E \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435 \u043D\u0435\u043B\u044C\u0437\u044F \u043E\u0442\u043C\u0435\u043D\u0438\u0442\u044C.",
-    "emptyTrashHint": "\u0417\u0434\u0435\u0441\u044C \u043F\u043E\u044F\u0432\u044F\u0442\u0441\u044F \u0443\u0434\u0430\u043B\u0451\u043D\u043D\u044B\u0435 \u0437\u0430\u0434\u0430\u0447\u0438. \u0418\u0445 \u043C\u043E\u0436\u043D\u043E \u0432\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u044C \u0438\u043B\u0438 \u0443\u0434\u0430\u043B\u0438\u0442\u044C \u043D\u0430\u0432\u0441\u0435\u0433\u0434\u0430.",
-    "archiveHint": "\u0417\u0434\u0435\u0441\u044C \u043F\u043E\u044F\u0432\u044F\u0442\u0441\u044F \u0437\u0430\u0432\u0435\u0440\u0448\u0451\u043D\u043D\u044B\u0435 \u0437\u0430\u0434\u0430\u0447\u0438 \u0438 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438.",
-    "cascadeHint": "\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u0438\u0435 \u0437\u0430\u0434\u0430\u0447\u0438 \u0442\u0430\u043A\u0436\u0435 \u0437\u0430\u0432\u0435\u0440\u0448\u0438\u0442 \u0435\u0451 \u0430\u043A\u0442\u0438\u0432\u043D\u044B\u0435 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438.",
-    "restoreParent": "\u0421\u043D\u0430\u0447\u0430\u043B\u0430 \u0432\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u0435 \u0440\u043E\u0434\u0438\u0442\u0435\u043B\u044C\u0441\u043A\u0443\u044E \u0437\u0430\u0434\u0430\u0447\u0443",
-    "reopenParent": "\u0421\u043D\u0430\u0447\u0430\u043B\u0430 \u0432\u0435\u0440\u043D\u0438\u0442\u0435 \u0440\u043E\u0434\u0438\u0442\u0435\u043B\u044C\u0441\u043A\u0443\u044E \u0437\u0430\u0434\u0430\u0447\u0443 \u0432 \u0430\u043A\u0442\u0438\u0432\u043D\u044B\u0435",
-    "staleNotice": "\u0417\u0430\u0434\u0430\u0447\u0430 \u0438\u0437\u043C\u0435\u043D\u0438\u043B\u0430\u0441\u044C \u0432 \u0434\u0440\u0443\u0433\u043E\u043C \u0438\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0435. \u041F\u0435\u0440\u0435\u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0444\u043E\u0440\u043C\u0443 \u043F\u0435\u0440\u0435\u0434 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u0435\u043C.",
-    "saved": "\u0421\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u043E",
-    "syncing": "\u0421\u0438\u043D\u0445\u0440\u043E\u043D\u0438\u0437\u0430\u0446\u0438\u044F\u2026",
-    "noTasks": "\u041F\u043E\u043A\u0430 \u043D\u0435\u0442 \u0430\u043A\u0442\u0438\u0432\u043D\u044B\u0445 \u0437\u0430\u0434\u0430\u0447",
-    "taskNotes": "\u0417\u0430\u043C\u0435\u0442\u043A\u0438",
-    "parentTask": "\u041E\u0441\u043D\u043E\u0432\u043D\u0430\u044F \u0437\u0430\u0434\u0430\u0447\u0430",
-    "completedAt": "\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u043E: {date}",
-    "back": "\u041D\u0430\u0437\u0430\u0434",
-    "trashCount": "\u041A\u043E\u0440\u0437\u0438\u043D\u0430 ({count})"
-  }
+// locales/en.json
+var en_default = {
+  locale: "en-US",
+  language: "Language",
+  heading: "My Tasks",
+  details: "Task details",
+  resizePanels: "Resize task list and details",
+  expandTask: "Expand: {title}",
+  collapseTask: "Collapse: {title}",
+  overallProgress: "Overall progress",
+  newTask: "New task",
+  taskPlaceholder: "What needs to be done?",
+  search: "Search tasks",
+  filters: "Task filters",
+  starred: "Important",
+  add: "Add",
+  addTask: "Add task",
+  refresh: "Refresh",
+  saveError: "Unable to save changes. Please try again.",
+  requestError: "Unable to complete the request. Please try again.",
+  reloadDraft: "Discard draft and reload",
+  reopenLabel: "Reopen: ",
+  completeLabel: "Complete: ",
+  progress: "{done} of {total} completed",
+  noResults: "No tasks found",
+  stepsProgress: "{done} of {total} steps",
+  unstar: "Remove from important",
+  star: "Mark as important",
+  taskTitle: "Task title",
+  taskDescription: "Task description",
+  description: "Description",
+  save: "Save",
+  subtaskTitle: "Subtask title",
+  subtaskDescription: "Subtask description",
+  you: "You",
+  addStep: "Add a step\u2026",
+  newSubtask: "New subtask",
+  addSubtask: "Add subtask",
+  notes: "Notes and results",
+  notePlaceholder: "What did you accomplish?",
+  newComment: "New comment",
+  addNote: "Add note",
+  close: "Close",
+  lastChanged: "Last updated: {actor} \xB7 {date}",
+  active: "Active",
+  archive: "Archive",
+  trash: "Trash",
+  edit: "Edit",
+  menu: "Actions",
+  moveTrash: "Move to Trash",
+  restore: "Restore",
+  purge: "Delete permanently",
+  emptyTrash: "Empty Trash",
+  cancel: "Cancel",
+  confirm: "Confirm",
+  trashQuestion: 'Move "{title}" and its subtasks to Trash? You can restore them later.',
+  purgeQuestion: 'Permanently delete "{title}" and its subtasks, notes and history? This cannot be undone.',
+  emptyTrashQuestion: "Permanently delete all {count} groups currently in Trash? This cannot be undone.",
+  emptyTrashHint: "Deleted items appear here. Restore them or delete them permanently.",
+  archiveHint: "Completed task groups appear here.",
+  cascadeHint: "Completing this task also completes its active subtasks.",
+  restoreParent: "Restore the parent task first",
+  reopenParent: "Reopen the parent task first",
+  staleNotice: "This form has changed elsewhere. Your draft keeps its original revision.",
+  syncing: "Saving\u2026",
+  noTasks: "No active tasks",
+  completedAt: "Completed: {date}",
+  trashCount: "Trash ({count})",
+  languageName: "English",
+  settings: "Settings",
+  autoLanguage: "Automatic",
+  languageHelp: "Automatic follows Hermes, then the browser or system language.",
+  languageSourceManual: "Selected in this app",
+  languageSourceHermes: "Following Hermes",
+  languageSourceBrowser: "Following browser or system",
+  languageSourceFallback: "Default language",
+  connectionChanged: "The active Hermes connection changed. Please try again.",
+  errorNewerDatabase: "The database was created by a newer plugin version",
+  errorTaskId: "A task ID is required",
+  errorNotFound: "Task not found",
+  errorTooManySubtasks: "Add at most 100 subtasks at a time",
+  errorSubtaskDepth: "Only one level of subtasks is supported",
+  errorSubtaskFields: "A subtask may contain only a title and description",
+  errorReopenParent: "Reopen the parent task first",
+  errorLifecycleSeparate: "Send a lifecycle action separately from edits",
+  errorNoChanges: "Provide a title, description, completion state, importance, or comment",
+  errorEvidence: "Hermes must describe what was completed and the supporting evidence",
+  errorRevision: "This task has changed. Refresh the list and try again",
+  errorRestoreFirst: "Restore this item from Trash first",
+  errorLifecycleUnknown: "Unknown lifecycle action",
+  errorNotInTrash: "This item is not in Trash",
+  errorRestoreParent: "Restore the parent task first",
+  errorPurgeConfirmation: "Confirm permanent deletion explicitly",
+  errorArgumentObject: "Expected an argument object",
+  errorArgumentUnknown: "Unknown argument",
+  errorReadRevision: "Read the list first and supply the task revision",
+  errorJsonContentType: "Expected application/json",
+  errorRequestSize: "Invalid request size",
+  errorJsonObject: "Expected a JSON object",
+  errorUnknownField: "Unknown field",
+  errorRevisionRequired: "A task revision is required",
+  errorLocalAddress: "Use the 127.0.0.1 address",
+  errorAccessDenied: "Local API access denied",
+  errorOrigin: "Request origin is not allowed",
+  errorRouteNotFound: "Not found",
+  errorInvalidData: "Invalid request data",
+  errorSaveData: "Unable to save data",
+  errorTextType: "{field}: expected text",
+  errorTextLength: "{field}: must contain {minimum} to {maximum} characters",
+  errorBoolean: "{field}: expected true or false",
+  "field.title": "title",
+  "field.description": "description",
+  "field.subtask title": "subtask title",
+  "field.comment": "comment",
+  requiredField: "Fill in this field."
 };
-function savedLanguage() {
+
+// locales/ru.json
+var ru_default = {
+  locale: "ru-RU",
+  language: "\u042F\u0437\u044B\u043A",
+  heading: "\u041C\u043E\u0438 \u0437\u0430\u0434\u0430\u0447\u0438",
+  details: "\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u043E\u0441\u0442\u0438 \u0437\u0430\u0434\u0430\u0447\u0438",
+  resizePanels: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u0448\u0438\u0440\u0438\u043D\u0443 \u0441\u043F\u0438\u0441\u043A\u0430 \u0438 \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0438",
+  expandTask: "\u0420\u0430\u0437\u0432\u0435\u0440\u043D\u0443\u0442\u044C: {title}",
+  collapseTask: "\u0421\u0432\u0435\u0440\u043D\u0443\u0442\u044C: {title}",
+  overallProgress: "\u041E\u0431\u0449\u0438\u0439 \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441",
+  newTask: "\u041D\u043E\u0432\u0430\u044F \u0437\u0430\u0434\u0430\u0447\u0430",
+  taskPlaceholder: "\u0427\u0442\u043E \u043D\u0443\u0436\u043D\u043E \u0441\u0434\u0435\u043B\u0430\u0442\u044C?",
+  search: "\u041F\u043E\u0438\u0441\u043A \u0437\u0430\u0434\u0430\u0447",
+  filters: "\u0424\u0438\u043B\u044C\u0442\u0440 \u0437\u0430\u0434\u0430\u0447",
+  starred: "\u0412\u0430\u0436\u043D\u044B\u0435",
+  add: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C",
+  addTask: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0437\u0430\u0434\u0430\u0447\u0443",
+  refresh: "\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C",
+  saveError: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u044F. \u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u0435 \u043F\u043E\u043F\u044B\u0442\u043A\u0443.",
+  requestError: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0432\u044B\u043F\u043E\u043B\u043D\u0438\u0442\u044C \u0437\u0430\u043F\u0440\u043E\u0441. \u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u0435 \u043F\u043E\u043F\u044B\u0442\u043A\u0443.",
+  reloadDraft: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0447\u0435\u0440\u043D\u043E\u0432\u0438\u043A \u0438 \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044C \u0437\u0430\u043D\u043E\u0432\u043E",
+  reopenLabel: "\u0412\u0435\u0440\u043D\u0443\u0442\u044C \u0432 \u0430\u043A\u0442\u0438\u0432\u043D\u044B\u0435: ",
+  completeLabel: "\u0412\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u043E: ",
+  progress: "{done} \u0438\u0437 {total} \u0432\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u043E",
+  noResults: "\u041D\u0438\u0447\u0435\u0433\u043E \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u043E",
+  stepsProgress: "{done} \u0438\u0437 {total} \u0448\u0430\u0433\u043E\u0432",
+  unstar: "\u0423\u0431\u0440\u0430\u0442\u044C \u0438\u0437 \u0432\u0430\u0436\u043D\u044B\u0445",
+  star: "\u041E\u0442\u043C\u0435\u0442\u0438\u0442\u044C \u0432\u0430\u0436\u043D\u043E\u0439",
+  taskTitle: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0437\u0430\u0434\u0430\u0447\u0438",
+  taskDescription: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0437\u0430\u0434\u0430\u0447\u0438",
+  description: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435",
+  save: "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C",
+  subtaskTitle: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438",
+  subtaskDescription: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438",
+  you: "\u0412\u044B",
+  addStep: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0448\u0430\u0433\u2026",
+  newSubtask: "\u041D\u043E\u0432\u0430\u044F \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0430",
+  addSubtask: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0443",
+  notes: "\u0417\u0430\u043C\u0435\u0442\u043A\u0438 \u0438 \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B",
+  notePlaceholder: "\u0427\u0442\u043E \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u0434\u0435\u043B\u0430\u0442\u044C?",
+  newComment: "\u041D\u043E\u0432\u044B\u0439 \u043A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439",
+  addNote: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0437\u0430\u043C\u0435\u0442\u043A\u0443",
+  close: "\u0417\u0430\u043A\u0440\u044B\u0442\u044C",
+  lastChanged: "\u041F\u043E\u0441\u043B\u0435\u0434\u043D\u0435\u0435 \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0435: {actor} \xB7 {date}",
+  active: "\u0410\u043A\u0442\u0438\u0432\u043D\u044B\u0435",
+  archive: "\u0410\u0440\u0445\u0438\u0432",
+  trash: "\u041A\u043E\u0440\u0437\u0438\u043D\u0430",
+  edit: "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C",
+  menu: "\u0414\u0435\u0439\u0441\u0442\u0432\u0438\u044F",
+  moveTrash: "\u0412 \u043A\u043E\u0440\u0437\u0438\u043D\u0443",
+  restore: "\u0412\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u044C",
+  purge: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043D\u0430\u0432\u0441\u0435\u0433\u0434\u0430",
+  emptyTrash: "\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C \u043A\u043E\u0440\u0437\u0438\u043D\u0443",
+  cancel: "\u041E\u0442\u043C\u0435\u043D\u0430",
+  confirm: "\u041F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044C",
+  trashQuestion: "\u041F\u0435\u0440\u0435\u043C\u0435\u0441\u0442\u0438\u0442\u044C \xAB{title}\xBB \u0438 \u0435\u0451 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438 \u0432 \u043A\u043E\u0440\u0437\u0438\u043D\u0443? \u0418\u0445 \u043C\u043E\u0436\u043D\u043E \u0432\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u044C.",
+  purgeQuestion: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043D\u0430\u0432\u0441\u0435\u0433\u0434\u0430 \xAB{title}\xBB, \u0435\u0451 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438, \u0437\u0430\u043C\u0435\u0442\u043A\u0438 \u0438 \u0438\u0441\u0442\u043E\u0440\u0438\u044E? \u042D\u0442\u043E \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435 \u043D\u0435\u043B\u044C\u0437\u044F \u043E\u0442\u043C\u0435\u043D\u0438\u0442\u044C.",
+  emptyTrashQuestion: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043D\u0430\u0432\u0441\u0435\u0433\u0434\u0430 \u0432\u0441\u0435 \u0437\u0430\u0434\u0430\u0447\u0438 \u0438\u0437 \u043A\u043E\u0440\u0437\u0438\u043D\u044B ({count})? \u042D\u0442\u043E \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435 \u043D\u0435\u043B\u044C\u0437\u044F \u043E\u0442\u043C\u0435\u043D\u0438\u0442\u044C.",
+  emptyTrashHint: "\u0417\u0434\u0435\u0441\u044C \u043F\u043E\u044F\u0432\u044F\u0442\u0441\u044F \u0443\u0434\u0430\u043B\u0451\u043D\u043D\u044B\u0435 \u0437\u0430\u0434\u0430\u0447\u0438. \u0418\u0445 \u043C\u043E\u0436\u043D\u043E \u0432\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u044C \u0438\u043B\u0438 \u0443\u0434\u0430\u043B\u0438\u0442\u044C \u043D\u0430\u0432\u0441\u0435\u0433\u0434\u0430.",
+  archiveHint: "\u0417\u0434\u0435\u0441\u044C \u043F\u043E\u044F\u0432\u044F\u0442\u0441\u044F \u0437\u0430\u0432\u0435\u0440\u0448\u0451\u043D\u043D\u044B\u0435 \u0437\u0430\u0434\u0430\u0447\u0438 \u0438 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438.",
+  cascadeHint: "\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u0438\u0435 \u0437\u0430\u0434\u0430\u0447\u0438 \u0442\u0430\u043A\u0436\u0435 \u0437\u0430\u0432\u0435\u0440\u0448\u0438\u0442 \u0435\u0451 \u0430\u043A\u0442\u0438\u0432\u043D\u044B\u0435 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438.",
+  restoreParent: "\u0421\u043D\u0430\u0447\u0430\u043B\u0430 \u0432\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u0435 \u0440\u043E\u0434\u0438\u0442\u0435\u043B\u044C\u0441\u043A\u0443\u044E \u0437\u0430\u0434\u0430\u0447\u0443",
+  reopenParent: "\u0421\u043D\u0430\u0447\u0430\u043B\u0430 \u0432\u0435\u0440\u043D\u0438\u0442\u0435 \u0440\u043E\u0434\u0438\u0442\u0435\u043B\u044C\u0441\u043A\u0443\u044E \u0437\u0430\u0434\u0430\u0447\u0443 \u0432 \u0430\u043A\u0442\u0438\u0432\u043D\u044B\u0435",
+  staleNotice: "\u0417\u0430\u0434\u0430\u0447\u0430 \u0438\u0437\u043C\u0435\u043D\u0438\u043B\u0430\u0441\u044C \u0432 \u0434\u0440\u0443\u0433\u043E\u043C \u0438\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0435. \u041F\u0435\u0440\u0435\u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0444\u043E\u0440\u043C\u0443 \u043F\u0435\u0440\u0435\u0434 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u0435\u043C.",
+  syncing: "\u0421\u0438\u043D\u0445\u0440\u043E\u043D\u0438\u0437\u0430\u0446\u0438\u044F\u2026",
+  noTasks: "\u041F\u043E\u043A\u0430 \u043D\u0435\u0442 \u0430\u043A\u0442\u0438\u0432\u043D\u044B\u0445 \u0437\u0430\u0434\u0430\u0447",
+  completedAt: "\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u043E: {date}",
+  trashCount: "\u041A\u043E\u0440\u0437\u0438\u043D\u0430 ({count})",
+  languageName: "\u0420\u0443\u0441\u0441\u043A\u0438\u0439",
+  settings: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438",
+  autoLanguage: "\u0410\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0447\u0435\u0441\u043A\u0438",
+  languageHelp: "\u0410\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439 \u0432\u044B\u0431\u043E\u0440 \u0443\u0447\u0438\u0442\u044B\u0432\u0430\u0435\u0442 \u044F\u0437\u044B\u043A Hermes, \u0437\u0430\u0442\u0435\u043C \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0430 \u0438\u043B\u0438 \u0441\u0438\u0441\u0442\u0435\u043C\u044B.",
+  languageSourceManual: "\u0412\u044B\u0431\u0440\u0430\u043D\u043E \u0432 \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u0438",
+  languageSourceHermes: "\u041A\u0430\u043A \u0432 Hermes",
+  languageSourceBrowser: "\u041A\u0430\u043A \u0432 \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0435 \u0438\u043B\u0438 \u0441\u0438\u0441\u0442\u0435\u043C\u0435",
+  languageSourceFallback: "\u042F\u0437\u044B\u043A \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E",
+  connectionChanged: "\u0410\u043A\u0442\u0438\u0432\u043D\u043E\u0435 \u043F\u043E\u0434\u043A\u043B\u044E\u0447\u0435\u043D\u0438\u0435 Hermes \u0438\u0437\u043C\u0435\u043D\u0438\u043B\u043E\u0441\u044C. \u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u0435 \u043F\u043E\u043F\u044B\u0442\u043A\u0443.",
+  errorNewerDatabase: "\u0411\u0430\u0437\u0430 \u0441\u043E\u0437\u0434\u0430\u043D\u0430 \u0431\u043E\u043B\u0435\u0435 \u043D\u043E\u0432\u043E\u0439 \u0432\u0435\u0440\u0441\u0438\u0435\u0439 \u043F\u043B\u0430\u0433\u0438\u043D\u0430",
+  errorTaskId: "\u0423\u043A\u0430\u0436\u0438\u0442\u0435 ID \u0437\u0430\u0434\u0430\u0447\u0438",
+  errorNotFound: "\u0417\u0430\u0434\u0430\u0447\u0430 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u0430",
+  errorTooManySubtasks: "\u0417\u0430 \u043E\u0434\u0438\u043D \u0440\u0430\u0437 \u043C\u043E\u0436\u043D\u043E \u0434\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0434\u043E 100 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447",
+  errorSubtaskDepth: "\u041F\u043E\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u0442\u0441\u044F \u043E\u0434\u0438\u043D \u0443\u0440\u043E\u0432\u0435\u043D\u044C \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447",
+  errorSubtaskFields: "\u041F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0430 \u043C\u043E\u0436\u0435\u0442 \u0441\u043E\u0434\u0435\u0440\u0436\u0430\u0442\u044C \u0442\u043E\u043B\u044C\u043A\u043E \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0438 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435",
+  errorReopenParent: "\u0421\u043D\u0430\u0447\u0430\u043B\u0430 \u0432\u0435\u0440\u043D\u0438\u0442\u0435 \u0440\u043E\u0434\u0438\u0442\u0435\u043B\u044C\u0441\u043A\u0443\u044E \u0437\u0430\u0434\u0430\u0447\u0443 \u0432 \u0430\u043A\u0442\u0438\u0432\u043D\u044B\u0435",
+  errorLifecycleSeparate: "\u041E\u0442\u043F\u0440\u0430\u0432\u044C\u0442\u0435 \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435 \u0441 \u043A\u043E\u0440\u0437\u0438\u043D\u043E\u0439 \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u043E \u043E\u0442 \u0440\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F",
+  errorNoChanges: "\u0423\u043A\u0430\u0436\u0438\u0442\u0435 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435, \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435, \u0433\u0430\u043B\u043E\u0447\u043A\u0443, \u0432\u0430\u0436\u043D\u043E\u0441\u0442\u044C \u0438\u043B\u0438 \u043A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439",
+  errorEvidence: "\u041F\u0440\u0438 \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u0438\u0438 Hermes \u0434\u043E\u043B\u0436\u0435\u043D \u0443\u043A\u0430\u0437\u0430\u0442\u044C, \u0447\u0442\u043E \u0441\u0434\u0435\u043B\u0430\u043D\u043E \u0438 \u0447\u0435\u043C \u044D\u0442\u043E \u043F\u043E\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043D\u043E",
+  errorRevision: "\u0417\u0430\u0434\u0430\u0447\u0430 \u0443\u0436\u0435 \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0430. \u041E\u0431\u043D\u043E\u0432\u0438\u0442\u0435 \u0441\u043F\u0438\u0441\u043E\u043A \u0438 \u043F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u0435 \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435",
+  errorRestoreFirst: "\u0421\u043D\u0430\u0447\u0430\u043B\u0430 \u0432\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u0435 \u043F\u0443\u043D\u043A\u0442 \u0438\u0437 \u043A\u043E\u0440\u0437\u0438\u043D\u044B",
+  errorLifecycleUnknown: "\u041D\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043D\u043E\u0435 \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435 \u0441 \u043A\u043E\u0440\u0437\u0438\u043D\u043E\u0439",
+  errorNotInTrash: "\u042D\u0442\u043E\u0442 \u043F\u0443\u043D\u043A\u0442 \u043D\u0435 \u0432 \u043A\u043E\u0440\u0437\u0438\u043D\u0435",
+  errorRestoreParent: "\u0421\u043D\u0430\u0447\u0430\u043B\u0430 \u0432\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u0435 \u0440\u043E\u0434\u0438\u0442\u0435\u043B\u044C\u0441\u043A\u0443\u044E \u0437\u0430\u0434\u0430\u0447\u0443",
+  errorPurgeConfirmation: "\u042F\u0432\u043D\u043E \u043F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u0435 \u043E\u043A\u043E\u043D\u0447\u0430\u0442\u0435\u043B\u044C\u043D\u043E\u0435 \u0443\u0434\u0430\u043B\u0435\u043D\u0438\u0435",
+  errorArgumentObject: "\u041E\u0436\u0438\u0434\u0430\u0435\u0442\u0441\u044F \u043E\u0431\u044A\u0435\u043A\u0442 \u0430\u0440\u0433\u0443\u043C\u0435\u043D\u0442\u043E\u0432",
+  errorArgumentUnknown: "\u041D\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043D\u044B\u0439 \u0430\u0440\u0433\u0443\u043C\u0435\u043D\u0442",
+  errorReadRevision: "\u0421\u043D\u0430\u0447\u0430\u043B\u0430 \u043F\u0440\u043E\u0447\u0438\u0442\u0430\u0439\u0442\u0435 \u0441\u043F\u0438\u0441\u043E\u043A \u0438 \u0443\u043A\u0430\u0436\u0438\u0442\u0435 \u0440\u0435\u0432\u0438\u0437\u0438\u044E \u0437\u0430\u0434\u0430\u0447\u0438",
+  errorJsonContentType: "\u041E\u0436\u0438\u0434\u0430\u0435\u0442\u0441\u044F application/json",
+  errorRequestSize: "\u041D\u0435\u0434\u043E\u043F\u0443\u0441\u0442\u0438\u043C\u044B\u0439 \u0440\u0430\u0437\u043C\u0435\u0440 \u0437\u0430\u043F\u0440\u043E\u0441\u0430",
+  errorJsonObject: "\u041E\u0436\u0438\u0434\u0430\u0435\u0442\u0441\u044F \u043E\u0431\u044A\u0435\u043A\u0442 JSON",
+  errorUnknownField: "\u041D\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043D\u043E\u0435 \u043F\u043E\u043B\u0435",
+  errorRevisionRequired: "\u041F\u0435\u0440\u0435\u0434\u0430\u0439\u0442\u0435 revision \u0437\u0430\u0434\u0430\u0447\u0438",
+  errorLocalAddress: "\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439\u0442\u0435 \u0430\u0434\u0440\u0435\u0441 127.0.0.1",
+  errorAccessDenied: "\u041D\u0435\u0442 \u0434\u043E\u0441\u0442\u0443\u043F\u0430 \u043A \u043B\u043E\u043A\u0430\u043B\u044C\u043D\u043E\u043C\u0443 API",
+  errorOrigin: "\u041D\u0435\u0434\u043E\u043F\u0443\u0441\u0442\u0438\u043C\u044B\u0439 \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0437\u0430\u043F\u0440\u043E\u0441\u0430",
+  errorRouteNotFound: "\u041D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u043E",
+  errorInvalidData: "\u041D\u0435\u043A\u043E\u0440\u0440\u0435\u043A\u0442\u043D\u044B\u0435 \u0434\u0430\u043D\u043D\u044B\u0435 \u0437\u0430\u043F\u0440\u043E\u0441\u0430",
+  errorSaveData: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\u0435",
+  errorTextType: "{field}: \u0442\u0440\u0435\u0431\u0443\u0435\u0442\u0441\u044F \u0442\u0435\u043A\u0441\u0442",
+  errorTextLength: "{field}: \u043E\u0442 {minimum} \u0434\u043E {maximum} \u0441\u0438\u043C\u0432\u043E\u043B\u043E\u0432",
+  errorBoolean: "{field}: \u0442\u0440\u0435\u0431\u0443\u0435\u0442\u0441\u044F true \u0438\u043B\u0438 false",
+  "field.title": "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435",
+  "field.description": "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435",
+  "field.subtask title": "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438",
+  "field.comment": "\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439",
+  requiredField: "\u0417\u0430\u043F\u043E\u043B\u043D\u0438\u0442\u0435 \u044D\u0442\u043E \u043F\u043E\u043B\u0435."
+};
+
+// locales/es.json
+var es_default = {
+  locale: "es-ES",
+  language: "Idioma",
+  heading: "Mis tareas",
+  details: "Detalles de la tarea",
+  resizePanels: "Ajustar el ancho de la lista y los detalles",
+  expandTask: "Expandir: {title}",
+  collapseTask: "Contraer: {title}",
+  overallProgress: "Progreso general",
+  newTask: "Nueva tarea",
+  taskPlaceholder: "\xBFQu\xE9 hay que hacer?",
+  search: "Buscar tareas",
+  filters: "Filtros de tareas",
+  starred: "Importantes",
+  add: "A\xF1adir",
+  addTask: "A\xF1adir tarea",
+  refresh: "Actualizar",
+  saveError: "No se pudieron guardar los cambios. Int\xE9ntalo de nuevo.",
+  requestError: "No se pudo completar la solicitud. Int\xE9ntalo de nuevo.",
+  reloadDraft: "Descartar borrador y recargar",
+  reopenLabel: "Reabrir: ",
+  completeLabel: "Completar: ",
+  progress: "{done} de {total} completadas",
+  noResults: "No se encontraron tareas",
+  stepsProgress: "{done} de {total} pasos",
+  unstar: "Quitar de importantes",
+  star: "Marcar como importante",
+  taskTitle: "T\xEDtulo de la tarea",
+  taskDescription: "Descripci\xF3n de la tarea",
+  description: "Descripci\xF3n",
+  save: "Guardar",
+  subtaskTitle: "T\xEDtulo de la subtarea",
+  subtaskDescription: "Descripci\xF3n de la subtarea",
+  you: "T\xFA",
+  addStep: "A\xF1adir un paso\u2026",
+  newSubtask: "Nueva subtarea",
+  addSubtask: "A\xF1adir subtarea",
+  notes: "Notas y resultados",
+  notePlaceholder: "\xBFQu\xE9 has conseguido?",
+  newComment: "Nuevo comentario",
+  addNote: "A\xF1adir nota",
+  close: "Cerrar",
+  lastChanged: "\xDAltima actualizaci\xF3n: {actor} \xB7 {date}",
+  active: "Activas",
+  archive: "Archivo",
+  trash: "Papelera",
+  edit: "Editar",
+  menu: "Acciones",
+  moveTrash: "Mover a la papelera",
+  restore: "Restaurar",
+  purge: "Eliminar definitivamente",
+  emptyTrash: "Vaciar papelera",
+  cancel: "Cancelar",
+  confirm: "Confirmar",
+  trashQuestion: "\xBFMover \xAB{title}\xBB y sus subtareas a la papelera? Podr\xE1s restaurarlas despu\xE9s.",
+  purgeQuestion: "\xBFEliminar definitivamente \xAB{title}\xBB, sus subtareas, notas e historial? Esta acci\xF3n no se puede deshacer.",
+  emptyTrashQuestion: "\xBFEliminar definitivamente todos los grupos de la papelera ({count})? Esta acci\xF3n no se puede deshacer.",
+  emptyTrashHint: "Las tareas eliminadas aparecen aqu\xED. Puedes restaurarlas o eliminarlas definitivamente.",
+  archiveHint: "Los grupos de tareas completados aparecen aqu\xED.",
+  cascadeHint: "Al completar esta tarea tambi\xE9n se completan sus subtareas activas.",
+  restoreParent: "Primero restaura la tarea principal",
+  reopenParent: "Primero reabre la tarea principal",
+  staleNotice: "La tarea ha cambiado en otro lugar. Se conserva la revisi\xF3n original del borrador.",
+  syncing: "Guardando\u2026",
+  noTasks: "No hay tareas activas",
+  completedAt: "Completada: {date}",
+  trashCount: "Papelera ({count})",
+  languageName: "Espa\xF1ol",
+  settings: "Ajustes",
+  autoLanguage: "Autom\xE1tico",
+  languageHelp: "El modo autom\xE1tico usa el idioma de Hermes o, si no est\xE1 disponible, el del navegador o sistema.",
+  languageSourceManual: "Elegido en esta aplicaci\xF3n",
+  languageSourceHermes: "Seg\xFAn Hermes",
+  languageSourceBrowser: "Seg\xFAn el navegador o sistema",
+  languageSourceFallback: "Idioma predeterminado",
+  connectionChanged: "La conexi\xF3n activa de Hermes ha cambiado. Int\xE9ntalo de nuevo.",
+  errorNewerDatabase: "La base de datos se cre\xF3 con una versi\xF3n m\xE1s reciente del complemento",
+  errorTaskId: "Se requiere el ID de la tarea",
+  errorNotFound: "Tarea no encontrada",
+  errorTooManySubtasks: "A\xF1ade como m\xE1ximo 100 subtareas a la vez",
+  errorSubtaskDepth: "Solo se admite un nivel de subtareas",
+  errorSubtaskFields: "Una subtarea solo puede contener un t\xEDtulo y una descripci\xF3n",
+  errorReopenParent: "Primero reabre la tarea principal",
+  errorLifecycleSeparate: "Env\xEDa la acci\xF3n de la papelera por separado de los cambios",
+  errorNoChanges: "Indica un t\xEDtulo, una descripci\xF3n, el estado de finalizaci\xF3n, la importancia o un comentario",
+  errorEvidence: "Hermes debe describir lo que se ha completado y las pruebas que lo confirman",
+  errorRevision: "Esta tarea ha cambiado. Actualiza la lista e int\xE9ntalo de nuevo",
+  errorRestoreFirst: "Primero restaura este elemento de la papelera",
+  errorLifecycleUnknown: "Acci\xF3n de papelera desconocida",
+  errorNotInTrash: "Este elemento no est\xE1 en la papelera",
+  errorRestoreParent: "Primero restaura la tarea principal",
+  errorPurgeConfirmation: "Confirma expl\xEDcitamente la eliminaci\xF3n definitiva",
+  errorArgumentObject: "Se esperaba un objeto de argumentos",
+  errorArgumentUnknown: "Argumento desconocido",
+  errorReadRevision: "Primero consulta la lista e indica la revisi\xF3n de la tarea",
+  errorJsonContentType: "Se esperaba application/json",
+  errorRequestSize: "Tama\xF1o de solicitud no v\xE1lido",
+  errorJsonObject: "Se esperaba un objeto JSON",
+  errorUnknownField: "Campo desconocido",
+  errorRevisionRequired: "Se requiere la revisi\xF3n de la tarea",
+  errorLocalAddress: "Usa la direcci\xF3n 127.0.0.1",
+  errorAccessDenied: "Acceso a la API local denegado",
+  errorOrigin: "El origen de la solicitud no est\xE1 permitido",
+  errorRouteNotFound: "No encontrado",
+  errorInvalidData: "Datos de solicitud no v\xE1lidos",
+  errorSaveData: "No se pudieron guardar los datos",
+  errorTextType: "{field}: se esperaba texto",
+  errorTextLength: "{field}: debe contener entre {minimum} y {maximum} caracteres",
+  errorBoolean: "{field}: se esperaba true o false",
+  "field.title": "t\xEDtulo",
+  "field.description": "descripci\xF3n",
+  "field.subtask title": "t\xEDtulo de la subtarea",
+  "field.comment": "comentario",
+  requiredField: "Rellena este campo."
+};
+
+// locales/pt-BR.json
+var pt_BR_default = {
+  locale: "pt-BR",
+  language: "Idioma",
+  heading: "Minhas tarefas",
+  details: "Detalhes da tarefa",
+  resizePanels: "Ajustar a largura da lista e dos detalhes",
+  expandTask: "Expandir: {title}",
+  collapseTask: "Recolher: {title}",
+  overallProgress: "Progresso geral",
+  newTask: "Nova tarefa",
+  taskPlaceholder: "O que precisa ser feito?",
+  search: "Buscar tarefas",
+  filters: "Filtros de tarefas",
+  starred: "Importantes",
+  add: "Adicionar",
+  addTask: "Adicionar tarefa",
+  refresh: "Atualizar",
+  saveError: "N\xE3o foi poss\xEDvel salvar as altera\xE7\xF5es. Tente novamente.",
+  requestError: "N\xE3o foi poss\xEDvel concluir a solicita\xE7\xE3o. Tente novamente.",
+  reloadDraft: "Descartar rascunho e recarregar",
+  reopenLabel: "Reabrir: ",
+  completeLabel: "Concluir: ",
+  progress: "{done} de {total} conclu\xEDdas",
+  noResults: "Nenhuma tarefa encontrada",
+  stepsProgress: "{done} de {total} etapas",
+  unstar: "Remover das importantes",
+  star: "Marcar como importante",
+  taskTitle: "T\xEDtulo da tarefa",
+  taskDescription: "Descri\xE7\xE3o da tarefa",
+  description: "Descri\xE7\xE3o",
+  save: "Salvar",
+  subtaskTitle: "T\xEDtulo da subtarefa",
+  subtaskDescription: "Descri\xE7\xE3o da subtarefa",
+  you: "Voc\xEA",
+  addStep: "Adicionar uma etapa\u2026",
+  newSubtask: "Nova subtarefa",
+  addSubtask: "Adicionar subtarefa",
+  notes: "Notas e resultados",
+  notePlaceholder: "O que voc\xEA realizou?",
+  newComment: "Novo coment\xE1rio",
+  addNote: "Adicionar nota",
+  close: "Fechar",
+  lastChanged: "\xDAltima atualiza\xE7\xE3o: {actor} \xB7 {date}",
+  active: "Ativas",
+  archive: "Arquivo",
+  trash: "Lixeira",
+  edit: "Editar",
+  menu: "A\xE7\xF5es",
+  moveTrash: "Mover para a lixeira",
+  restore: "Restaurar",
+  purge: "Excluir permanentemente",
+  emptyTrash: "Esvaziar lixeira",
+  cancel: "Cancelar",
+  confirm: "Confirmar",
+  trashQuestion: "Mover \xAB{title}\xBB e suas subtarefas para a lixeira? Voc\xEA poder\xE1 restaur\xE1-las depois.",
+  purgeQuestion: "Excluir permanentemente \xAB{title}\xBB, suas subtarefas, notas e hist\xF3rico? Esta a\xE7\xE3o n\xE3o pode ser desfeita.",
+  emptyTrashQuestion: "Excluir permanentemente todos os grupos da lixeira ({count})? Esta a\xE7\xE3o n\xE3o pode ser desfeita.",
+  emptyTrashHint: "As tarefas exclu\xEDdas aparecem aqui. Voc\xEA pode restaur\xE1-las ou exclu\xED-las permanentemente.",
+  archiveHint: "Os grupos de tarefas conclu\xEDdos aparecem aqui.",
+  cascadeHint: "Concluir esta tarefa tamb\xE9m conclui suas subtarefas ativas.",
+  restoreParent: "Restaure a tarefa principal primeiro",
+  reopenParent: "Reabra a tarefa principal primeiro",
+  staleNotice: "A tarefa foi alterada em outro lugar. A revis\xE3o original do rascunho foi mantida.",
+  syncing: "Salvando\u2026",
+  noTasks: "Nenhuma tarefa ativa",
+  completedAt: "Conclu\xEDda: {date}",
+  trashCount: "Lixeira ({count})",
+  languageName: "Portugu\xEAs (Brasil)",
+  settings: "Configura\xE7\xF5es",
+  autoLanguage: "Autom\xE1tico",
+  languageHelp: "O modo autom\xE1tico usa o idioma do Hermes ou, se indispon\xEDvel, o do navegador ou sistema.",
+  languageSourceManual: "Selecionado neste aplicativo",
+  languageSourceHermes: "Seguindo o Hermes",
+  languageSourceBrowser: "Seguindo o navegador ou sistema",
+  languageSourceFallback: "Idioma padr\xE3o",
+  connectionChanged: "A conex\xE3o ativa do Hermes mudou. Tente novamente.",
+  errorNewerDatabase: "O banco de dados foi criado por uma vers\xE3o mais recente do plugin",
+  errorTaskId: "O ID da tarefa \xE9 obrigat\xF3rio",
+  errorNotFound: "Tarefa n\xE3o encontrada",
+  errorTooManySubtasks: "Adicione no m\xE1ximo 100 subtarefas por vez",
+  errorSubtaskDepth: "Apenas um n\xEDvel de subtarefas \xE9 permitido",
+  errorSubtaskFields: "Uma subtarefa pode conter apenas t\xEDtulo e descri\xE7\xE3o",
+  errorReopenParent: "Reabra a tarefa principal primeiro",
+  errorLifecycleSeparate: "Envie a a\xE7\xE3o da lixeira separadamente das altera\xE7\xF5es",
+  errorNoChanges: "Informe t\xEDtulo, descri\xE7\xE3o, estado de conclus\xE3o, import\xE2ncia ou coment\xE1rio",
+  errorEvidence: "O Hermes deve descrever o que foi conclu\xEDdo e as evid\xEAncias que comprovam isso",
+  errorRevision: "Esta tarefa foi alterada. Atualize a lista e tente novamente",
+  errorRestoreFirst: "Restaure este item da lixeira primeiro",
+  errorLifecycleUnknown: "A\xE7\xE3o da lixeira desconhecida",
+  errorNotInTrash: "Este item n\xE3o est\xE1 na lixeira",
+  errorRestoreParent: "Restaure a tarefa principal primeiro",
+  errorPurgeConfirmation: "Confirme explicitamente a exclus\xE3o permanente",
+  errorArgumentObject: "Era esperado um objeto de argumentos",
+  errorArgumentUnknown: "Argumento desconhecido",
+  errorReadRevision: "Consulte a lista primeiro e informe a revis\xE3o da tarefa",
+  errorJsonContentType: "Era esperado application/json",
+  errorRequestSize: "Tamanho de solicita\xE7\xE3o inv\xE1lido",
+  errorJsonObject: "Era esperado um objeto JSON",
+  errorUnknownField: "Campo desconhecido",
+  errorRevisionRequired: "A revis\xE3o da tarefa \xE9 obrigat\xF3ria",
+  errorLocalAddress: "Use o endere\xE7o 127.0.0.1",
+  errorAccessDenied: "Acesso \xE0 API local negado",
+  errorOrigin: "A origem da solicita\xE7\xE3o n\xE3o \xE9 permitida",
+  errorRouteNotFound: "N\xE3o encontrado",
+  errorInvalidData: "Dados de solicita\xE7\xE3o inv\xE1lidos",
+  errorSaveData: "N\xE3o foi poss\xEDvel salvar os dados",
+  errorTextType: "{field}: era esperado texto",
+  errorTextLength: "{field}: deve conter de {minimum} a {maximum} caracteres",
+  errorBoolean: "{field}: era esperado true ou false",
+  "field.title": "t\xEDtulo",
+  "field.description": "descri\xE7\xE3o",
+  "field.subtask title": "t\xEDtulo da subtarefa",
+  "field.comment": "coment\xE1rio",
+  requiredField: "Preencha este campo."
+};
+
+// locales/de.json
+var de_default = {
+  locale: "de-DE",
+  language: "Sprache",
+  heading: "Meine Aufgaben",
+  details: "Aufgabendetails",
+  resizePanels: "Breite von Liste und Details \xE4ndern",
+  expandTask: "Aufklappen: {title}",
+  collapseTask: "Zuklappen: {title}",
+  overallProgress: "Gesamtfortschritt",
+  newTask: "Neue Aufgabe",
+  taskPlaceholder: "Was muss erledigt werden?",
+  search: "Aufgaben durchsuchen",
+  filters: "Aufgabenfilter",
+  starred: "Wichtig",
+  add: "Hinzuf\xFCgen",
+  addTask: "Aufgabe hinzuf\xFCgen",
+  refresh: "Aktualisieren",
+  saveError: "Die \xC4nderungen konnten nicht gespeichert werden. Bitte erneut versuchen.",
+  requestError: "Die Anfrage konnte nicht abgeschlossen werden. Bitte erneut versuchen.",
+  reloadDraft: "Entwurf verwerfen und neu laden",
+  reopenLabel: "Wieder \xF6ffnen: ",
+  completeLabel: "Abschlie\xDFen: ",
+  progress: "{done} von {total} abgeschlossen",
+  noResults: "Keine Aufgaben gefunden",
+  stepsProgress: "{done} von {total} Schritten",
+  unstar: "Markierung als wichtig entfernen",
+  star: "Als wichtig markieren",
+  taskTitle: "Aufgabentitel",
+  taskDescription: "Aufgabenbeschreibung",
+  description: "Beschreibung",
+  save: "Speichern",
+  subtaskTitle: "Titel der Unteraufgabe",
+  subtaskDescription: "Beschreibung der Unteraufgabe",
+  you: "Du",
+  addStep: "Schritt hinzuf\xFCgen\u2026",
+  newSubtask: "Neue Unteraufgabe",
+  addSubtask: "Unteraufgabe hinzuf\xFCgen",
+  notes: "Notizen und Ergebnisse",
+  notePlaceholder: "Was hast du erledigt?",
+  newComment: "Neuer Kommentar",
+  addNote: "Notiz hinzuf\xFCgen",
+  close: "Schlie\xDFen",
+  lastChanged: "Zuletzt aktualisiert: {actor} \xB7 {date}",
+  active: "Aktiv",
+  archive: "Archiv",
+  trash: "Papierkorb",
+  edit: "Bearbeiten",
+  menu: "Aktionen",
+  moveTrash: "In den Papierkorb",
+  restore: "Wiederherstellen",
+  purge: "Endg\xFCltig l\xF6schen",
+  emptyTrash: "Papierkorb leeren",
+  cancel: "Abbrechen",
+  confirm: "Best\xE4tigen",
+  trashQuestion: "\u201E{title}\u201C und die zugeh\xF6rigen Unteraufgaben in den Papierkorb verschieben? Du kannst sie sp\xE4ter wiederherstellen.",
+  purgeQuestion: "\u201E{title}\u201C, die zugeh\xF6rigen Unteraufgaben, Notizen und den Verlauf endg\xFCltig l\xF6schen? Dies kann nicht r\xFCckg\xE4ngig gemacht werden.",
+  emptyTrashQuestion: "Alle Gruppen im Papierkorb ({count}) endg\xFCltig l\xF6schen? Dies kann nicht r\xFCckg\xE4ngig gemacht werden.",
+  emptyTrashHint: "Gel\xF6schte Aufgaben erscheinen hier. Du kannst sie wiederherstellen oder endg\xFCltig l\xF6schen.",
+  archiveHint: "Abgeschlossene Aufgabengruppen erscheinen hier.",
+  cascadeHint: "Beim Abschlie\xDFen dieser Aufgabe werden auch ihre aktiven Unteraufgaben abgeschlossen.",
+  restoreParent: "Stelle zuerst die \xFCbergeordnete Aufgabe wieder her",
+  reopenParent: "\xD6ffne zuerst die \xFCbergeordnete Aufgabe wieder",
+  staleNotice: "Die Aufgabe wurde an anderer Stelle ge\xE4ndert. Der Entwurf beh\xE4lt seine urspr\xFCngliche Revision.",
+  syncing: "Wird gespeichert\u2026",
+  noTasks: "Keine aktiven Aufgaben",
+  completedAt: "Abgeschlossen: {date}",
+  trashCount: "Papierkorb ({count})",
+  languageName: "Deutsch",
+  settings: "Einstellungen",
+  autoLanguage: "Automatisch",
+  languageHelp: "Automatisch wird die Sprache von Hermes verwendet, sonst die des Browsers oder Systems.",
+  languageSourceManual: "In dieser App ausgew\xE4hlt",
+  languageSourceHermes: "Wie in Hermes",
+  languageSourceBrowser: "Wie im Browser oder System",
+  languageSourceFallback: "Standardsprache",
+  connectionChanged: "Die aktive Hermes-Verbindung hat sich ge\xE4ndert. Bitte erneut versuchen.",
+  errorNewerDatabase: "Die Datenbank wurde mit einer neueren Plugin-Version erstellt",
+  errorTaskId: "Eine Aufgaben-ID ist erforderlich",
+  errorNotFound: "Aufgabe nicht gefunden",
+  errorTooManySubtasks: "F\xFCge h\xF6chstens 100 Unteraufgaben auf einmal hinzu",
+  errorSubtaskDepth: "Es wird nur eine Ebene von Unteraufgaben unterst\xFCtzt",
+  errorSubtaskFields: "Eine Unteraufgabe darf nur einen Titel und eine Beschreibung enthalten",
+  errorReopenParent: "\xD6ffne zuerst die \xFCbergeordnete Aufgabe wieder",
+  errorLifecycleSeparate: "Sende die Papierkorb-Aktion getrennt von Bearbeitungen",
+  errorNoChanges: "Gib einen Titel, eine Beschreibung, den Abschlussstatus, die Wichtigkeit oder einen Kommentar an",
+  errorEvidence: "Hermes muss beschreiben, was erledigt wurde und welche Nachweise dies belegen",
+  errorRevision: "Diese Aufgabe wurde ge\xE4ndert. Aktualisiere die Liste und versuche es erneut",
+  errorRestoreFirst: "Stelle diesen Eintrag zuerst aus dem Papierkorb wieder her",
+  errorLifecycleUnknown: "Unbekannte Papierkorb-Aktion",
+  errorNotInTrash: "Dieser Eintrag befindet sich nicht im Papierkorb",
+  errorRestoreParent: "Stelle zuerst die \xFCbergeordnete Aufgabe wieder her",
+  errorPurgeConfirmation: "Best\xE4tige das endg\xFCltige L\xF6schen ausdr\xFCcklich",
+  errorArgumentObject: "Ein Argumentobjekt wurde erwartet",
+  errorArgumentUnknown: "Unbekanntes Argument",
+  errorReadRevision: "Lies zuerst die Liste und gib die Revision der Aufgabe an",
+  errorJsonContentType: "application/json wurde erwartet",
+  errorRequestSize: "Ung\xFCltige Anfragegr\xF6\xDFe",
+  errorJsonObject: "Ein JSON-Objekt wurde erwartet",
+  errorUnknownField: "Unbekanntes Feld",
+  errorRevisionRequired: "Die Revision der Aufgabe ist erforderlich",
+  errorLocalAddress: "Verwende die Adresse 127.0.0.1",
+  errorAccessDenied: "Zugriff auf die lokale API verweigert",
+  errorOrigin: "Die Herkunft der Anfrage ist nicht zul\xE4ssig",
+  errorRouteNotFound: "Nicht gefunden",
+  errorInvalidData: "Ung\xFCltige Anfragedaten",
+  errorSaveData: "Daten konnten nicht gespeichert werden",
+  errorTextType: "{field}: Text erwartet",
+  errorTextLength: "{field}: muss {minimum} bis {maximum} Zeichen enthalten",
+  errorBoolean: "{field}: true oder false erwartet",
+  "field.title": "Titel",
+  "field.description": "Beschreibung",
+  "field.subtask title": "Titel der Unteraufgabe",
+  "field.comment": "Kommentar",
+  requiredField: "F\xFClle dieses Feld aus."
+};
+
+// locales/fr.json
+var fr_default = {
+  locale: "fr-FR",
+  language: "Langue",
+  heading: "Mes t\xE2ches",
+  details: "D\xE9tails de la t\xE2che",
+  resizePanels: "Redimensionner la liste et les d\xE9tails",
+  expandTask: "D\xE9velopper : {title}",
+  collapseTask: "R\xE9duire : {title}",
+  overallProgress: "Progression globale",
+  newTask: "Nouvelle t\xE2che",
+  taskPlaceholder: "Que faut-il faire ?",
+  search: "Rechercher des t\xE2ches",
+  filters: "Filtres des t\xE2ches",
+  starred: "Importantes",
+  add: "Ajouter",
+  addTask: "Ajouter une t\xE2che",
+  refresh: "Actualiser",
+  saveError: "Impossible d\u2019enregistrer les modifications. R\xE9essayez.",
+  requestError: "Impossible de traiter la demande. R\xE9essayez.",
+  reloadDraft: "Abandonner le brouillon et recharger",
+  reopenLabel: "Rouvrir : ",
+  completeLabel: "Terminer : ",
+  progress: "{done} sur {total} termin\xE9es",
+  noResults: "Aucune t\xE2che trouv\xE9e",
+  stepsProgress: "{done} \xE9tapes sur {total}",
+  unstar: "Retirer des t\xE2ches importantes",
+  star: "Marquer comme importante",
+  taskTitle: "Titre de la t\xE2che",
+  taskDescription: "Description de la t\xE2che",
+  description: "Description",
+  save: "Enregistrer",
+  subtaskTitle: "Titre de la sous-t\xE2che",
+  subtaskDescription: "Description de la sous-t\xE2che",
+  you: "Vous",
+  addStep: "Ajouter une \xE9tape\u2026",
+  newSubtask: "Nouvelle sous-t\xE2che",
+  addSubtask: "Ajouter une sous-t\xE2che",
+  notes: "Notes et r\xE9sultats",
+  notePlaceholder: "Qu\u2019avez-vous accompli ?",
+  newComment: "Nouveau commentaire",
+  addNote: "Ajouter une note",
+  close: "Fermer",
+  lastChanged: "Derni\xE8re modification : {actor} \xB7 {date}",
+  active: "Actives",
+  archive: "Archives",
+  trash: "Corbeille",
+  edit: "Modifier",
+  menu: "Actions",
+  moveTrash: "Mettre \xE0 la corbeille",
+  restore: "Restaurer",
+  purge: "Supprimer d\xE9finitivement",
+  emptyTrash: "Vider la corbeille",
+  cancel: "Annuler",
+  confirm: "Confirmer",
+  trashQuestion: "Mettre \xAB {title} \xBB et ses sous-t\xE2ches \xE0 la corbeille ? Vous pourrez les restaurer plus tard.",
+  purgeQuestion: "Supprimer d\xE9finitivement \xAB {title} \xBB, ses sous-t\xE2ches, ses notes et son historique ? Cette action est irr\xE9versible.",
+  emptyTrashQuestion: "Supprimer d\xE9finitivement tous les groupes de la corbeille ({count}) ? Cette action est irr\xE9versible.",
+  emptyTrashHint: "Les t\xE2ches supprim\xE9es apparaissent ici. Vous pouvez les restaurer ou les supprimer d\xE9finitivement.",
+  archiveHint: "Les groupes de t\xE2ches termin\xE9s apparaissent ici.",
+  cascadeHint: "Terminer cette t\xE2che termine aussi ses sous-t\xE2ches actives.",
+  restoreParent: "Restaurez d\u2019abord la t\xE2che principale",
+  reopenParent: "Rouvrez d\u2019abord la t\xE2che principale",
+  staleNotice: "La t\xE2che a \xE9t\xE9 modifi\xE9e ailleurs. Le brouillon conserve sa r\xE9vision d\u2019origine.",
+  syncing: "Enregistrement\u2026",
+  noTasks: "Aucune t\xE2che active",
+  completedAt: "Termin\xE9e : {date}",
+  trashCount: "Corbeille ({count})",
+  languageName: "Fran\xE7ais",
+  settings: "Param\xE8tres",
+  autoLanguage: "Automatique",
+  languageHelp: "Le mode automatique utilise la langue de Hermes, sinon celle du navigateur ou du syst\xE8me.",
+  languageSourceManual: "Choisie dans cette application",
+  languageSourceHermes: "Selon Hermes",
+  languageSourceBrowser: "Selon le navigateur ou le syst\xE8me",
+  languageSourceFallback: "Langue par d\xE9faut",
+  connectionChanged: "La connexion active de Hermes a chang\xE9. R\xE9essayez.",
+  errorNewerDatabase: "La base de donn\xE9es a \xE9t\xE9 cr\xE9\xE9e par une version plus r\xE9cente du plugin",
+  errorTaskId: "L\u2019ID de la t\xE2che est requis",
+  errorNotFound: "T\xE2che introuvable",
+  errorTooManySubtasks: "Ajoutez au maximum 100 sous-t\xE2ches \xE0 la fois",
+  errorSubtaskDepth: "Un seul niveau de sous-t\xE2ches est pris en charge",
+  errorSubtaskFields: "Une sous-t\xE2che ne peut contenir qu\u2019un titre et une description",
+  errorReopenParent: "Rouvrez d\u2019abord la t\xE2che principale",
+  errorLifecycleSeparate: "Envoyez l\u2019action li\xE9e \xE0 la corbeille s\xE9par\xE9ment des modifications",
+  errorNoChanges: "Indiquez un titre, une description, un \xE9tat d\u2019ach\xE8vement, une importance ou un commentaire",
+  errorEvidence: "Hermes doit d\xE9crire ce qui a \xE9t\xE9 accompli et les \xE9l\xE9ments qui le confirment",
+  errorRevision: "Cette t\xE2che a \xE9t\xE9 modifi\xE9e. Actualisez la liste et r\xE9essayez",
+  errorRestoreFirst: "Restaurez d\u2019abord cet \xE9l\xE9ment depuis la corbeille",
+  errorLifecycleUnknown: "Action li\xE9e \xE0 la corbeille inconnue",
+  errorNotInTrash: "Cet \xE9l\xE9ment n\u2019est pas dans la corbeille",
+  errorRestoreParent: "Restaurez d\u2019abord la t\xE2che principale",
+  errorPurgeConfirmation: "Confirmez explicitement la suppression d\xE9finitive",
+  errorArgumentObject: "Un objet d\u2019arguments est attendu",
+  errorArgumentUnknown: "Argument inconnu",
+  errorReadRevision: "Consultez d\u2019abord la liste et indiquez la r\xE9vision de la t\xE2che",
+  errorJsonContentType: "Le type application/json est attendu",
+  errorRequestSize: "Taille de la demande non valide",
+  errorJsonObject: "Un objet JSON est attendu",
+  errorUnknownField: "Champ inconnu",
+  errorRevisionRequired: "La r\xE9vision de la t\xE2che est requise",
+  errorLocalAddress: "Utilisez l\u2019adresse 127.0.0.1",
+  errorAccessDenied: "Acc\xE8s \xE0 l\u2019API locale refus\xE9",
+  errorOrigin: "L\u2019origine de la demande n\u2019est pas autoris\xE9e",
+  errorRouteNotFound: "Introuvable",
+  errorInvalidData: "Donn\xE9es de la demande non valides",
+  errorSaveData: "Impossible d\u2019enregistrer les donn\xE9es",
+  errorTextType: "{field} : du texte est attendu",
+  errorTextLength: "{field} : doit contenir de {minimum} \xE0 {maximum} caract\xE8res",
+  errorBoolean: "{field} : true ou false est attendu",
+  "field.title": "titre",
+  "field.description": "description",
+  "field.subtask title": "titre de la sous-t\xE2che",
+  "field.comment": "commentaire",
+  requiredField: "Renseignez ce champ."
+};
+
+// locales/pl.json
+var pl_default = {
+  locale: "pl-PL",
+  language: "J\u0119zyk",
+  heading: "Moje zadania",
+  details: "Szczeg\xF3\u0142y zadania",
+  resizePanels: "Zmie\u0144 szeroko\u015B\u0107 listy i szczeg\xF3\u0142\xF3w",
+  expandTask: "Rozwi\u0144: {title}",
+  collapseTask: "Zwi\u0144: {title}",
+  overallProgress: "Og\xF3lny post\u0119p",
+  newTask: "Nowe zadanie",
+  taskPlaceholder: "Co trzeba zrobi\u0107?",
+  search: "Szukaj zada\u0144",
+  filters: "Filtry zada\u0144",
+  starred: "Wa\u017Cne",
+  add: "Dodaj",
+  addTask: "Dodaj zadanie",
+  refresh: "Od\u015Bwie\u017C",
+  saveError: "Nie uda\u0142o si\u0119 zapisa\u0107 zmian. Spr\xF3buj ponownie.",
+  requestError: "Nie uda\u0142o si\u0119 wykona\u0107 \u017C\u0105dania. Spr\xF3buj ponownie.",
+  reloadDraft: "Odrzu\u0107 wersj\u0119 robocz\u0105 i wczytaj ponownie",
+  reopenLabel: "Otw\xF3rz ponownie: ",
+  completeLabel: "Uko\u0144cz: ",
+  progress: "Uko\u0144czono: {done} z {total}",
+  noResults: "Nie znaleziono zada\u0144",
+  stepsProgress: "Kroki: {done} z {total}",
+  unstar: "Usu\u0144 z wa\u017Cnych",
+  star: "Oznacz jako wa\u017Cne",
+  taskTitle: "Tytu\u0142 zadania",
+  taskDescription: "Opis zadania",
+  description: "Opis",
+  save: "Zapisz",
+  subtaskTitle: "Tytu\u0142 podzadania",
+  subtaskDescription: "Opis podzadania",
+  you: "Ty",
+  addStep: "Dodaj krok\u2026",
+  newSubtask: "Nowe podzadanie",
+  addSubtask: "Dodaj podzadanie",
+  notes: "Notatki i wyniki",
+  notePlaceholder: "Co uda\u0142o si\u0119 zrobi\u0107?",
+  newComment: "Nowy komentarz",
+  addNote: "Dodaj notatk\u0119",
+  close: "Zamknij",
+  lastChanged: "Ostatnia zmiana: {actor} \xB7 {date}",
+  active: "Aktywne",
+  archive: "Archiwum",
+  trash: "Kosz",
+  edit: "Edytuj",
+  menu: "Dzia\u0142ania",
+  moveTrash: "Przenie\u015B do kosza",
+  restore: "Przywr\xF3\u0107",
+  purge: "Usu\u0144 trwale",
+  emptyTrash: "Opr\xF3\u017Cnij kosz",
+  cancel: "Anuluj",
+  confirm: "Potwierd\u017A",
+  trashQuestion: "Przenie\u015B\u0107 \u201E{title}\u201D i jego podzadania do kosza? Mo\u017Cesz je p\xF3\u017Aniej przywr\xF3ci\u0107.",
+  purgeQuestion: "Trwale usun\u0105\u0107 \u201E{title}\u201D, jego podzadania, notatki i histori\u0119? Tej operacji nie mo\u017Cna cofn\u0105\u0107.",
+  emptyTrashQuestion: "Trwale usun\u0105\u0107 wszystkie grupy z kosza ({count})? Tej operacji nie mo\u017Cna cofn\u0105\u0107.",
+  emptyTrashHint: "Tutaj pojawiaj\u0105 si\u0119 usuni\u0119te zadania. Mo\u017Cesz je przywr\xF3ci\u0107 lub trwale usun\u0105\u0107.",
+  archiveHint: "Tutaj pojawiaj\u0105 si\u0119 uko\u0144czone grupy zada\u0144.",
+  cascadeHint: "Uko\u0144czenie tego zadania ko\u0144czy tak\u017Ce jego aktywne podzadania.",
+  restoreParent: "Najpierw przywr\xF3\u0107 zadanie nadrz\u0119dne",
+  reopenParent: "Najpierw otw\xF3rz ponownie zadanie nadrz\u0119dne",
+  staleNotice: "Zadanie zmieniono w innym miejscu. Wersja robocza zachowuje pierwotn\u0105 rewizj\u0119.",
+  syncing: "Zapisywanie\u2026",
+  noTasks: "Brak aktywnych zada\u0144",
+  completedAt: "Uko\u0144czono: {date}",
+  trashCount: "Kosz ({count})",
+  languageName: "Polski",
+  settings: "Ustawienia",
+  autoLanguage: "Automatycznie",
+  languageHelp: "Tryb automatyczny u\u017Cywa j\u0119zyka Hermes, a gdy jest niedost\u0119pny \u2014 j\u0119zyka przegl\u0105darki lub systemu.",
+  languageSourceManual: "Wybrany w tej aplikacji",
+  languageSourceHermes: "Zgodnie z Hermes",
+  languageSourceBrowser: "Zgodnie z przegl\u0105dark\u0105 lub systemem",
+  languageSourceFallback: "J\u0119zyk domy\u015Blny",
+  connectionChanged: "Aktywne po\u0142\u0105czenie Hermes uleg\u0142o zmianie. Spr\xF3buj ponownie.",
+  errorNewerDatabase: "Baza danych zosta\u0142a utworzona przez nowsz\u0105 wersj\u0119 wtyczki",
+  errorTaskId: "Wymagany jest ID zadania",
+  errorNotFound: "Nie znaleziono zadania",
+  errorTooManySubtasks: "Mo\u017Cna doda\u0107 najwy\u017Cej 100 podzada\u0144 naraz",
+  errorSubtaskDepth: "Obs\u0142ugiwany jest tylko jeden poziom podzada\u0144",
+  errorSubtaskFields: "Podzadanie mo\u017Ce zawiera\u0107 tylko tytu\u0142 i opis",
+  errorReopenParent: "Najpierw otw\xF3rz ponownie zadanie nadrz\u0119dne",
+  errorLifecycleSeparate: "Wy\u015Blij dzia\u0142anie dotycz\u0105ce kosza oddzielnie od zmian",
+  errorNoChanges: "Podaj tytu\u0142, opis, stan uko\u0144czenia, wa\u017Cno\u015B\u0107 lub komentarz",
+  errorEvidence: "Hermes musi opisa\u0107 wykonane dzia\u0142ania i dowody ich uko\u0144czenia",
+  errorRevision: "To zadanie zosta\u0142o zmienione. Od\u015Bwie\u017C list\u0119 i spr\xF3buj ponownie",
+  errorRestoreFirst: "Najpierw przywr\xF3\u0107 ten element z kosza",
+  errorLifecycleUnknown: "Nieznane dzia\u0142anie dotycz\u0105ce kosza",
+  errorNotInTrash: "Tego elementu nie ma w koszu",
+  errorRestoreParent: "Najpierw przywr\xF3\u0107 zadanie nadrz\u0119dne",
+  errorPurgeConfirmation: "Wyra\u017Anie potwierd\u017A trwa\u0142e usuni\u0119cie",
+  errorArgumentObject: "Oczekiwano obiektu argument\xF3w",
+  errorArgumentUnknown: "Nieznany argument",
+  errorReadRevision: "Najpierw odczytaj list\u0119 i podaj rewizj\u0119 zadania",
+  errorJsonContentType: "Oczekiwano application/json",
+  errorRequestSize: "Nieprawid\u0142owy rozmiar \u017C\u0105dania",
+  errorJsonObject: "Oczekiwano obiektu JSON",
+  errorUnknownField: "Nieznane pole",
+  errorRevisionRequired: "Wymagana jest rewizja zadania",
+  errorLocalAddress: "U\u017Cyj adresu 127.0.0.1",
+  errorAccessDenied: "Odmowa dost\u0119pu do lokalnego API",
+  errorOrigin: "Niedozwolone \u017Ar\xF3d\u0142o \u017C\u0105dania",
+  errorRouteNotFound: "Nie znaleziono",
+  errorInvalidData: "Nieprawid\u0142owe dane \u017C\u0105dania",
+  errorSaveData: "Nie uda\u0142o si\u0119 zapisa\u0107 danych",
+  errorTextType: "{field}: oczekiwano tekstu",
+  errorTextLength: "{field}: musi zawiera\u0107 od {minimum} do {maximum} znak\xF3w",
+  errorBoolean: "{field}: oczekiwano true lub false",
+  "field.title": "tytu\u0142",
+  "field.description": "opis",
+  "field.subtask title": "tytu\u0142 podzadania",
+  "field.comment": "komentarz",
+  requiredField: "Wype\u0142nij to pole."
+};
+
+// frontend/src/i18n.mjs
+var translations = { en: en_default, ru: ru_default, es: es_default, "pt-BR": pt_BR_default, de: de_default, fr: fr_default, pl: pl_default };
+var supportedLanguages = Object.entries(translations).map(([code, catalog]) => ({ code, name: catalog.languageName }));
+var LANGUAGE_KEY = "ptm.language";
+function normalizeLanguage(value) {
+  if (typeof value !== "string") return null;
+  const tag = value.split(",")[0].split(";")[0].trim().replaceAll("_", "-").toLowerCase();
+  const exact = supportedLanguages.find((item) => item.code.toLowerCase() === tag);
+  if (exact) return exact.code;
+  const base = tag.split("-")[0];
+  if (base === "pt") return "pt-BR";
+  return Object.hasOwn(translations, base) ? base : null;
+}
+function browserLanguages() {
+  const nav = globalThis.window?.navigator || globalThis.navigator;
+  return nav?.languages?.length ? [...nav.languages] : nav?.language ? [nav.language] : [];
+}
+function languageStorage() {
   try {
-    const value = localStorage.getItem("ptm.language");
-    return Object.hasOwn(translations, value) ? value : "en";
+    return globalThis.localStorage || globalThis.window?.localStorage;
   } catch {
-    return "en";
+    return void 0;
   }
 }
+function languagePreference(storage = languageStorage()) {
+  try {
+    return normalizeLanguage(storage?.getItem(LANGUAGE_KEY));
+  } catch {
+    return null;
+  }
+}
+function resolveLanguage({ manual, hermes, browser = browserLanguages() } = {}) {
+  const selected = normalizeLanguage(manual);
+  if (selected) return { language: selected, source: "Manual" };
+  if (typeof hermes === "string" && hermes.trim() && hermes.toLowerCase() !== "auto") {
+    const inherited = normalizeLanguage(hermes);
+    return { language: inherited || "en", source: inherited ? "Hermes" : "Fallback" };
+  }
+  for (const candidate of Array.isArray(browser) ? browser : [browser]) {
+    const inherited = normalizeLanguage(candidate);
+    if (inherited) return { language: inherited, source: "Browser" };
+  }
+  return { language: "en", source: "Fallback" };
+}
+function localeFor(language) {
+  return translations[normalizeLanguage(language) || "en"].locale;
+}
+function formatNumber(language, value) {
+  return new Intl.NumberFormat(localeFor(language)).format(value);
+}
+function formatDateTime(language, stamp) {
+  const date = new Date(stamp);
+  return Number.isNaN(date.valueOf()) ? "\u2014" : new Intl.DateTimeFormat(localeFor(language), { dateStyle: "medium", timeStyle: "short" }).format(date);
+}
 function translate(language, key, values = {}) {
-  const c = Object.hasOwn(translations, language) ? translations[language] : translations.en;
-  return (c[key] || translations.en[key] || key).replace(/\{(\w+)\}/g, (_, name) => String(values[name] ?? `{${name}}`));
+  const code = normalizeLanguage(language) || "en", catalog = translations[code];
+  const message = Object.hasOwn(catalog, key) && catalog[key] || Object.hasOwn(en_default, key) && en_default[key] || key;
+  return message.replace(/\{(\w+)\}/g, (_, name) => {
+    const value = values[name];
+    if (value === void 0) return `{${name}}`;
+    if (name === "field") return catalog[`field.${value}`] || en_default[`field.${value}`] || String(value);
+    return typeof value === "number" ? formatNumber(code, value) : String(value);
+  });
+}
+var LocalizedError = class extends Error {
+  constructor(key, values = {}) {
+    super(translate("en", key, values));
+    this.key = key;
+    this.values = values;
+  }
+};
+var escape = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+var errorPatterns = Object.values(translations).flatMap((catalog) => Object.entries(catalog).filter(([key]) => key.startsWith("error") || ["connectionChanged", "requestError", "saveError"].includes(key)).map(([key, message]) => {
+  const names = [];
+  const pattern = message.split(/(\{\w+\})/).map((part) => {
+    if (/^\{\w+\}$/.test(part)) {
+      names.push(part.slice(1, -1));
+      return "(.+?)";
+    }
+    return escape(part);
+  }).join("");
+  return { key, names, pattern: new RegExp(`^${pattern}$`), catalog };
+}));
+function describeError(error, fallback = "requestError") {
+  if (error instanceof LocalizedError && Object.hasOwn(en_default, error.key)) return { key: error.key, values: error.values };
+  for (const entry of errorPatterns) {
+    const match = entry.pattern.exec(error?.message || "");
+    if (!match) continue;
+    const values = {};
+    entry.names.forEach((name, index) => {
+      const value = match[index + 1];
+      if (name === "field") values[name] = Object.keys(entry.catalog).find((key) => key.startsWith("field.") && entry.catalog[key] === value)?.slice(6) || value;
+      else if (["minimum", "maximum", "count"].includes(name)) values[name] = Number(value.replace(/[,\.\s\u00a0\u202f]/g, ""));
+      else values[name] = value;
+    });
+    return { key: entry.key, values };
+  }
+  return { key: fallback, values: {} };
 }
 
 // frontend/src/state.mjs
 var empty = () => ({ tasks: [], trash: [], comments: [], events: [], progress: { total: 0, done: 0, percent: 0 } });
-function createController({ transport, scope = "default", storage } = {}) {
-  if (storage === void 0) {
-    try {
-      storage = globalThis.localStorage;
-    } catch {
-    }
-  }
+function createController({ transport, scope = "default", storage, hermesLanguage, browserLanguages: browserLanguages2 = browserLanguages() } = {}) {
+  if (storage === void 0) storage = languageStorage();
   const listeners = /* @__PURE__ */ new Set();
   const key = `ptm.view:${scope}`;
   let prefs = {};
@@ -215,9 +933,14 @@ function createController({ transport, scope = "default", storage } = {}) {
     if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) prefs = parsed;
   } catch {
   }
+  let manualLanguage = languagePreference(storage);
+  let inheritedLanguage = hermesLanguage, machineLanguages = browserLanguages2;
+  const initialLanguage = resolveLanguage({ manual: manualLanguage, hermes: inheritedLanguage, browser: machineLanguages });
   let state = {
     data: empty(),
-    language: savedLanguage(),
+    language: initialLanguage.language,
+    languagePreference: manualLanguage || "auto",
+    languageSource: initialLanguage.source,
     view: "active",
     query: "",
     starred: false,
@@ -228,6 +951,7 @@ function createController({ transport, scope = "default", storage } = {}) {
     pending: false,
     loaded: false,
     error: "",
+    errorDetail: null,
     confirmation: null
   };
   let sequence = 0, generation = 0, disposed = false;
@@ -237,7 +961,20 @@ function createController({ transport, scope = "default", storage } = {}) {
     for (const listener of listeners) listener();
   };
   const t = (name, values) => translate(state.language, name, values);
-  const report = (error) => emit({ error: error instanceof TypeError ? t("requestError") : error.message || t("saveError") });
+  const report = (error, fallback = "requestError") => {
+    const detail = describeError(error, fallback);
+    emit({ error: t(detail.key, detail.values), errorDetail: detail });
+  };
+  function applyLanguage() {
+    const next = resolveLanguage({ manual: manualLanguage, hermes: inheritedLanguage, browser: machineLanguages });
+    if (next.language === state.language && next.source === state.languageSource && (manualLanguage || "auto") === state.languagePreference) return;
+    emit({
+      language: next.language,
+      languagePreference: manualLanguage || "auto",
+      languageSource: next.source,
+      ...state.errorDetail ? { error: translate(next.language, state.errorDetail.key, state.errorDetail.values) } : {}
+    });
+  }
   const request = (path, options = {}) => transport(path, { ...options, language: state.language });
   function persist() {
     try {
@@ -251,7 +988,7 @@ function createController({ transport, scope = "default", storage } = {}) {
     try {
       const next = await request("/tasks");
       if (disposed || id !== sequence || epoch !== generation) return;
-      emit({ data: { ...empty(), ...next }, loaded: true, error: "" });
+      emit({ data: { ...empty(), ...next }, loaded: true, error: "", errorDetail: null });
     } catch (error) {
       if (!disposed && id === sequence && epoch === generation) report(error);
     }
@@ -259,7 +996,7 @@ function createController({ transport, scope = "default", storage } = {}) {
   async function mutate(action, optimistic) {
     if (state.pending || disposed) return null;
     const epoch = ++generation, previous = state.data;
-    emit({ pending: true, error: "", ...optimistic ? { data: optimistic(previous) } : {} });
+    emit({ pending: true, error: "", errorDetail: null, ...optimistic ? { data: optimistic(previous) } : {} });
     let result = null, written = false;
     try {
       result = await action();
@@ -270,7 +1007,7 @@ function createController({ transport, scope = "default", storage } = {}) {
       if (!disposed && epoch === generation) {
         if (!written) emit({ data: previous });
         await refresh(true);
-        if (!disposed && epoch === generation) report(error);
+        if (!disposed && epoch === generation) report(error, "saveError");
       }
     } finally {
       if (!disposed && epoch === generation) emit({ pending: false });
@@ -366,12 +1103,27 @@ function createController({ transport, scope = "default", storage } = {}) {
       persist();
     },
     language(language) {
-      if (!["en", "ru"].includes(language)) return;
+      if (language !== "auto" && !normalizeLanguage(language)) return;
+      manualLanguage = language === "auto" ? null : normalizeLanguage(language);
       try {
-        storage?.setItem("ptm.language", language);
+        storage?.setItem(LANGUAGE_KEY, manualLanguage || "auto");
       } catch {
       }
-      emit({ language, error: "" });
+      applyLanguage();
+    },
+    inheritLanguage(language, browser = browserLanguages()) {
+      inheritedLanguage = language;
+      machineLanguages = browser;
+      applyLanguage();
+    },
+    syncLanguagePreference() {
+      try {
+        if (storage?.getItem) {
+          manualLanguage = normalizeLanguage(storage.getItem(LANGUAGE_KEY));
+          applyLanguage();
+        }
+      } catch {
+      }
     },
     dispose() {
       disposed = true;
@@ -393,12 +1145,16 @@ function visibleRoots(state) {
 }
 
 // frontend/src/view.mjs
+var formValidation = (t) => ({
+  onInvalid: (event) => event.target.setCustomValidity?.(t(event.target.validity?.valueMissing ? "requiredField" : "errorInvalidData")),
+  onInputCapture: (event) => event.target.setCustomValidity?.("")
+});
 function createTasksView(React2, kit = {}) {
   const h = React2.createElement;
   const Input = kit.Input || "input", Textarea = kit.Textarea || "textarea";
   const Button = ({ className, ...props }) => h(kit.Button || "button", {
     ...props,
-    className: [!kit.Button && "ptm-button", className].filter(Boolean).join(" ") || void 0
+    className: ["ptm-control", !kit.Button && "ptm-button", className].filter(Boolean).join(" ") || void 0
   });
   const act = (label, onClick, props = {}) => h(Button, { type: "button", onClick, ...props }, label);
   const icon = (name, glyph) => h("span", { className: `ptm-icon ptm-icon-${name}`, "aria-hidden": true }, glyph);
@@ -446,6 +1202,15 @@ function createTasksView(React2, kit = {}) {
     );
   }
   function Editor({ task, state, controller, t }) {
+    const panel = React2.useRef(null);
+    React2.useEffect(() => {
+      panel.current?.focus();
+    }, [task.id]);
+    const close = () => {
+      const widget = panel.current?.closest(".ptm");
+      controller.set({ editing: null });
+      queueMicrotask(() => [...widget?.querySelectorAll("[data-task-id]") || []].find((row) => row.dataset.taskId === task.id)?.querySelector(".ptm-task-title")?.focus());
+    };
     const input = (form, field, fallback) => state.drafts.get(`${task.id}:${form}`)?.values[field] ?? fallback;
     const dirty = (form) => state.drafts.get(`${task.id}:${form}`);
     const warning = (form) => dirty(form)?.revision !== void 0 && dirty(form).revision !== task.revision ? h(
@@ -460,17 +1225,35 @@ function createTasksView(React2, kit = {}) {
     };
     const change = (form, field) => (event2) => controller.draft(task.id, form, field, event2.target.value);
     const prefix = task.parent_id ? `${task.id}:` : "";
-    const date = (stamp) => new Date(stamp).toLocaleString(t("locale"), { dateStyle: "medium", timeStyle: "short" });
+    const date = (stamp) => formatDateTime(state.language, stamp);
     const notes = state.data.comments.filter((note) => note.task_id === task.id);
     const event = state.data.events.filter((item) => item.task_id === task.id).at(-1);
     return h(
       "section",
-      { className: "ptm-editor", "aria-label": t("details") },
-      h("div", { className: "ptm-editor-header" }, h("strong", {}, t("details")), act(t("close"), () => controller.set({ editing: null }))),
+      {
+        ref: panel,
+        className: "ptm-editor",
+        tabIndex: -1,
+        "aria-label": t("details"),
+        onKeyDown: (event2) => {
+          if (event2.key === "Escape") {
+            event2.stopPropagation();
+            close();
+          }
+        }
+      },
+      h(
+        "div",
+        { className: "ptm-editor-header" },
+        h("strong", {}, t("details")),
+        act(icon("close"), close, { className: "ptm-close", "aria-label": t("close"), title: t("close") })
+      ),
       h(
         "form",
-        { className: "ptm-edit", onSubmit: submit("edit") },
-        h("label", {}, t("taskTitle"), h(Input, {
+        { ...formValidation(t), className: "ptm-edit", onSubmit: submit("edit") },
+        h("label", {}, t(task.parent_id ? "subtaskTitle" : "taskTitle"), h(Textarea, {
+          rows: 2,
+          className: "ptm-title-input",
           value: input("edit", "title", task.title),
           maxLength: 300,
           required: true,
@@ -480,18 +1263,18 @@ function createTasksView(React2, kit = {}) {
         })),
         h("label", {}, t("description"), h(Textarea, {
           value: input("edit", "description", task.description),
-          rows: 3,
+          rows: 6,
           maxLength: 2e4,
           "data-draft-key": prefix + "description",
           "aria-label": t(task.parent_id ? "subtaskDescription" : "taskDescription"),
           onChange: change("edit", "description")
         })),
         warning("edit"),
-        h(Button, { type: "submit", disabled: state.pending || !dirty("edit") }, t("save"))
+        h(Button, { type: "submit", className: "ptm-primary", disabled: state.pending || !dirty("edit") }, t("save"))
       ),
       !task.parent_id && !task.done && h(
         "form",
-        { className: "ptm-subtask-add", onSubmit: submit("child") },
+        { ...formValidation(t), className: "ptm-subtask-add", onSubmit: submit("child") },
         h(Input, {
           value: input("child", "title", ""),
           "data-draft-key": "new-subtask",
@@ -501,7 +1284,7 @@ function createTasksView(React2, kit = {}) {
           maxLength: 300,
           onChange: change("child", "title")
         }),
-        h(Button, { type: "submit", disabled: state.pending }, withIcon("plus", t("addSubtask")))
+        h(Button, { type: "submit", className: "ptm-primary", disabled: state.pending }, withIcon("plus", t("addSubtask")))
       ),
       h(
         "section",
@@ -515,7 +1298,7 @@ function createTasksView(React2, kit = {}) {
         )),
         h(
           "form",
-          { onSubmit: submit("note") },
+          { ...formValidation(t), onSubmit: submit("note") },
           h(Textarea, {
             value: input("note", "comment", ""),
             "data-draft-key": "new-comment",
@@ -527,7 +1310,7 @@ function createTasksView(React2, kit = {}) {
             onChange: change("note", "comment")
           }),
           warning("note"),
-          h(Button, { type: "submit", disabled: state.pending || !dirty("note") }, t("addNote"))
+          h(Button, { type: "submit", className: "ptm-primary", disabled: state.pending || !dirty("note") }, t("addNote"))
         )
       ),
       task.completed_at && h("small", {}, t("completedAt", { date: date(task.completed_at) })),
@@ -550,7 +1333,7 @@ function createTasksView(React2, kit = {}) {
       { className: `ptm-group${child ? " ptm-child" : ""}`, "data-task-id": task.id },
       h(
         "div",
-        { className: `ptm-row${task.done ? " is-done" : ""}` },
+        { className: `ptm-row${task.done ? " is-done" : ""}${state.editing === task.id && !trashed ? " is-selected" : ""}` },
         !trashed && h(
           "label",
           { className: "ptm-check-hit", title: locked ? t("reopenParent") : !child ? t("cascadeHint") : void 0 },
@@ -563,15 +1346,29 @@ function createTasksView(React2, kit = {}) {
             onChange: () => controller.toggle(task)
           })
         ),
+        !child && h("button", {
+          type: "button",
+          className: "ptm-expand",
+          "aria-expanded": expanded,
+          "aria-label": t(expanded ? "collapseTask" : "expandTask", { title: task.title }),
+          onClick: () => controller.expand(task.id)
+        }, icon("chevron")),
         h(
           "button",
           {
             type: "button",
             className: "ptm-task-title",
-            "aria-expanded": !child ? expanded : void 0,
-            onClick: () => !child ? controller.expand(task.id) : controller.set({ editing: state.editing === task.id ? null : task.id })
+            title: task.title,
+            "aria-current": state.editing === task.id && !trashed ? "true" : void 0,
+            onClick: () => {
+              if (trashed) {
+                if (!child) controller.expand(task.id);
+                return;
+              }
+              if (!child && !expanded) controller.expand(task.id);
+              controller.set({ editing: task.id });
+            }
           },
-          children.length ? h("span", { className: "ptm-chevron", "aria-hidden": true }) : null,
           h("span", { className: "ptm-title-text" }, task.title)
         ),
         !trashed && h("button", {
@@ -586,7 +1383,7 @@ function createTasksView(React2, kit = {}) {
         children.length ? h(
           "small",
           { className: "ptm-step-count", "aria-label": t("stepsProgress", { done: children.filter((c) => c.done).length, total: children.length }) },
-          `${children.filter((c) => c.done).length}/${children.length}`
+          `${formatNumber(state.language, children.filter((c) => c.done).length)}/${formatNumber(state.language, children.length)}`
         ) : null,
         h(
           "details",
@@ -600,7 +1397,7 @@ function createTasksView(React2, kit = {}) {
           h(
             "div",
             { role: "menu", className: "ptm-menu-items" },
-            !trashed && menuAction(t("edit"), () => controller.set({ editing: state.editing === task.id ? null : task.id })),
+            !trashed && menuAction(t("edit"), () => controller.set({ editing: task.id })),
             !trashed && menuAction(t(task.starred ? "unstar" : "star"), () => controller.star(task), { disabled: state.pending }),
             !trashed && menuAction(withIcon("trash", t("moveTrash")), () => controller.confirm("trash", task), { disabled: state.pending }),
             trashed && menuAction(t("restore"), () => controller.restore(task), { disabled: state.pending || Boolean(parent?.trashed_at), title: parent?.trashed_at ? t("restoreParent") : void 0 }),
@@ -608,7 +1405,6 @@ function createTasksView(React2, kit = {}) {
           )
         )
       ),
-      state.editing === task.id && !trashed && h(Editor, { task, state, controller, t }),
       expanded && !child && h(
         "div",
         { className: "ptm-children" },
@@ -617,14 +1413,36 @@ function createTasksView(React2, kit = {}) {
       )
     );
   }
-  return function TasksView({ transport, scope = "default", surface = "dashboard", schedule, controller: supplied }) {
+  return function TasksView({ transport, scope = "default", surface = "dashboard", schedule, controller: supplied, hermesLanguage }) {
     const controllers = React2.useRef(/* @__PURE__ */ new Map());
     const transportRef = React2.useRef(transport);
     transportRef.current = transport;
-    if (!controllers.current.has(scope)) controllers.current.set(scope, supplied || createController({ scope, transport: (...args) => transportRef.current(...args) }));
+    if (!controllers.current.has(scope)) controllers.current.set(scope, supplied || createController({ scope, hermesLanguage, transport: (...args) => transportRef.current(...args) }));
     const controller = controllers.current.get(scope);
     const state = React2.useSyncExternalStore(controller.subscribe, controller.getSnapshot);
     const t = (name, values) => translate(state.language, name, values);
+    React2.useEffect(() => {
+      if (surface === "preview") {
+        document.title = translate(state.language, "heading");
+        document.documentElement.lang = state.language;
+      }
+    }, [surface, state.language]);
+    React2.useEffect(() => {
+      controller.syncLanguagePreference();
+    }, [controller]);
+    React2.useEffect(() => {
+      const update = () => controller.inheritLanguage(hermesLanguage);
+      const sync = (event) => {
+        if (event.key === "ptm.language" || event.key === null) controller.syncLanguagePreference();
+      };
+      update();
+      window.addEventListener("languagechange", update);
+      window.addEventListener("storage", sync);
+      return () => {
+        window.removeEventListener("languagechange", update);
+        window.removeEventListener("storage", sync);
+      };
+    }, [controller, hermesLanguage]);
     React2.useEffect(() => {
       controller.refresh();
       const poll = () => {
@@ -636,7 +1454,7 @@ function createTasksView(React2, kit = {}) {
       })();
       window.addEventListener("focus", poll);
       const closeMenus = (event) => {
-        for (const menu of document.querySelectorAll(".ptm-menu[open]")) if (!menu.contains(event.target)) menu.removeAttribute("open");
+        for (const menu of document.querySelectorAll(".ptm-menu[open], .ptm-settings[open]")) if (!menu.contains(event.target)) menu.removeAttribute("open");
       };
       document.addEventListener("pointerdown", closeMenus);
       return () => {
@@ -656,8 +1474,31 @@ function createTasksView(React2, kit = {}) {
         });
       };
     }, []);
+    const [split, setSplit] = React2.useState(50);
+    const [addingAtEnd, setAddingAtEnd] = React2.useState(false);
+    const bottomForm = React2.useRef(null);
+    React2.useEffect(() => {
+      setAddingAtEnd(false);
+    }, [controller, state.view]);
+    React2.useEffect(() => {
+      if (addingAtEnd) bottomForm.current?.querySelector("input")?.focus();
+    }, [addingAtEnd]);
+    const workspace = React2.useRef(null);
+    const resize = (event) => {
+      if (!event.currentTarget.hasPointerCapture?.(event.pointerId)) return;
+      const box = workspace.current.getBoundingClientRect();
+      setSplit(Math.max(30, Math.min(70, (event.clientX - box.left) / box.width * 100)));
+    };
+    const cancelBottomAdd = () => {
+      setAddingAtEnd(false);
+      queueMicrotask(() => workspace.current?.querySelector(".ptm-add-root")?.focus());
+    };
     const roots = visibleRoots(state);
     const items = state.view === "trash" ? state.data.trash : state.data.tasks;
+    const selected = state.view !== "trash" && items.find((task) => task.id === state.editing && !task.trashed_at && roots.some((root) => root.id === task.id || root.id === task.parent_id));
+    React2.useEffect(() => {
+      if (state.editing && !selected && !state.pending) controller.set({ editing: null });
+    }, [controller, state.editing, selected?.id, state.pending]);
     const trashRoots = state.data.trash.filter((task) => !state.data.trash.some((parent) => parent.id === task.parent_id));
     return h(
       "section",
@@ -665,13 +1506,35 @@ function createTasksView(React2, kit = {}) {
       h(
         "header",
         { className: "ptm-header" },
-        h("h1", {}, t("heading"), h("span", { className: "ptm-count" }, state.data.progress.total)),
-        h("div", { className: "ptm-header-actions" }, h(
-          "select",
-          { className: "ptm-language", value: state.language, "aria-label": t("language"), onChange: (event) => controller.language(event.target.value) },
-          h("option", { value: "en" }, "English"),
-          h("option", { value: "ru" }, "\u0420\u0443\u0441\u0441\u043A\u0438\u0439")
-        ), act(t("refresh"), () => controller.refresh(), { disabled: state.pending }))
+        h("h1", {}, t("heading"), h("span", { className: "ptm-count" }, formatNumber(state.language, state.data.progress.total))),
+        h(
+          "div",
+          { className: "ptm-header-actions" },
+          h(
+            "details",
+            { className: "ptm-settings" },
+            h("summary", { "aria-label": t("settings"), title: t("settings") }, icon("settings", "\u2699")),
+            h(
+              "div",
+              { className: "ptm-settings-panel" },
+              h("strong", {}, t("settings")),
+              h("label", {}, t("language"), h(
+                "select",
+                {
+                  className: "ptm-language",
+                  value: state.languagePreference,
+                  "aria-label": t("language"),
+                  onChange: (event) => controller.language(event.target.value)
+                },
+                h("option", { value: "auto" }, t("autoLanguage")),
+                supportedLanguages.map(({ code, name }) => h("option", { key: code, value: code, lang: code }, name))
+              )),
+              h("small", { className: "ptm-muted" }, t(`languageSource${state.languageSource}`)),
+              h("small", { className: "ptm-muted" }, t("languageHelp"))
+            )
+          ),
+          act(t("refresh"), () => controller.refresh(), { disabled: state.pending })
+        )
       ),
       h(
         "div",
@@ -682,50 +1545,125 @@ function createTasksView(React2, kit = {}) {
       h("nav", { className: "ptm-tabs", "aria-label": t("filters") }, ["active", "archive", "trash"].map((view) => act(view === "trash" ? withIcon("trash", t("trashCount", { count: trashRoots.length })) : t(view), () => controller.set({ view, editing: null }), { key: view, "aria-pressed": state.view === view }))),
       h(
         "div",
-        { className: "ptm-toolbar" },
+        { ref: workspace, className: `ptm-workspace${selected ? " has-details" : ""}`, style: { "--ptm-list-width": `${split}%` } },
         h(
           "div",
-          { className: "ptm-search" },
-          icon("search"),
-          h(Input, {
-            type: "search",
-            value: state.query,
-            placeholder: t("search"),
-            "aria-label": t("search"),
-            onChange: (event) => controller.set({ query: event.target.value })
-          })
+          { className: "ptm-list-pane" },
+          h(
+            "div",
+            { className: "ptm-toolbar" },
+            h(
+              "div",
+              { className: "ptm-search" },
+              icon("search"),
+              h(Input, {
+                type: "search",
+                value: state.query,
+                placeholder: t("search"),
+                "aria-label": t("search"),
+                onChange: (event) => controller.set({ query: event.target.value })
+              })
+            ),
+            act(t("starred"), () => controller.set({ starred: !state.starred }), { "aria-pressed": state.starred }),
+            state.view === "trash" && trashRoots.length > 0 && act(withIcon("trash", t("emptyTrash")), () => controller.confirm("empty"), { className: "ptm-danger", disabled: state.pending })
+          ),
+          state.view === "active" && h(
+            "form",
+            { ...formValidation(t), className: "ptm-add", onSubmit: (event) => {
+              event.preventDefault();
+              controller.add();
+            } },
+            h(Input, {
+              value: state.newTitle,
+              placeholder: t("taskPlaceholder"),
+              "aria-label": t("newTask"),
+              maxLength: 300,
+              required: true,
+              onChange: (event) => controller.set({ newTitle: event.target.value })
+            }),
+            h(Button, { type: "submit", className: "ptm-add-task ptm-primary", disabled: state.pending }, withIcon("plus", t("add")))
+          ),
+          h("div", { className: "ptm-message", role: "status", "aria-live": "polite" }, state.error || (state.pending ? t("syncing") : "")),
+          h(
+            "div",
+            { className: "ptm-list" },
+            roots.length ? roots.map((task) => h(TaskRow, { key: task.id, task, state, controller, t, children: items.filter((child) => child.parent_id === task.id) })) : h("p", { className: "ptm-empty" }, t(state.query || state.starred ? "noResults" : state.view === "trash" ? "emptyTrashHint" : state.view === "archive" ? "archiveHint" : "noTasks")),
+            state.view === "active" && (addingAtEnd ? h(
+              "form",
+              {
+                ...formValidation(t),
+                ref: bottomForm,
+                className: "ptm-add-bottom",
+                onKeyDown: (event) => {
+                  if (event.key === "Escape") {
+                    event.preventDefault();
+                    cancelBottomAdd();
+                  }
+                },
+                onSubmit: async (event) => {
+                  event.preventDefault();
+                  if (await controller.add()) setAddingAtEnd(false);
+                }
+              },
+              h(Input, {
+                value: state.newTitle,
+                placeholder: t("taskPlaceholder"),
+                "aria-label": t("newTask"),
+                maxLength: 300,
+                required: true,
+                onChange: (event) => controller.set({ newTitle: event.target.value })
+              }),
+              h(
+                "div",
+                { className: "ptm-add-bottom-actions" },
+                h(Button, { type: "submit", className: "ptm-add-task ptm-primary", disabled: state.pending }, withIcon("plus", t("add"))),
+                act(t("cancel"), cancelBottomAdd)
+              )
+            ) : act(withIcon("plus", t("addTask")), () => setAddingAtEnd(true), { className: "ptm-add-root", disabled: state.pending }))
+          )
         ),
-        act(t("starred"), () => controller.set({ starred: !state.starred }), { "aria-pressed": state.starred }),
-        state.view === "trash" && trashRoots.length > 0 && act(withIcon("trash", t("emptyTrash")), () => controller.confirm("empty"), { className: "ptm-danger", disabled: state.pending })
-      ),
-      state.view === "active" && h(
-        "form",
-        { className: "ptm-add", onSubmit: (event) => {
-          event.preventDefault();
-          controller.add();
-        } },
-        h(Input, {
-          value: state.newTitle,
-          placeholder: t("taskPlaceholder"),
-          "aria-label": t("newTask"),
-          maxLength: 300,
-          required: true,
-          onChange: (event) => controller.set({ newTitle: event.target.value })
+        selected && h("div", {
+          className: "ptm-divider",
+          role: "separator",
+          tabIndex: 0,
+          "aria-label": t("resizePanels"),
+          "aria-orientation": "vertical",
+          "aria-valuemin": 30,
+          "aria-valuemax": 70,
+          "aria-valuenow": Math.round(split),
+          onPointerDown: (event) => {
+            if (event.button === 0) {
+              event.preventDefault();
+              event.currentTarget.focus();
+              event.currentTarget.setPointerCapture(event.pointerId);
+            }
+          },
+          onPointerMove: resize,
+          onPointerUp: (event) => {
+            if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+          },
+          onDoubleClick: () => setSplit(50),
+          onKeyDown: (event) => {
+            const next = { ArrowLeft: split - 5, ArrowRight: split + 5, Home: 30, End: 70 }[event.key];
+            if (next !== void 0) {
+              event.preventDefault();
+              setSplit(Math.max(30, Math.min(70, next)));
+            }
+          }
         }),
-        h(Button, { type: "submit", className: "ptm-add-task", disabled: state.pending }, withIcon("plus", t("add")))
+        selected && h(Editor, { key: `${scope}:${selected.id}`, task: selected, state, controller, t })
       ),
-      h("div", { className: "ptm-message", role: "status", "aria-live": "polite" }, state.error || (state.pending ? t("syncing") : "")),
-      h("div", { className: "ptm-list" }, roots.length ? roots.map((task) => h(TaskRow, { key: task.id, task, state, controller, t, children: items.filter((child) => child.parent_id === task.id) })) : h("p", { className: "ptm-empty" }, t(state.query || state.starred ? "noResults" : state.view === "trash" ? "emptyTrashHint" : state.view === "archive" ? "archiveHint" : "noTasks"))),
       h(Confirmation, { state, controller, t })
     );
   };
 }
 
 // frontend/src/style.css
-var style_default = '.ptm { --ptm-bg:var(--background-base,var(--color-background,#fff)); --ptm-soft:var(--color-muted,#f4f4f5); --ptm-line:var(--color-border,#dedee3); --ptm-text:var(--foreground-base,var(--color-foreground,#242428)); --ptm-muted:var(--color-muted-foreground,#71717a); --ptm-accent:var(--color-primary,#52525b); --ptm-danger:var(--color-destructive,#b42318); color:var(--ptm-text); font:inherit; font-size:14px; line-height:1.45; width:100%; min-width:0; padding:16px; box-sizing:border-box; }\n.ptm[data-surface=webapp] { --ptm-bg:var(--ui-bg-editor); --ptm-soft:var(--ui-bg-hover,var(--ui-bg-elevated)); --ptm-line:var(--ui-stroke-secondary); --ptm-text:var(--ui-text-primary); --ptm-muted:var(--ui-text-secondary); --ptm-accent:var(--ui-accent); --ptm-danger:var(--ui-danger,var(--ui-red,var(--ui-accent))); }\n.ptm *, .ptm *::before, .ptm *::after {box-sizing:border-box;}\n.ptm button,.ptm input,.ptm textarea,.ptm select {font:inherit; color:inherit; max-width:100%;}\n.ptm button {cursor:pointer;}\n.ptm button:disabled,.ptm input:disabled {cursor:default; opacity:.55;}\n.ptm .ptm-button,.ptm .ptm-compact-button {background:transparent;border:1px solid var(--ptm-line);border-radius:6px;padding:5px 9px;min-height:32px;}\n.ptm button:hover:not(:disabled),.ptm summary:hover {background:var(--ptm-soft);}\n.ptm :focus-visible {outline:2px solid var(--ptm-accent);outline-offset:2px;}\n.ptm-header,.ptm-header-actions,.ptm-toolbar,.ptm-add,.ptm-progress,.ptm-editor-header,.ptm-subtask-add {display:flex;align-items:center;gap:8px;min-width:0;}\n.ptm-header {justify-content:space-between;flex-wrap:wrap;margin-bottom:12px;}\n.ptm h1 {font-size:18px;font-weight:600;margin:0;line-height:1.4;}\n.ptm h2 {font-size:16px;margin:0;}\n.ptm h3 {font-size:13px;margin:8px 0;}\n.ptm-count {color:var(--ptm-muted);font-size:13px;font-weight:400;margin-left:8px;}\n.ptm .ptm-language {background:var(--ptm-bg);border:1px solid var(--ptm-line);border-radius:6px;padding:5px;min-height:32px;}\n.ptm-progress {color:var(--ptm-muted);font-size:12px;justify-content:space-between;margin-bottom:12px;}\n.ptm progress {appearance:none;border:0;width:100px;height:4px;background:var(--ptm-line);color:var(--ptm-accent);border-radius:4px;overflow:hidden;}\n.ptm progress::-webkit-progress-bar {background:var(--ptm-line);}\n.ptm progress::-webkit-progress-value {background:var(--ptm-accent);}\n.ptm progress::-moz-progress-bar {background:var(--ptm-accent);}\n.ptm-tabs {display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--ptm-line);padding-bottom:8px;}\n.ptm [aria-pressed=true] {background:var(--ptm-soft)!important;font-weight:600;}\n.ptm-toolbar {margin:10px 0;flex-wrap:wrap;}\n.ptm-search {position:relative;flex:1 1 140px;min-width:0;}\n.ptm .ptm-search input[type=search] {padding-inline-start:30px;}\n.ptm-icon-label {display:inline-flex;align-items:center;gap:6px;}\n.ptm-icon {display:inline-grid;place-items:center;position:relative;width:14px;height:14px;flex:none;line-height:1;}\n.ptm-icon-plus {font-size:17px;}\n.ptm-search .ptm-icon {position:absolute;inset-inline-start:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--ptm-muted);z-index:1;}\n.ptm-icon-search::before {content:"";position:absolute;top:1px;left:1px;width:9px;height:9px;border:1.5px solid currentColor;border-radius:50%;}\n.ptm-icon-search::after {content:"";position:absolute;top:9px;left:9px;width:5px;height:1.5px;background:currentColor;transform:rotate(45deg);transform-origin:left center;}\n.ptm-icon-trash::before {content:"";position:absolute;top:4px;left:3px;width:8px;height:9px;border:1.5px solid currentColor;border-radius:0 0 2px 2px;}\n.ptm-icon-trash::after {content:"";position:absolute;top:2px;left:1px;width:12px;height:2px;background:currentColor;border-radius:1px;}\n.ptm input:not([type=checkbox]),.ptm textarea {width:100%;min-width:0;background:var(--ptm-bg);border:1px solid var(--ptm-line);border-radius:6px;padding:7px 9px;}\n.ptm textarea {resize:vertical;min-height:60px;}\n.ptm input::placeholder,.ptm textarea::placeholder {color:var(--ptm-muted);}\n.ptm-add {margin:8px 0;}\n.ptm-add input,.ptm-subtask-add input {flex:1;}\n.ptm-message {min-height:22px;font-size:12px;color:var(--ptm-danger);overflow-wrap:anywhere;}\n.ptm-group {min-width:0;}\n.ptm-row {display:flex;align-items:center;gap:5px;min-height:40px;border-bottom:1px solid var(--ptm-line);position:relative;}\n.ptm-row {border-bottom-color:color-mix(in srgb,var(--ptm-line) 50%,transparent);}\n.ptm-row:hover {background:var(--ptm-soft);}\n.ptm-check-hit {display:grid;place-items:center;flex:0 0 34px;min-height:38px;cursor:pointer;}\n.ptm .ptm-check {appearance:none;width:19px;height:19px;border:1.5px solid var(--ptm-muted);border-radius:50%;margin:0;display:grid;place-content:center;cursor:pointer;flex-shrink:0;background:transparent;}\n.ptm .ptm-check:checked {background:var(--ptm-accent);border-color:var(--ptm-accent);}\n.ptm .ptm-check:checked::after {content:"\u2713";font-size:13px;line-height:1;color:var(--ptm-bg);}\n.ptm .ptm-task-title {display:flex;align-items:center;gap:5px;flex:1;min-width:0;min-height:38px;text-align:left;border:0;background:none;padding:6px 2px;}\n.ptm-title-text {overflow-wrap:anywhere;}\n.ptm-chevron {display:grid;place-items:center;flex:0 0 26px;color:var(--ptm-text);}\n.ptm-chevron::before {content:"";width:11px;height:11px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);}\n.ptm-task-title[aria-expanded=true] .ptm-chevron::before {transform:rotate(45deg);}\n.ptm-step-count {font-size:11px;color:var(--ptm-muted);white-space:nowrap;}\n.ptm button.ptm-star-toggle {flex:0 0 32px;min-height:36px;padding:0;border:0;border-radius:4px;background:transparent;color:var(--ptm-muted);font-size:18px;}\n.ptm button.ptm-star-toggle[aria-pressed=true] {background:transparent!important;color:var(--ptm-accent);}\n.ptm button.ptm-star-toggle:hover:not(:disabled) {background:var(--ptm-soft)!important;}\n@media(max-width:600px) {.ptm button.ptm-star-toggle {flex-basis:44px;min-height:44px;}}\n.ptm .is-done .ptm-title-text {text-decoration:line-through;color:var(--ptm-muted);}\n.ptm-children {margin-left:24px;border-left:1px solid var(--ptm-line);padding-left:7px;}\n.ptm-children {border-left-color:color-mix(in srgb,var(--ptm-line) 50%,transparent);}\n.ptm .ptm-add-task,.ptm .ptm-add-child {background:transparent;border:0!important;color:var(--ptm-muted);font-size:12px;flex-shrink:0;}\n.ptm .ptm-add-child {margin:4px 0 4px 32px;}\n.ptm-menu {position:relative;flex:0 0 32px;}\n.ptm-menu summary {list-style:none;text-align:center;cursor:pointer;border-radius:4px;min-width:32px;min-height:36px;font-size:20px;}\n.ptm-menu summary::-webkit-details-marker {display:none;}\n.ptm-menu-items {position:absolute;z-index:20;right:0;top:100%;display:grid;min-width:180px;max-width:min(260px,calc(100vw - 50px));padding:4px;background:var(--ptm-bg);border:1px solid var(--ptm-line);border-radius:7px;box-shadow:0 4px 14px #0002;}\n.ptm .ptm-menu-items button {border:0!important;text-align:left;white-space:normal;justify-content:flex-start;}\n.ptm .ptm-danger {color:var(--ptm-danger);}\n.ptm-editor {background:var(--ptm-bg);border-bottom:1px solid var(--ptm-line);padding:12px 8px 16px 34px;min-width:0;display:grid;gap:10px;}\n.ptm-editor-header {justify-content:space-between;font-size:12px;}\n.ptm-edit,.ptm-notes form {display:grid;gap:8px;}\n.ptm-edit label {display:grid;gap:4px;color:var(--ptm-muted);font-size:12px;}\n.ptm-edit button,.ptm-notes form button {justify-self:start;}\n.ptm-note {padding:6px 0;border-bottom:1px solid var(--ptm-line);}\n.ptm-note p {margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere;}\n.ptm-note small,.ptm-muted {color:var(--ptm-muted);font-size:11px;}\n.ptm-stale {display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--ptm-muted);}\n.ptm-empty {padding:24px 8px;text-align:center;color:var(--ptm-muted);font-size:13px;}\n.ptm-dialog {background:var(--ptm-bg);color:var(--ptm-text);border:1px solid var(--ptm-line);border-radius:10px;padding:20px;width:420px;max-width:calc(100vw - 32px);}\n.ptm-dialog p {overflow-wrap:anywhere;}\n.ptm-dialog::backdrop {background:#0006;}\n.ptm-dialog-actions {display:flex;justify-content:flex-end;gap:8px;}\n@media(max-width:600px) { .ptm {padding:10px 8px;} .ptm-children {margin-left:16px;padding-left:4px;} .ptm-editor {padding-left:12px;} .ptm-check-hit {flex-basis:38px;min-height:44px;} .ptm-row {min-height:44px;} .ptm-menu summary {min-height:44px;padding-top:3px;} .ptm-task-title {min-height:44px;} .ptm-subtask-add {align-items:stretch;flex-wrap:wrap;} .ptm-subtask-add input {flex-basis:100%;} }\n.ptm[data-surface=preview] {max-width:960px;margin:auto;background:var(--ptm-bg);}\n@media(prefers-color-scheme:dark) { .ptm[data-surface=preview] {--ptm-bg:#202024;--ptm-soft:#2c2c32;--ptm-line:#414148;--ptm-text:#eeeef0;--ptm-muted:#aaaab3;--ptm-accent:#c4c4d0;--ptm-danger:#f29c96;} }\n';
+var style_default = '.ptm { container-type:inline-size; --ptm-bg:var(--background-base,var(--color-background,#fff)); --ptm-soft:var(--color-muted,#f4f4f5); --ptm-line:var(--color-border,#dedee3); --ptm-text:var(--foreground-base,var(--color-foreground,#242428)); --ptm-muted:var(--color-muted-foreground,#71717a); --ptm-accent:var(--color-primary,#52525b); --ptm-on-accent:var(--color-primary-foreground,var(--ptm-bg)); --ptm-radius:6px; --ptm-danger:var(--color-destructive,#b42318); color:var(--ptm-text); font:inherit; font-size:14px; line-height:1.45; width:100%; min-width:0; padding:16px; box-sizing:border-box; }\r\n.ptm[data-surface=webapp] { --ptm-bg:var(--ui-bg-editor); --ptm-soft:var(--ui-bg-hover,var(--ui-bg-elevated)); --ptm-line:var(--ui-stroke-secondary); --ptm-text:var(--ui-text-primary); --ptm-muted:var(--ui-text-secondary); --ptm-accent:var(--ui-accent); --ptm-on-accent:var(--ui-text-on-accent,#fff); --ptm-danger:var(--ui-danger,var(--ui-red,var(--ui-accent))); }\r\n.ptm *, .ptm *::before, .ptm *::after {box-sizing:border-box;}\r\n.ptm button,.ptm input,.ptm textarea,.ptm select {font:inherit; color:inherit; max-width:100%;}\r\n.ptm button {cursor:pointer;}\r\n.ptm button:disabled,.ptm input:disabled {cursor:default; opacity:.55;}\r\n.ptm button.ptm-control {appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:34px;padding:5px 9px;border:1px solid var(--ptm-line);border-radius:var(--ptm-radius);background:transparent;color:var(--ptm-text);box-shadow:none;letter-spacing:normal;text-transform:none;font:inherit;font-weight:500;line-height:1.4;}\r\n.ptm button.ptm-control.ptm-primary {background:var(--ptm-accent);border-color:var(--ptm-accent);color:var(--ptm-on-accent);}\r\n.ptm button.ptm-control.ptm-primary:hover:not(:disabled) {background:color-mix(in srgb,var(--ptm-accent) 88%,var(--ptm-text));border-color:color-mix(in srgb,var(--ptm-accent) 88%,var(--ptm-text));}\r\n.ptm button.ptm-control[aria-pressed=true] {border-color:var(--ptm-accent);}\r\n.ptm button:hover:not(:disabled),.ptm summary:hover {background:var(--ptm-soft);}\r\n.ptm :focus-visible {outline:2px solid var(--ptm-accent);outline-offset:2px;}\r\n.ptm-header,.ptm-header-actions,.ptm-toolbar,.ptm-add,.ptm-progress,.ptm-editor-header,.ptm-subtask-add {display:flex;align-items:center;gap:8px;min-width:0;}\r\n.ptm-header {justify-content:space-between;flex-wrap:wrap;margin-bottom:12px;}\r\n.ptm h1 {font-size:18px;font-weight:600;margin:0;line-height:1.4;}\r\n.ptm h2 {font-size:16px;margin:0;}\r\n.ptm h3 {font-size:13px;margin:8px 0;}\r\n.ptm-count {color:var(--ptm-muted);font-size:13px;font-weight:400;margin-left:8px;}\r\n.ptm .ptm-language {background:var(--ptm-bg);border:1px solid var(--ptm-line);border-radius:6px;padding:5px;min-height:32px;}\r\n.ptm-progress {color:var(--ptm-muted);font-size:12px;justify-content:space-between;margin-bottom:12px;}\r\n.ptm progress {appearance:none;border:0;width:100px;height:4px;background:var(--ptm-line);color:var(--ptm-accent);border-radius:var(--ptm-radius);overflow:hidden;}\r\n.ptm progress::-webkit-progress-bar {background:var(--ptm-line);}\r\n.ptm progress::-webkit-progress-value {background:var(--ptm-accent);}\r\n.ptm progress::-moz-progress-bar {background:var(--ptm-accent);}\r\n.ptm-tabs {display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--ptm-line);padding-bottom:8px;}\r\n.ptm [aria-pressed=true] {background:var(--ptm-soft)!important;font-weight:600;}\r\n.ptm-toolbar {margin:10px 0;flex-wrap:wrap;}\r\n.ptm-search {position:relative;flex:1 1 140px;min-width:0;}\r\n.ptm .ptm-search input[type=search] {padding-inline-start:30px;}\r\n.ptm-icon-label {display:inline-flex;align-items:center;gap:6px;}\r\n.ptm-icon {display:inline-grid;place-items:center;position:relative;width:14px;height:14px;flex:none;line-height:1;}\r\n.ptm-icon-plus {font-size:17px;}\r\n.ptm-search .ptm-icon {position:absolute;inset-inline-start:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--ptm-muted);z-index:1;}\r\n.ptm-icon-search::before {content:"";position:absolute;top:1px;left:1px;width:9px;height:9px;border:1.5px solid currentColor;border-radius:50%;}\r\n.ptm-icon-search::after {content:"";position:absolute;top:9px;left:9px;width:5px;height:1.5px;background:currentColor;transform:rotate(45deg);transform-origin:left center;}\r\n.ptm-icon-trash::before {content:"";position:absolute;top:4px;left:3px;width:8px;height:9px;border:1.5px solid currentColor;border-radius:0 0 2px 2px;}\r\n.ptm-icon-trash::after {content:"";position:absolute;top:2px;left:1px;width:12px;height:2px;background:currentColor;border-radius:1px;}\r\n.ptm input:not([type=checkbox]),.ptm textarea {width:100%;min-width:0;background:var(--ptm-bg);border:1px solid var(--ptm-line);border-radius:6px;padding:7px 9px;}\r\n.ptm textarea {resize:vertical;min-height:60px;}\r\n.ptm input::placeholder,.ptm textarea::placeholder {color:var(--ptm-muted);}\r\n.ptm-add {margin:8px 0;}\r\n.ptm-add input,.ptm-subtask-add input {flex:1;}\r\n.ptm-message {min-height:22px;font-size:12px;color:var(--ptm-danger);overflow-wrap:anywhere;}\r\n.ptm-group {min-width:0;}\r\n.ptm-row {display:flex;align-items:center;gap:5px;min-height:40px;border-bottom:1px solid var(--ptm-line);position:relative;}\r\n.ptm-row {border-bottom-color:color-mix(in srgb,var(--ptm-line) 50%,transparent);}\r\n.ptm-row:hover {background:var(--ptm-soft);}\r\n.ptm-check-hit {display:grid;place-items:center;flex:0 0 34px;min-height:38px;cursor:pointer;}\r\n.ptm .ptm-check {appearance:none;width:19px;height:19px;border:1.5px solid var(--ptm-muted);border-radius:50%;margin:0;display:grid;place-content:center;cursor:pointer;flex-shrink:0;background:transparent;}\r\n.ptm .ptm-check:checked {background:var(--ptm-accent);border-color:var(--ptm-accent);}\r\n.ptm .ptm-check:checked::after {content:"\u2713";font-size:13px;line-height:1;color:var(--ptm-bg);}\r\n.ptm .ptm-task-title {display:flex;align-items:center;gap:5px;flex:1;min-width:0;min-height:38px;text-align:left;border:0;background:none;padding:6px 2px;}\r\n.ptm-title-text {overflow-wrap:anywhere;}\r\n.ptm .ptm-expand {display:grid;place-items:center;flex:0 0 24px;align-self:stretch;padding:0;border:0;border-radius:var(--ptm-radius);background:transparent;color:var(--ptm-muted);}\r\n.ptm-icon-chevron::before {content:"";width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);}\r\n.ptm-expand[aria-expanded=true] .ptm-icon-chevron::before {transform:rotate(45deg);}\r\n.ptm-step-count {font-size:11px;color:var(--ptm-muted);white-space:nowrap;}\r\n.ptm button.ptm-star-toggle {flex:0 0 32px;min-height:36px;padding:0;border:0;border-radius:var(--ptm-radius);background:transparent;color:var(--ptm-muted);font-size:18px;}\r\n.ptm button.ptm-star-toggle[aria-pressed=true] {background:transparent!important;color:var(--ptm-accent);}\r\n.ptm button.ptm-star-toggle:hover:not(:disabled) {background:var(--ptm-soft)!important;}\r\n@media(max-width:600px) {.ptm button.ptm-star-toggle {flex-basis:44px;min-height:44px;}}\r\n.ptm .is-done .ptm-title-text {text-decoration:line-through;color:var(--ptm-muted);}\r\n.ptm-children {margin-left:24px;border-left:1px solid var(--ptm-line);padding-left:7px;}\r\n.ptm-children {border-left-color:color-mix(in srgb,var(--ptm-line) 50%,transparent);}\r\n.ptm button.ptm-control.ptm-add-task {flex-shrink:0;padding:6px 12px;font-size:13px;}\r\n.ptm button.ptm-control.ptm-add-child,.ptm button.ptm-control.ptm-add-root {background:transparent;border:0!important;color:var(--ptm-muted);font-size:12px;flex-shrink:0;}\r\n.ptm .ptm-add-root {margin:4px 0 4px 34px;}\r\n.ptm-add-bottom {display:grid;gap:8px;margin:8px 0;padding:8px 0 8px 34px;}\r\n.ptm-add-bottom-actions {display:flex;gap:8px;align-items:center;}\r\n.ptm .ptm-add-child {margin:4px 0 4px 32px;}\r\n.ptm-menu {position:relative;flex:0 0 32px;}\r\n.ptm-menu summary {list-style:none;text-align:center;cursor:pointer;border-radius:var(--ptm-radius);min-width:32px;min-height:36px;font-size:20px;}\r\n.ptm-menu summary::-webkit-details-marker {display:none;}\r\n.ptm-menu-items {position:absolute;z-index:20;right:0;top:100%;display:grid;min-width:180px;max-width:min(260px,calc(100vw - 50px));padding:4px;background:var(--ptm-bg);border:1px solid var(--ptm-line);border-radius:7px;box-shadow:0 4px 14px #0002;}\r\n.ptm .ptm-menu-items button {border:0!important;text-align:left;white-space:normal;justify-content:flex-start;}\r\n.ptm .ptm-danger {color:var(--ptm-danger);}\r\n.ptm-workspace {display:flex;min-width:0;height:clamp(360px,72dvh,860px);margin-top:8px;}\r\n.ptm-list-pane {display:flex;flex-direction:column;flex:1;min-width:0;min-height:0;}\r\n.ptm-list {flex:1;min-height:0;overflow:auto;scrollbar-gutter:stable;padding:2px;}\r\n.ptm-workspace.has-details .ptm-list-pane {flex:0 0 calc(var(--ptm-list-width) - 5px);}\r\n.ptm .ptm-divider {flex:0 0 10px;position:relative;cursor:col-resize;touch-action:none;}\r\n.ptm-divider::before {content:"";position:absolute;inset:0 4px;background:var(--ptm-line);border-radius:2px;}\r\n.ptm-divider:hover::before,.ptm-divider:focus-visible::before {background:var(--ptm-accent);}\r\n.ptm-editor {background:var(--ptm-bg);padding:0 16px 16px;min-width:0;flex:1;overflow:auto;display:flex;flex-direction:column;gap:16px;scrollbar-gutter:stable;}\r\n.ptm-editor:focus {outline:none;}\r\n.ptm-editor-header {justify-content:space-between;font-size:14px;position:sticky;top:0;z-index:2;background:var(--ptm-bg);padding:8px 0;border-bottom:1px solid var(--ptm-line);}\r\n.ptm button.ptm-control.ptm-close {display:inline-flex;align-items:center;justify-content:center;flex:0 0 36px;width:36px;height:36px;min-height:36px;padding:0;border:1px solid var(--ptm-line);border-radius:6px;line-height:1;}\r\n.ptm .ptm-close .ptm-icon-close {display:block;position:relative;flex:0 0 16px;width:16px;height:16px;}\r\n.ptm-icon-close::before,.ptm-icon-close::after {content:"";position:absolute;left:50%;top:50%;width:14px;height:2px;border-radius:1px;background:currentColor;transform:translate(-50%,-50%) rotate(45deg);}\r\n.ptm-icon-close::after {transform:translate(-50%,-50%) rotate(-45deg);}\r\n.ptm .ptm-title-input {font-size:15px;font-weight:600;line-height:1.5;min-height:64px;}\r\n.ptm .ptm-row.is-selected {background:color-mix(in srgb,var(--ptm-accent) 12%,var(--ptm-bg));box-shadow:inset 3px 0 var(--ptm-accent);border-radius:6px;}\r\n.ptm .ptm-row.is-selected .ptm-task-title {font-weight:600;}\r\n.ptm-workspace.has-details .ptm-title-text {white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}\r\n.ptm-editor .ptm-subtask-add {flex-wrap:wrap;}\r\n.ptm-editor .ptm-subtask-add input {flex-basis:100%;}\r\n@container (max-width:700px) {\r\n  .ptm-workspace.has-details .ptm-list-pane,.ptm-workspace.has-details .ptm-divider {display:none;}\r\n  .ptm-workspace.has-details .ptm-editor {padding:0 4px 16px;}\r\n  .ptm button.ptm-control.ptm-close {flex-basis:44px;width:44px;height:44px;min-height:44px;}\r\n}\r\n.ptm-edit,.ptm-notes form {display:grid;gap:8px;}\r\n.ptm-edit label {display:grid;gap:4px;color:var(--ptm-muted);font-size:12px;}\r\n.ptm-edit button,.ptm-notes form button {justify-self:start;}\r\n.ptm-note {padding:6px 0;border-bottom:1px solid var(--ptm-line);}\r\n.ptm-note p {margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere;}\r\n.ptm-note small,.ptm-muted {color:var(--ptm-muted);font-size:11px;}\r\n.ptm-stale {display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--ptm-muted);}\r\n.ptm-empty {padding:24px 8px;text-align:center;color:var(--ptm-muted);font-size:13px;}\r\n.ptm-dialog {background:var(--ptm-bg);color:var(--ptm-text);border:1px solid var(--ptm-line);border-radius:10px;padding:20px;width:420px;max-width:calc(100vw - 32px);}\r\n.ptm-dialog p {overflow-wrap:anywhere;}\r\n.ptm-dialog::backdrop {background:#0006;}\r\n.ptm-dialog-actions {display:flex;justify-content:flex-end;gap:8px;}\r\n@media(max-width:600px) { .ptm {padding:10px 8px;} .ptm-children {margin-left:16px;padding-left:4px;} .ptm-editor {padding-left:12px;} .ptm-check-hit {flex-basis:38px;min-height:44px;} .ptm-row {min-height:44px;} .ptm-menu summary {min-height:44px;padding-top:3px;} .ptm-task-title {min-height:44px;} .ptm-subtask-add {align-items:stretch;flex-wrap:wrap;} .ptm-subtask-add input {flex-basis:100%;} }\r\n.ptm[data-surface=preview] {max-width:960px;margin:auto;background:var(--ptm-bg);}\r\n@media(prefers-color-scheme:dark) { .ptm[data-surface=preview] {--ptm-bg:#202024;--ptm-soft:#2c2c32;--ptm-line:#414148;--ptm-text:#eeeef0;--ptm-muted:#aaaab3;--ptm-accent:#c4c4d0;--ptm-danger:#f29c96;} }\r\n.ptm-header-actions {position:relative;flex-wrap:wrap;margin-inline-start:auto;}\r\n.ptm-settings {position:static;}\r\n.ptm-settings summary {box-shadow:none;letter-spacing:normal;display:flex;align-items:center;justify-content:center;list-style:none;cursor:pointer;width:34px;height:34px;border:1px solid var(--ptm-line);border-radius:6px;}\r\n.ptm-settings summary::-webkit-details-marker {display:none;}\r\n.ptm-icon-settings {font-size:18px;width:20px;height:20px;}\r\n.ptm-settings-panel {position:absolute;inset-inline-end:0;top:calc(100% + 6px);z-index:30;display:grid;gap:10px;width:280px;max-width:calc(100vw - 32px);padding:14px;border:1px solid var(--ptm-line);border-radius:8px;background:var(--ptm-bg);box-shadow:0 4px 14px #0002;overflow-wrap:anywhere;}\r\n.ptm-settings-panel label {display:grid;gap:6px;}\r\n.ptm-settings-panel .ptm-language {width:100%;}\r\n.ptm-tabs button,.ptm-toolbar button,.ptm-subtask-add button,.ptm-add-bottom-actions button {white-space:normal;overflow-wrap:anywhere;}\r\n.ptm-editor-header strong {overflow-wrap:anywhere;}\r\n';
 
 // frontend/src/webapp.mjs
 var View = createTasksView(React, SDK);
+var useHostI18n = typeof SDK.useI18n === "function" ? SDK.useI18n : () => null;
 var webapp_default = {
   id: "personal-task-manager",
   name: "My Tasks",
@@ -736,15 +1674,17 @@ var webapp_default = {
     document.head.append(style);
     ctx.onDispose(() => style.remove());
     function TasksPage() {
+      const hostI18n = useHostI18n();
+      const hostLanguage = hostI18n?.isLoadingConfig || hostI18n?.configLoadError ? void 0 : hostI18n?.locale;
       const profile = SDK.useValue(SDK.host.state.profile);
       const epoch = SDK.useGatewayActivationEpoch();
       const transport = React.useCallback(async (path, { body, language, ...options } = {}) => {
-        if (epoch !== SDK.gatewayActivationEpoch()) throw new Error("The active Hermes connection changed");
+        if (epoch !== SDK.gatewayActivationEpoch()) throw new LocalizedError("connectionChanged");
         const result = await ctx.rest(`${path}?language=${encodeURIComponent(language || "en")}`, { ...options, ...body === void 0 ? {} : { body } });
-        if (epoch !== SDK.gatewayActivationEpoch()) throw new Error("The active Hermes connection changed");
+        if (epoch !== SDK.gatewayActivationEpoch()) throw new LocalizedError("connectionChanged");
         return result;
       }, [profile, epoch]);
-      return React.createElement(View, { transport, scope: `${profile}:${epoch}`, surface: "webapp", schedule: ctx.setInterval });
+      return React.createElement(View, { transport, scope: `${profile}:${epoch}`, surface: "webapp", hermesLanguage: hostLanguage, schedule: ctx.setInterval });
     }
     ctx.registerMany([
       { id: "page", area: SDK.ROUTES_AREA, data: { path: "/personal-tasks" }, render: () => React.createElement(TasksPage) },

@@ -1,5 +1,6 @@
-Add **Hermes Personal Task Manager @VERSION@** as a community plugin in the tools
-category. It records personal tasks, one level of subtasks, notes and confirmed
+Update the existing submission **#157264** to **Hermes Personal Task Manager
+@VERSION@**, a community plugin in the tools category. This replaces the earlier
+0.2.3 pin in the same PR; no replacement PR is needed. It records personal tasks, one level of subtasks, notes and confirmed
 results in one profile-scoped SQLite database shared by chat tools, Dashboard
 and Desktop/WebApp. It does not execute tasks.
 
@@ -11,7 +12,13 @@ Pinned source: https://github.com/RudiFreeman/hermes-personal-task-manager/tree/
 - Dashboard manifest/API and native host React components.
 - Desktop SDK route/sidebar, ctx.rest and lifecycle cleanup. No core overrides,
   raw native bridge, remote executable imports or self-updater.
-- English-first UI and documentation, optional Russian translation.
+- Resizable list/details layout, a visible close button, independent scrolling
+  and full-width mobile details. Root tasks can be added below the list.
+- Seven languages: English, Russian, Spanish, Brazilian Portuguese, German,
+  French and Polish. Automatic mode inherits `useI18n().locale` from either
+  Hermes SDK, with browser/system and English fallback; manual choice persists.
+- Central UI/API error catalogs, localized dates/numbers, preserved drafts and
+  live switching without reloading. Documentation is in English.
 - Explicit parent completion atomically completes active children; reopening
   preserves child completion. Trash is restorable; purge requires confirmation.
 - Hermes tool instructions require explicit user requests and completion evidence;
@@ -22,8 +29,7 @@ Pinned source: https://github.com/RudiFreeman/hermes-personal-task-manager/tree/
 - Storage: task titles/descriptions, completion timestamps, notes, revisions and
   events in the active profile's plugin data directory. No credentials stored.
 - Network: authenticated requests only to the current Hermes instance's plugin
-  API. No third-party runtime service, telemetry, fonts or CDN. README badges
-  request static images from shields.io when a Markdown client renders them.
+  API. No third-party runtime service, telemetry, fonts or CDN.
 - Outside data: no normal runtime reads outside the plugin's source/data. The
   optional, non-secret PTM_DATA_DIR development override chooses another storage
   directory and must not be shared across profiles accidentally.
@@ -31,8 +37,9 @@ Pinned source: https://github.com/RudiFreeman/hermes-personal-task-manager/tree/
   jobs, token refresh, credential-store access or approval bypass. Visible UI
   polls every three seconds; timers/listeners are removed on unload.
 - Optional development preview binds loopback and generates an in-memory token.
-  Optional browser checks read operator-supplied authentication-state files;
-  these test files are not loaded by the runtime or shipped with credentials.
+  Optional browser checks use private authentication-state files. Release
+  screenshots use only synthetic GET responses on separate native test hosts;
+  task writes are blocked. Credentials are never committed or put in screenshots.
 - Schema 1 migrates atomically to 2. Upgrade all writers together and back up the
   stopped database plus WAL first; older plugin versions refuse schema 2.
 - Prebuilt readable JavaScript is committed with sources/build script/lockfile.
@@ -52,4 +59,9 @@ Pinned source: https://github.com/RudiFreeman/hermes-personal-task-manager/tree/
 ![Dashboard light](https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/dashboard-light.png)
 ![Dashboard dark](https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/dashboard-dark.png)
 ![WebApp light](https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/webapp-light.png)
+![WebApp dark](https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/webapp-dark.png)
+![Dashboard mobile](https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/dashboard-mobile.png)
 ![WebApp mobile](https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/webapp-mobile.png)
+
+Russian-language screenshots are included in the pinned README. All gallery
+images are immutable URLs pointing to the same code-and-screenshots commit.

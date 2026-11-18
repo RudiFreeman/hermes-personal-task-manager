@@ -1,0 +1,124 @@
+{
+  "plugin_version": "1.0.0",
+  "captured_at": "2026-11-18T12:10:58.827838+00:00",
+  "native_host": true,
+  "synthetic_data": true,
+  "task_mutations": 0,
+  "privacy_reviewed": true,
+  "theme_checks": [
+    {
+      "surface": "dashboard",
+      "theme": "light",
+      "primary": "color(srgb 0 0.32549 0.992157)",
+      "expected": "color(srgb 0 0.32549 0.992157)",
+      "radius": "6px",
+      "secondaryRadius": "6px",
+      "closeRadius": "6px",
+      "secondaryBackground": "rgba(0, 0, 0, 0)",
+      "foreground": "rgb(232, 242, 253)"
+    },
+    {
+      "surface": "dashboard",
+      "theme": "dark",
+      "primary": "color(srgb 1 0.901961 0.796078)",
+      "expected": "color(srgb 1 0.901961 0.796078)",
+      "radius": "6px",
+      "secondaryRadius": "6px",
+      "closeRadius": "6px",
+      "secondaryBackground": "rgba(0, 0, 0, 0)",
+      "foreground": "rgb(4, 28, 28)"
+    },
+    {
+      "surface": "webapp",
+      "theme": "light",
+      "primary": "rgb(0, 83, 253)",
+      "expected": "rgb(0, 83, 253)",
+      "radius": "6px",
+      "secondaryRadius": "6px",
+      "closeRadius": "6px",
+      "secondaryBackground": "rgba(0, 0, 0, 0)",
+      "foreground": "rgb(255, 255, 255)"
+    },
+    {
+      "surface": "webapp",
+      "theme": "dark",
+      "primary": "rgb(74, 132, 254)",
+      "expected": "rgb(74, 132, 254)",
+      "radius": "6px",
+      "secondaryRadius": "6px",
+      "closeRadius": "6px",
+      "secondaryBackground": "rgba(0, 0, 0, 0)",
+      "foreground": "rgb(255, 255, 255)"
+    }
+  ],
+  "bundle_hash_normalization": "LF",
+  "bundles": {
+    "dashboard/dist/index.js": "19671665f40334d450d01c2e3f1ed50145259a0b49496b3e1e383d590a8f5c8a",
+    "dashboard/dist/style.css": "3b85f89bf83dab6f8155cd0c2d2600cca31fb1b6eb32594aadb9967bddeba4f1",
+    "desktop/plugin.js": "2ca663cd8ded998980704833bfdcd984b0b52bc8a26a6ee7ab2d19cb22e12dfc"
+  },
+  "captured_bundle_bytes": {
+    "dashboard/dist/index.js": "19671665f40334d450d01c2e3f1ed50145259a0b49496b3e1e383d590a8f5c8a",
+    "dashboard/dist/style.css": "af3a6685b0da70d00c56b1d51bb926015c99aeb56113a9117af353ccd78f444a",
+    "desktop/plugin.js": "2ca663cd8ded998980704833bfdcd984b0b52bc8a26a6ee7ab2d19cb22e12dfc"
+  },
+  "screenshots": {
+    "dashboard-light.png": {
+      "sha256": "66bc726efe7350096462ed0437d0e9a4a5dff73d809e4845a68afe3156c8d865",
+      "width": 986,
+      "height": 879,
+      "language": "en",
+      "viewport_width": 1280
+    },
+    "dashboard-dark.png": {
+      "sha256": "3b81b3f41f540b84173077f50a34e68623466a795967770c1b1aa2357d1ccaa2",
+      "width": 986,
+      "height": 879,
+      "language": "en",
+      "viewport_width": 1280
+    },
+    "dashboard-mobile.png": {
+      "sha256": "0ac457aac66a1151dd27b4bf9a04509d5e2fd97bd66c089c02e01908ea3b9542",
+      "width": 358,
+      "height": 868,
+      "language": "en",
+      "viewport_width": 390
+    },
+    "dashboard-ru.png": {
+      "sha256": "4a3584ebc98050c61e3c863d5fc4a2349b2be76ac255ee658dd188f48a68e797",
+      "width": 986,
+      "height": 879,
+      "language": "ru",
+      "viewport_width": 1280
+    },
+    "webapp-light.png": {
+      "sha256": "09c4f91b12c93673c7e4391964524b7e749f8bc01b7df59950ca7c7a7c854208",
+      "width": 1020,
+      "height": 879,
+      "language": "en",
+      "viewport_width": 1280
+    },
+    "webapp-dark.png": {
+      "sha256": "509a41abdb0a63e60031bfdb83aae073c36b7c9cfbd43f3619282c31066b752d",
+      "width": 1020,
+      "height": 879,
+      "language": "en",
+      "viewport_width": 1280
+    },
+    "webapp-mobile.png": {
+      "sha256": "28e9bc6e6325979e4533a1613efe01577da3a17b145aacda9b3e7fe8a8dcbaf8",
+      "width": 390,
+      "height": 867,
+      "language": "en",
+      "viewport_width": 390
+    },
+    "webapp-ru.png": {
+      "sha256": "83c0957a3a2854ee5988779926937e5f54bf9ffc9b5cb4951de86161788ffb39",
+      "width": 1020,
+      "height": 879,
+      "language": "ru",
+      "viewport_width": 1280
+    }
+  },
+  "privacy_review_note": "All eight native screenshots visually reviewed: synthetic task text only, no accounts, credentials, URLs, personal tasks or update overlays."
+}

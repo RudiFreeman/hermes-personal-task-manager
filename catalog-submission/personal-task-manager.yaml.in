@@ -5,7 +5,7 @@ title: Hermes Personal Task Manager
 repo: https://github.com/RudiFreeman/hermes-personal-task-manager
 sha: "@SHA@"
 version: "@VERSION@"
-description: Personal tasks and subtasks shared between Hermes chat, Dashboard and WebApp, with Archive and restorable Trash.
+description: Shared personal tasks, subtasks and notes for Hermes chat, Dashboard and WebApp, with resizable task details, seven languages, Archive and restorable Trash.
 maintainer: RudiFreeman
 tier: community
 category: tools
@@ -16,6 +16,8 @@ screenshots:
   - https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/dashboard-light.png
   - https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/dashboard-dark.png
   - https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/webapp-light.png
+  - https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/webapp-dark.png
+  - https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/dashboard-mobile.png
   - https://raw.githubusercontent.com/RudiFreeman/hermes-personal-task-manager/@SHA@/docs/screenshots/webapp-mobile.png
 capabilities:
   provides_tools:

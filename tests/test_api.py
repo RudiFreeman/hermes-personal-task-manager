@@ -45,3 +45,29 @@ def test_strict_json_language_and_purge_confirmation(client):
     assert client.patch(endpoint, json={"revision": 2, "action": "purge"}).status_code == 409
     assert client.patch(endpoint, json={"revision": 2, "action": "purge", "confirmed": "true"}).status_code == 422
     assert client.patch(endpoint, json={"revision": 2, "action": "purge", "confirmed": True}).status_code == 200
+
+
+@pytest.mark.parametrize("language,prefix", [
+    ("en", "title: must contain"), ("ru", "Название: от"),
+    ("es", "título: debe contener"), ("pt-BR", "título: deve conter"),
+    ("de", "Titel: muss"), ("fr", "titre : doit contenir"),
+    ("pl", "tytuł: musi zawierać"), ("ja", "title: must contain"),
+])
+def test_all_http_locales_preserve_status_and_validation(client, language, prefix):
+    import json
+    locale = language if language != "ja" else "en"
+    messages = json.loads((Path(__file__).resolve().parents[1] / "locales" / (locale + ".json")).read_text(encoding="utf-8"))
+    endpoint = "/tasks-api/tasks?language=" + language
+    invalid = client.post(endpoint, json={"title": " "})
+    assert invalid.status_code == 409
+    assert invalid.json()["detail"].startswith(prefix)
+    assert invalid.json()["error_code"] == "errorTextLength"
+    strict = client.post(endpoint, json={"title": 42})
+    assert strict.status_code == 422
+    assert strict.json()["detail"] == messages["errorInvalidData"]
+    task = client.post(endpoint, json={"title": "Disposable locale test"}).json()
+    stale = client.patch("/tasks-api/tasks/" + task["id"] + "?language=" + language,
+                         json={"revision": 99, "done": True})
+    assert stale.status_code == 409
+    assert stale.json()["detail"] == messages["errorRevision"]
+    assert client.get("/tasks-api/tasks").json()["tasks"][0]["done"] is False

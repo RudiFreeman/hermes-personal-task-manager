@@ -10,6 +10,14 @@ import uuid
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
+def select_language(page, code):
+    settings = page.locator(".ptm-settings")
+    if settings.get_attribute("open") is None:
+        settings.locator("summary").click()
+    page.locator(".ptm-language").select_option(code)
+    page.locator(".ptm h1").click()
+
+
 def check_layout(pages, args):
     from playwright.sync_api import expect
     for surface, page in pages.items():
@@ -74,7 +82,7 @@ def run(args):
                 page.evaluate("location.hash='/personal-tasks'")
             expect(page.locator(".ptm")).to_have_attribute("data-loaded", "true", timeout=30000)
             assert args.profile in page.locator(".ptm").get_attribute("data-scope"), "Unexpected profile; refusing test writes"
-            page.locator(".ptm-language").select_option("en")
+            select_language(page, "en")
             pages[surface] = page
         dash, web = pages["dashboard"], pages["webapp"]
         if args.layout_only:
@@ -96,9 +104,8 @@ def run(args):
             row.get_by_role("menuitem", name=label, exact=True).click()
 
         def edit(page, identity):
-            if not group(page, identity).locator(":scope > .ptm-editor").count():
-                menu(page, identity, "Edit")
-            return group(page, identity).locator(":scope > .ptm-editor")
+            group(page, identity).locator(":scope > .ptm-row .ptm-task-title").click()
+            return page.locator(".ptm-editor")
 
         def tab(page, name):
             page.locator(".ptm-tabs").get_by_role("button", name=name, exact=True).click()
@@ -148,14 +155,14 @@ def run(args):
         assert description.evaluate("n => n === document.activeElement"), "Background refresh stole focus"
         expect(description).to_have_value("Unsaved Dashboard text")
         expect(editor.locator('[data-draft-key="new-comment"]')).to_have_value("Unsaved note")
-        dash.locator(".ptm-language").select_option("ru")
+        select_language(dash, "ru")
         with dash.expect_request(lambda request: request.method == "PATCH" and "/tasks/" in request.url) as sent:
             editor.locator(".ptm-edit button[type=submit]").click()
         assert sent.value.post_data_json["revision"] == original_revision
         expect(dash.locator(".ptm-message")).to_contain_text("Задача уже изменена")
         expect(description).to_have_value("Unsaved Dashboard text")
         assert next(task for task in snapshot()["tasks"] if task["id"] == parent_id)["description"] == ""
-        dash.locator(".ptm-language").select_option("en")
+        select_language(dash, "en")
         editor.locator(".ptm-edit").get_by_role("button", name="Discard draft and reload", exact=True).click()
         description.fill("Saved after explicit reload")
         editor.locator(".ptm-edit button[type=submit]").click()

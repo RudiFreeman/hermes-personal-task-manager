@@ -1,20 +1,32 @@
-import {savedLanguage, translate} from "./i18n.mjs";
+import {languageStorage, languagePreference, resolveLanguage, normalizeLanguage, browserLanguages as readBrowserLanguages, LANGUAGE_KEY, describeError, translate} from "./i18n.mjs";
 
 const empty = () => ({tasks: [], trash: [], comments: [], events: [], progress: {total: 0, done: 0, percent: 0}});
 
-export function createController({transport, scope = "default", storage} = {}) {
-  if (storage === undefined) {try {storage = globalThis.localStorage;} catch { /* Disabled storage. */ }}
+export function createController({transport, scope = "default", storage, hermesLanguage, browserLanguages = readBrowserLanguages()} = {}) {
+  if (storage === undefined) storage = languageStorage();
   const listeners = new Set();
   const key = `ptm.view:${scope}`;
   let prefs = {};
   try {const parsed = JSON.parse(storage?.getItem(key) || "{}"); if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) prefs = parsed;} catch { /* Private browsing. */ }
-  let state = {data: empty(), language: savedLanguage(), view: "active", query: "", starred: false,
+  let manualLanguage = languagePreference(storage);
+  let inheritedLanguage = hermesLanguage, machineLanguages = browserLanguages;
+  const initialLanguage = resolveLanguage({manual: manualLanguage, hermes: inheritedLanguage, browser: machineLanguages});
+  let state = {data: empty(), language: initialLanguage.language, languagePreference: manualLanguage || "auto", languageSource: initialLanguage.source, view: "active", query: "", starred: false,
     expanded: new Set(Array.isArray(prefs.expanded) ? prefs.expanded.filter(id => typeof id === "string") : []), editing: null,
-    drafts: new Map(), newTitle: "", pending: false, loaded: false, error: "", confirmation: null};
+    drafts: new Map(), newTitle: "", pending: false, loaded: false, error: "", errorDetail: null, confirmation: null};
   let sequence = 0, generation = 0, disposed = false;
   const emit = patch => {if (disposed) return; state = {...state, ...patch}; for (const listener of listeners) listener();};
   const t = (name, values) => translate(state.language, name, values);
-  const report = error => emit({error: error instanceof TypeError ? t("requestError") : error.message || t("saveError")});
+  const report = (error, fallback = "requestError") => {
+    const detail = describeError(error, fallback);
+    emit({error: t(detail.key, detail.values), errorDetail: detail});
+  };
+  function applyLanguage() {
+    const next = resolveLanguage({manual: manualLanguage, hermes: inheritedLanguage, browser: machineLanguages});
+    if (next.language === state.language && next.source === state.languageSource && (manualLanguage || "auto") === state.languagePreference) return;
+    emit({language: next.language, languagePreference: manualLanguage || "auto", languageSource: next.source,
+      ...(state.errorDetail ? {error: translate(next.language, state.errorDetail.key, state.errorDetail.values)} : {})});
+  }
   const request = (path, options = {}) => transport(path, {...options, language: state.language});
   function persist() {try {storage?.setItem(key, JSON.stringify({expanded: [...state.expanded]}));} catch { /* Session state still works. */ }}
   async function refresh(internal = false) {
@@ -23,7 +35,7 @@ export function createController({transport, scope = "default", storage} = {}) {
     try {
       const next = await request("/tasks");
       if (disposed || id !== sequence || epoch !== generation) return;
-      emit({data: {...empty(), ...next}, loaded: true, error: ""});
+      emit({data: {...empty(), ...next}, loaded: true, error: "", errorDetail: null});
     } catch (error) {
       if (!disposed && id === sequence && epoch === generation) report(error);
     }
@@ -31,7 +43,7 @@ export function createController({transport, scope = "default", storage} = {}) {
   async function mutate(action, optimistic) {
     if (state.pending || disposed) return null;
     const epoch = ++generation, previous = state.data;
-    emit({pending: true, error: "", ...(optimistic ? {data: optimistic(previous)} : {})});
+    emit({pending: true, error: "", errorDetail: null, ...(optimistic ? {data: optimistic(previous)} : {})});
     let result = null, written = false;
     try {
       result = await action(); written = true;
@@ -43,7 +55,7 @@ export function createController({transport, scope = "default", storage} = {}) {
         // A batch may be partially committed, or a response may be lost after
         // the server committed. Reconcile before displaying the failure.
         await refresh(true);
-        if (!disposed && epoch === generation) report(error);
+        if (!disposed && epoch === generation) report(error, "saveError");
       }
     } finally {
       if (!disposed && epoch === generation) emit({pending: false});
@@ -117,9 +129,18 @@ export function createController({transport, scope = "default", storage} = {}) {
     discard(id, form) {const drafts = new Map(state.drafts); drafts.delete(formKey(id, form)); emit({drafts});},
     expand(id) {const expanded = new Set(state.expanded); expanded.has(id) ? expanded.delete(id) : expanded.add(id); emit({expanded}); persist();},
     language(language) {
-      if (!["en", "ru"].includes(language)) return;
-      try {storage?.setItem("ptm.language", language);} catch { /* Session fallback. */ }
-      emit({language, error: ""});
+      if (language !== "auto" && !normalizeLanguage(language)) return;
+      manualLanguage = language === "auto" ? null : normalizeLanguage(language);
+      try {storage?.setItem(LANGUAGE_KEY, manualLanguage || "auto");} catch { /* Session fallback. */ }
+      applyLanguage();
+    },
+    inheritLanguage(language, browser = readBrowserLanguages()) {
+      inheritedLanguage = language; machineLanguages = browser; applyLanguage();
+    },
+    syncLanguagePreference() {
+      // A cached profile may become active after another profile changed the
+      // app-wide preference. Failed storage must not erase an in-memory pick.
+      try {if (storage?.getItem) {manualLanguage = normalizeLanguage(storage.getItem(LANGUAGE_KEY)); applyLanguage();}} catch { /* Keep the session choice. */ }
     },
     dispose() {disposed = true; ++sequence; ++generation; listeners.clear();},
     pause() {++sequence; ++generation; emit({pending: false});},

@@ -1,30 +1,47 @@
-# Catalog submission staging
+# Existing catalog PR: #157264
 
-No catalog pull request has been created. Templates are local preparation
-artifacts and deliberately contain placeholders rather than a misleading pin.
-`community` is the entry's tier; `tools` is its category. This does not label
-the plugin as maintained or verified by NousResearch.
+Update [NousResearch/hermes-agent#157264](https://github.com/NousResearch/hermes-agent/pull/157264),
+not a replacement PR. Its current head is the `catalog-personal-task-manager-6029ac4`
+branch of `RudiFreeman/hermes-agent`. The earlier entry pins plugin version 0.2.3;
+this candidate updates the same entry to **1.0.0**.
 
-After the candidate source is committed locally, render an exact entry:
+`community` is the tier and `tools` is the category. The project is not presented
+as maintained or verified by NousResearch.
 
-```sh
-python scripts/prepare_catalog.py --sha FULL_40_CHARACTER_COMMIT
+## Prepare locally
+
+1. Preserve UI edits and run `npm run build` and `npm test`.
+2. Run Python tests on temporary databases and current Hermes admission validation:
+   `hermes plugins validate /path/to/candidate --install-deps`.
+3. Refresh `docs/screenshots` with native host screenshots on synthetic tasks.
+4. Commit the complete source, generated bundles, documentation and PNGs locally.
+5. Generate the exact entry and PR body from that full, local source commit:
+
+```text
+python scripts/prepare_catalog.py --sha FULL_40_CHARACTER_SOURCE_COMMIT \
+  --validation-report /private/review/validation-summary.json \
+  --previous-entry /private/review/previous-catalog.yaml
 ```
 
-The command reads only local Git data, checks the pinned version, compatibility
-floor and screenshot assets, then writes under ignored `.local/catalog-submission`:
+The script checks all version declarations and committed PNGs. Generated files
+are placed in ignored `.local/catalog-submission`: YAML, `PR_BODY.md`, a patch
+against upstream main, and an optional patch against the current PR entry.
+It performs no network requests and never pushes or modifies GitHub.
 
-- `plugin-catalog/personal-task-manager.yaml`: the single upstream entry.
-- `PR_BODY.md`: English description with explicit pending acceptance markers.
-- `catalog.patch`: a patch adding only that YAML to NousResearch/hermes-agent.
+## Publish only after the owner's confirmation
 
-It does not push, fork, contact GitHub, create branches or open a pull request.
-Publishing the source commit for Git installer testing requires separate user
-confirmation. Before submitting upstream, the owner must install that exact
-commit through the normal Git installer and explicitly approve the result.
-Then replace the PR's pending validation/acceptance markers with actual evidence,
-confirm the SHA is public and images resolve, and rerun current Hermes validation.
+After approval, push the source commit first. Then run:
 
-In a separate clean checkout of NousResearch/hermes-agent, inspect the patch
-with `git apply --check /absolute/path/catalog.patch`, then apply it only when
-ready. Do not open the upstream PR before the owner's explicit approval.
+```text
+python scripts/verify_catalog_links.py --sha FULL_40_CHARACTER_SOURCE_COMMIT
+```
+
+This verifies that the public commit exists and every image URL returns a PNG.
+Only then copy the generated YAML to the existing PR branch, commit and push that
+branch, and replace the existing PR description with the generated body. Keep
+version, full SHA, README URL and all screenshot URLs on that same source commit.
+Do not claim the image links were verified while the commit is still local.
+
+Normal-installer owner acceptance is distinct from automated checks; record it
+only when actually performed. This preparation does not open a new PR, publish
+a commit, change the working VPS installation, or imply catalog acceptance.

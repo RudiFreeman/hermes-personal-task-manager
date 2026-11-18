@@ -1,10 +1,13 @@
 {
   "name": "personal-task-manager",
   "label": "My Tasks",
-  "description": "A simple personal task list with subtasks. English and Russian interface.",
-  "version": "0.2.4",
+  "description": "Personal tasks, subtasks, notes and results shared with Hermes. Seven interface languages.",
+  "version": "1.0.0",
   "icon": "FileText",
-  "tab": {"path": "/personal-tasks", "position": "end"},
+  "tab": {
+    "path": "/personal-tasks",
+    "position": "end"
+  },
   "entry": "dist/index.js",
   "css": "dist/style.css",
   "api": "plugin_api.py"

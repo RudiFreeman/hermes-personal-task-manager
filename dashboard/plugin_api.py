@@ -1,7 +1,10 @@
 """Dashboard mounts this router behind its existing authentication gate."""
 import importlib.util
 from pathlib import Path
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Request
+from fastapi.routing import APIRoute
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Literal
 
@@ -10,7 +13,26 @@ from typing import Literal
 spec = importlib.util.spec_from_file_location("ptm_dashboard_store", Path(__file__).resolve().parents[1] / "backend" / "store.py")
 storage = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(storage)
-router = APIRouter()
+def request_language(request):
+    return request.query_params.get("language") or request.headers.get("Accept-Language", "en")
+
+
+class LocalizedRoute(APIRoute):
+    def get_route_handler(self):
+        original = super().get_route_handler()
+
+        async def handler(request):
+            try:
+                return await original(request)
+            except RequestValidationError:
+                # Keep strict validation and HTTP 422. Do not expose Pydantic's
+                # English diagnostic prose or echo task contents into the UI.
+                return JSONResponse(status_code=422, content={"detail": storage.localized_message("errorInvalidData", request_language(request)),
+                    "error_code": "errorInvalidData", "error_params": {}})
+        return handler
+
+
+router = APIRouter(route_class=LocalizedRoute)
 
 
 class Child(BaseModel):
@@ -40,7 +62,8 @@ def execute(action, request):
     try:
         return action(storage.Store())
     except storage.TaskError as exc:
-        raise HTTPException(status_code=409, detail=exc.localized(request.query_params.get("language") or request.headers.get("Accept-Language", "en"))) from exc
+        return JSONResponse(status_code=409, content={"detail": exc.localized(request_language(request)),
+            "error_code": exc.code, "error_params": exc.params})
 
 
 @router.get("/tasks")

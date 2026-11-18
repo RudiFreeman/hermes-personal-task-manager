@@ -2,20 +2,63 @@
 from contextlib import contextmanager
 from datetime import datetime, timezone
 import os
+import json
+from functools import lru_cache
 from pathlib import Path
 import sqlite3
 import time
 import uuid
 
 
+LOCALE_DIR = Path(__file__).resolve().parents[1] / "locales"
+SUPPORTED_LANGUAGES = {path.stem.lower(): path.stem for path in LOCALE_DIR.glob("*.json")}
+
+
+def normalize_language(language):
+    tag = str(language or "").split(",")[0].split(";")[0].strip().replace("_", "-").lower()
+    if tag in SUPPORTED_LANGUAGES:
+        return SUPPORTED_LANGUAGES[tag]
+    base = tag.split("-")[0]
+    return "pt-BR" if base == "pt" else SUPPORTED_LANGUAGES.get(base, "en")
+
+
+@lru_cache(maxsize=32)
+def _catalog(language="en"):
+    return json.loads((LOCALE_DIR / (normalize_language(language) + ".json")).read_text(encoding="utf-8"))
+
+
+def localized_message(key, language="en", values=None):
+    catalog, english = _catalog(normalize_language(language)), _catalog("en")
+    message = catalog.get(key) or english.get(key) or key
+    params = dict(values or {})
+    if "field" in params:
+        field = "field." + params["field"]
+        params["field"] = catalog.get(field) or english.get(field) or params["field"]
+    # Error bounds are integers; UI dates, times and general numbers use Intl.
+    separator = {"en": ",", "ru": "\u00a0", "es": ".", "pt-BR": ".", "de": ".", "fr": "\u202f", "pl": "\u00a0"}.get(normalize_language(language), ",")
+    for name, value in params.items():
+        if type(value) is int:
+            params[name] = format(value, ",").replace(",", separator)
+    return message.format_map(params)
+
+
+@lru_cache(maxsize=1)
+def _error_keys():
+    return {message: key for key, message in _catalog("en").items() if key.startswith("error") and "{" not in message}
+
+
 class TaskError(ValueError):
-    """English by default, with a Russian rendering for localized HTTP clients."""
-    def __init__(self, message, russian=None):
+    """Preserve the tool-facing English error; localize HTTP presentation only."""
+    def __init__(self, message, russian=None, *, code=None, params=None):
         super().__init__(message)
         self.russian = russian or message
+        self.code = code or _error_keys().get(message)
+        self.params = params or {}
 
     def localized(self, language="en"):
-        return self.russian if language.split(",")[0].split(";")[0].strip().lower().split("-")[0] == "ru" else str(self)
+        if self.code:
+            return localized_message(self.code, language, self.params)
+        return self.russian if normalize_language(language) == "ru" else str(self)
 
 
 def default_path():
@@ -33,14 +76,12 @@ def now():
 
 
 def text(value, label, maximum, required=False):
-    russian = {"title": "Название", "description": "Описание", "subtask title": "Название подзадачи", "comment": "Комментарий"}.get(label, label)
     if not isinstance(value, str):
-        raise TaskError(f"{label}: expected text", f"{russian}: требуется текст")
+        raise TaskError(f"{label}: expected text", code="errorTextType", params={"field": label})
     value = value.strip()
     if (required and not value) or len(value) > maximum:
         minimum = 1 if required else 0
-        raise TaskError(f"{label}: must contain {minimum} to {maximum} characters",
-                        f"{russian}: от {minimum} до {maximum} символов")
+        raise TaskError(f"{label}: must contain {minimum} to {maximum} characters", code="errorTextLength", params={"field": label, "minimum": minimum, "maximum": maximum})
     return value
 
 
@@ -54,7 +95,7 @@ class Store:
             db.execute("BEGIN IMMEDIATE")
             version = db.execute("PRAGMA user_version").fetchone()[0]
             if version > 2:
-                raise TaskError("The database was created by a newer plugin version", "База создана более новой версией плагина")
+                raise TaskError("The database was created by a newer plugin version")
             if version == 0:
                 schema = """
                     CREATE TABLE tasks (
@@ -118,10 +159,10 @@ class Store:
 
     def _get(self, db, task_id):
         if not isinstance(task_id, str):
-            raise TaskError("A task ID is required", "Укажите ID задачи")
+            raise TaskError("A task ID is required")
         row = db.execute("SELECT * FROM tasks WHERE id=?", (task_id,)).fetchone()
         if row is None:
-            raise TaskError("Task not found", "Задача не найдена")
+            raise TaskError("Task not found")
         return dict(row)
 
     def snapshot(self):
@@ -157,13 +198,13 @@ class Store:
         if subtasks is None:
             subtasks = []
         if not isinstance(subtasks, list) or len(subtasks) > 100:
-            raise TaskError("Add at most 100 subtasks at a time", "За один раз можно добавить до 100 подзадач")
+            raise TaskError("Add at most 100 subtasks at a time")
         if parent_id is not None and subtasks:
-            raise TaskError("Only one level of subtasks is supported", "Поддерживается один уровень подзадач")
+            raise TaskError("Only one level of subtasks is supported")
         children = []
         for child in subtasks:
             if not isinstance(child, dict) or set(child) - {"title", "description"}:
-                raise TaskError("A subtask may contain only a title and description", "Подзадача может содержать только название и описание")
+                raise TaskError("A subtask may contain only a title and description")
             children.append((text(child.get("title"), "subtask title", 300, True),
                              text(child.get("description", ""), "description", 20000)))
         stamp = now()
@@ -174,9 +215,9 @@ class Store:
                 parent = self._get(db, parent_id)
                 self._active(parent)
                 if parent["parent_id"] is not None:
-                    raise TaskError("Only one level of subtasks is supported", "Поддерживается один уровень подзадач")
+                    raise TaskError("Only one level of subtasks is supported")
                 if parent["done"]:
-                    raise TaskError("Reopen the parent task first", "Сначала верните родительскую задачу в активные")
+                    raise TaskError("Reopen the parent task first")
             for item_id, item_parent, item_title, item_description in [
                 (task_id, parent_id, title, description),
                 *((uuid.uuid4().hex, task_id, t, d) for t, d in children),
@@ -194,12 +235,12 @@ class Store:
     def update(self, task_id, changes, actor="user", expected_revision=None):
         if isinstance(changes, dict) and "action" in changes:
             if set(changes) - {"action", "confirmed"}:
-                raise TaskError("Send a lifecycle action separately from edits", "Отправьте действие с корзиной отдельно от редактирования")
+                raise TaskError("Send a lifecycle action separately from edits")
             return self.lifecycle(task_id, changes["action"], actor, expected_revision, changes.get("confirmed", False))
         if not isinstance(changes, dict) or not changes or set(changes) - {
             "title", "description", "done", "starred", "comment"
         }:
-            raise TaskError("Provide a title, description, completion state, importance, or comment", "Укажите название, описание, галочку, важность или комментарий")
+            raise TaskError("Provide a title, description, completion state, importance, or comment")
         fields = {}
         for field in ("title", "description"):
             if field in changes:
@@ -208,18 +249,18 @@ class Store:
         for field in ("done", "starred"):
             if field in changes:
                 if type(changes[field]) is not bool:
-                    raise TaskError(f"{field}: expected true or false", f"{field}: требуется true или false")
+                    raise TaskError(f"{field}: expected true or false", code="errorBoolean", params={"field": field})
                 fields[field] = changes[field]
         comment = text(changes.get("comment", ""), "comment", 10000)
         if actor == "hermes" and changes.get("done") is True and not comment:
-            raise TaskError("Hermes must describe what was completed and the supporting evidence", "При завершении Hermes должен указать, что сделано и чем это подтверждено")
+            raise TaskError("Hermes must describe what was completed and the supporting evidence")
         stamp = now()
         with self.connection() as db:
             db.execute("BEGIN IMMEDIATE")
             task = self._get(db, task_id)
             self._active(task)
             if expected_revision is not None and expected_revision != task["revision"]:
-                raise TaskError("This task has changed. Refresh the list and try again", "Задача уже изменена. Обновите список и повторите действие")
+                raise TaskError("This task has changed. Refresh the list and try again")
             if fields.get("done") is True and not task["done"]:
                 children = db.execute("SELECT id FROM tasks WHERE parent_id=? AND done=0 AND trashed_at IS NULL", (task_id,)).fetchall()
                 for child in children:
@@ -230,7 +271,7 @@ class Store:
             if fields.get("done") is False and task["done"] and task["parent_id"]:
                 parent = self._get(db, task["parent_id"])
                 if parent["done"]:
-                    raise TaskError("Reopen the parent task first", "Сначала верните родительскую задачу в активные")
+                    raise TaskError("Reopen the parent task first")
             if "done" in fields and fields["done"] != bool(task["done"]):
                 fields["completed_at"] = stamp if fields["done"] else None
             changed = {key: value for key, value in fields.items() if task[key] != value}
@@ -250,17 +291,17 @@ class Store:
     @staticmethod
     def _active(task):
         if task["trashed_at"] is not None:
-            raise TaskError("Restore this item from Trash first", "Сначала восстановите пункт из корзины")
+            raise TaskError("Restore this item from Trash first")
 
     def lifecycle(self, task_id, action, actor="user", expected_revision=None, confirmed=False):
         if action not in ("trash", "restore", "purge") or type(confirmed) is not bool:
-            raise TaskError("Unknown lifecycle action", "Неизвестное действие с корзиной")
+            raise TaskError("Unknown lifecycle action")
         stamp = now()
         with self.connection() as db:
             db.execute("BEGIN IMMEDIATE")
             task = self._get(db, task_id)
             if expected_revision is not None and expected_revision != task["revision"]:
-                raise TaskError("This task has changed. Refresh the list and try again", "Задача уже изменена. Обновите список и повторите действие")
+                raise TaskError("This task has changed. Refresh the list and try again")
             if action == "trash":
                 if task["trashed_at"] is not None:
                     return task
@@ -270,20 +311,20 @@ class Store:
                     db.execute("UPDATE tasks SET trashed_at=?,trash_batch=?,updated_at=?,revision=revision+1 WHERE id=?", (stamp, batch, stamp, item["id"]))
             else:
                 if task["trashed_at"] is None:
-                    raise TaskError("This item is not in Trash", "Этот пункт не в корзине")
+                    raise TaskError("This item is not in Trash")
                 if action == "restore":
                     if task["parent_id"]:
                         parent = self._get(db, task["parent_id"])
                         if parent["trashed_at"] is not None:
-                            raise TaskError("Restore the parent task first", "Сначала восстановите родительскую задачу")
+                            raise TaskError("Restore the parent task first")
                         if parent["done"] and not task["done"]:
-                            raise TaskError("Reopen the parent task first", "Сначала верните родительскую задачу в активные")
+                            raise TaskError("Reopen the parent task first")
                     items = db.execute("SELECT id FROM tasks WHERE (id=? OR parent_id=?) AND trash_batch=?", (task_id, task_id, task["trash_batch"])).fetchall()
                     for item in items:
                         db.execute("UPDATE tasks SET trashed_at=NULL,trash_batch=NULL,updated_at=?,revision=revision+1 WHERE id=?", (stamp, item["id"]))
                 else:
                     if not confirmed:
-                        raise TaskError("Confirm permanent deletion explicitly", "Явно подтвердите окончательное удаление")
+                        raise TaskError("Confirm permanent deletion explicitly")
                     items = db.execute("SELECT id FROM tasks WHERE id=? OR parent_id=? ORDER BY parent_id IS NULL", (task_id, task_id)).fetchall()
                     for item in items:
                         db.execute("DELETE FROM comments WHERE task_id=?", (item["id"],))

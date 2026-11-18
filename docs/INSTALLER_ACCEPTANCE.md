@@ -1,13 +1,13 @@
 # Owner acceptance through the normal Git installer
 
 This is a manual acceptance checklist, not a record of completed owner testing.
-Do not submit the catalog PR until the owner explicitly approves the result.
+Do not update existing catalog PR #157264 until the owner explicitly approves the prepared result.
 
 ## Before installation
 
 1. Approve publishing only the prepared plugin source to its GitHub repository
    for testing. This does not approve an upstream catalog PR.
-2. Record the published full commit SHA and expected version **0.2.1**.
+2. Record the published full commit SHA and expected version **1.0.0**.
 3. Use a disposable Hermes profile first. Keep both host surfaces on that same
    profile. If testing an existing database later, stop all its writers and back
    it up with any WAL files first; schema downgrade is unsupported.
@@ -20,14 +20,14 @@ supports a ref, use the published full SHA. Otherwise verify the repository's
 default branch still points at that commit before installing.
 
 Enable the backend in the intended profile. Enable the Desktop half in WebApp
-Capabilities / Plugins and open My Tasks. Verify version 0.2.1 and run
+Capabilities / Plugins and open My Tasks. Verify version 1.0.0 and run
 `hermes plugins doctor personal-task-manager` if CLI access is available.
 Prebuilt host bundles do not require Node development dependencies.
 
 ## Verify with synthetic tasks
 
-- Create a task and two subtasks in Dashboard. Collapse/expand by the parent
-  title and confirm progress and round checkboxes.
+- Create a task and two subtasks in Dashboard. Collapse/expand with the parent arrow, open details with its title,
+  and confirm progress and round checkboxes. Resize the split and close details.
 - Open WebApp with the same profile. Confirm the group appears; edit a child
   there and confirm Dashboard receives the change.
 - Keep a dirty description open in one surface; change the same task in the
@@ -38,12 +38,11 @@ Prebuilt host bundles do not require Node development dependencies.
 - Move the group to Trash after confirmation. Restore it in the other surface.
   Cancel permanent deletion once; verify it remains. Confirm deletion only for
   this synthetic group when ready.
-- Change English/Russian, reload and check persistence. Check a narrow viewport
+- Open the gear menu, switch English/Russian, return to Automatic, reload and check persistence. Check a narrow viewport
   and both host themes for overflow, readable text and usable controls.
 - Start a new chat. Explicitly ask Hermes to add a new synthetic task, then
   supply a confirmed result and ask it to mark completion with a comment.
   Verify the UI receives the result. Creating a task must not execute it.
 
 Record the Hermes version, plugin SHA, both surfaces tested, any issues and the
-owner's explicit acceptance. Then prepare the final catalog entry and upstream
-PR from that exact public commit. Do not silently change the pin after approval.
+owner's explicit acceptance. Then update the catalog entry and existing PR #157264 from that exact public commit. Do not silently change the pin after approval.

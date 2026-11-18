@@ -1,184 +1,94 @@
-export const translations = {
-  "en": {
-    "locale": "en-US",
-    "language": "Language",
-    "workspace": "PERSONAL SPACE",
-    "heading": "My Tasks",
-    "subtitle": "Write it down. Break it into steps. Check it off.",
-    "details": "Task details",
-    "overallProgress": "Overall progress",
-    "newTask": "New task",
-    "taskPlaceholder": "What needs to be done?",
-    "search": "Search tasks",
-    "filters": "Task filters",
-    "all": "All tasks",
-    "starred": "Important",
-    "add": "Add",
-    "refresh": "Refresh",
-    "saveError": "Unable to save changes. Please try again.",
-    "requestError": "Unable to complete the request. Please try again.",
-    "staleDraft": "This item has changed. Your draft is preserved; reload it before retrying.",
-    "reloadDraft": "Discard draft and reload",
-    "reopenLabel": "Reopen: ",
-    "completeLabel": "Complete: ",
-    "progress": "{done} of {total} completed",
-    "noResults": "No tasks found",
-    "allDone": "All done",
-    "start": "Start with one task",
-    "searchHint": "Try another search or view all tasks.",
-    "doneHint": "Take a breath. Add your next plans when you're ready.",
-    "startHint": "Add a task above, then break it into small steps.",
-    "completed": "Completed",
-    "stepsProgress": "{done} of {total} steps",
-    "unstar": "Remove from important",
-    "star": "Mark as important",
-    "detailHint": "Every task has a next step",
-    "selectHint": "Select a task to add a description, subtasks, and notes.",
-    "taskTitle": "Task title",
-    "descriptionPlaceholder": "Description, links, or expected result…",
-    "taskDescription": "Task description",
-    "task": "Task",
-    "description": "Description",
-    "save": "Save",
-    "subtasks": "Subtasks",
-    "subtaskTitle": "Subtask title",
-    "subtaskDescription": "Subtask description",
-    "stepPlaceholder": "Describe this step…",
-    "saveStep": "Save step",
-    "you": "You",
-    "addStep": "Add a step…",
-    "newSubtask": "New subtask",
-    "addSubtask": "Add subtask",
-    "notes": "Notes and results",
-    "notesHint": "Keep track of what you have done and where you left off.",
-    "notePlaceholder": "What did you accomplish?",
-    "newComment": "New comment",
-    "addNote": "Add note",
-    "completedHeading": "COMPLETED",
-    "detailsHeading": "DETAILS",
-    "close": "Close",
-    "reopen": "Reopen task",
-    "complete": "Mark as completed",
-    "lastChanged": "Last updated: {actor} · {date}",
-    "active": "Active",
-    "archive": "Archive",
-    "trash": "Trash",
-    "edit": "Edit",
-    "menu": "Actions",
-    "moveTrash": "Move to Trash",
-    "restore": "Restore",
-    "purge": "Delete permanently",
-    "emptyTrash": "Empty Trash",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "trashQuestion": "Move \"{title}\" and its subtasks to Trash? You can restore them later.",
-    "purgeQuestion": "Permanently delete \"{title}\" and its subtasks, notes and history? This cannot be undone.",
-    "emptyTrashQuestion": "Permanently delete all {count} groups currently in Trash? This cannot be undone.",
-    "emptyTrashHint": "Deleted items appear here. Restore them or delete them permanently.",
-    "archiveHint": "Completed task groups appear here.",
-    "cascadeHint": "Completing this task also completes its active subtasks.",
-    "restoreParent": "Restore the parent task first",
-    "reopenParent": "Reopen the parent task first",
-    "staleNotice": "This form has changed elsewhere. Your draft keeps its original revision.",
-    "saved": "Saved",
-    "syncing": "Saving?",
-    "noTasks": "No active tasks",
-    "taskNotes": "Notes",
-    "parentTask": "Parent task",
-    "completedAt": "Completed: {date}",
-    "back": "Back",
-    "trashCount": "Trash ({count})"
-  },
-  "ru": {
-    "locale": "ru-RU",
-    "language": "Язык",
-    "workspace": "ЛИЧНОЕ ПРОСТРАНСТВО",
-    "heading": "Мои задачи",
-    "subtitle": "Запишите. Разбейте на шаги. Отметьте сделанное.",
-    "details": "Подробности задачи",
-    "overallProgress": "Общий прогресс",
-    "newTask": "Новая задача",
-    "taskPlaceholder": "Что нужно сделать?",
-    "search": "Поиск задач",
-    "filters": "Фильтр задач",
-    "all": "Все задачи",
-    "starred": "Важные",
-    "add": "Добавить",
-    "refresh": "Обновить",
-    "saveError": "Не удалось сохранить изменения. Повторите попытку.",
-    "requestError": "Не удалось выполнить запрос. Повторите попытку.",
-    "staleDraft": "Этот пункт изменён. Черновик сохранён; загрузите актуальную версию перед повторной попыткой.",
-    "reloadDraft": "Удалить черновик и загрузить заново",
-    "reopenLabel": "Вернуть в активные: ",
-    "completeLabel": "Выполнено: ",
-    "progress": "{done} из {total} выполнено",
-    "noResults": "Ничего не найдено",
-    "allDone": "Всё сделано",
-    "start": "Начните с одной задачи",
-    "searchHint": "Попробуйте другой поиск или откройте все задачи.",
-    "doneHint": "Можно выдохнуть. Новые планы — когда будете готовы.",
-    "startHint": "Добавьте задачу выше, а затем разбейте её на небольшие шаги.",
-    "completed": "Выполненные",
-    "stepsProgress": "{done} из {total} шагов",
-    "unstar": "Убрать из важных",
-    "star": "Отметить важной",
-    "detailHint": "У каждой задачи — свой следующий шаг",
-    "selectHint": "Выберите задачу, чтобы добавить описание, подзадачи и заметки.",
-    "taskTitle": "Название задачи",
-    "descriptionPlaceholder": "Описание, ссылки или ожидаемый результат…",
-    "taskDescription": "Описание задачи",
-    "task": "Задача",
-    "description": "Описание",
-    "save": "Сохранить",
-    "subtasks": "Подзадачи",
-    "subtaskTitle": "Название подзадачи",
-    "subtaskDescription": "Описание подзадачи",
-    "stepPlaceholder": "Описание шага…",
-    "saveStep": "Сохранить шаг",
-    "you": "Вы",
-    "addStep": "Добавить шаг…",
-    "newSubtask": "Новая подзадача",
-    "addSubtask": "Добавить подзадачу",
-    "notes": "Заметки и результаты",
-    "notesHint": "Здесь можно сохранить, что сделано и на чём остановились.",
-    "notePlaceholder": "Что удалось сделать?",
-    "newComment": "Новый комментарий",
-    "addNote": "Добавить заметку",
-    "completedHeading": "ВЫПОЛНЕНО",
-    "detailsHeading": "ПОДРОБНОСТИ",
-    "close": "Закрыть",
-    "reopen": "Вернуть в активные",
-    "complete": "Отметить выполненной",
-    "lastChanged": "Последнее изменение: {actor} · {date}",
-    "active": "Активные",
-    "archive": "Архив",
-    "trash": "Корзина",
-    "edit": "Редактировать",
-    "menu": "Действия",
-    "moveTrash": "В корзину",
-    "restore": "Восстановить",
-    "purge": "Удалить навсегда",
-    "emptyTrash": "Очистить корзину",
-    "cancel": "Отмена",
-    "confirm": "Подтвердить",
-    "trashQuestion": "Переместить «{title}» и её подзадачи в корзину? Их можно восстановить.",
-    "purgeQuestion": "Удалить навсегда «{title}», её подзадачи, заметки и историю? Это действие нельзя отменить.",
-    "emptyTrashQuestion": "Удалить навсегда все задачи из корзины ({count})? Это действие нельзя отменить.",
-    "emptyTrashHint": "Здесь появятся удалённые задачи. Их можно восстановить или удалить навсегда.",
-    "archiveHint": "Здесь появятся завершённые задачи и подзадачи.",
-    "cascadeHint": "Завершение задачи также завершит её активные подзадачи.",
-    "restoreParent": "Сначала восстановите родительскую задачу",
-    "reopenParent": "Сначала верните родительскую задачу в активные",
-    "staleNotice": "Задача изменилась в другом интерфейсе. Перезагрузите форму перед сохранением.",
-    "saved": "Сохранено",
-    "syncing": "Синхронизация…",
-    "noTasks": "Пока нет активных задач",
-    "taskNotes": "Заметки",
-    "parentTask": "Основная задача",
-    "completedAt": "Завершено: {date}",
-    "back": "Назад",
-    "trashCount": "Корзина ({count})"
+import en from "../../locales/en.json" with {type: "json"};
+import ru from "../../locales/ru.json" with {type: "json"};
+import es from "../../locales/es.json" with {type: "json"};
+import ptBR from "../../locales/pt-BR.json" with {type: "json"};
+import de from "../../locales/de.json" with {type: "json"};
+import fr from "../../locales/fr.json" with {type: "json"};
+import pl from "../../locales/pl.json" with {type: "json"};
+
+// JSON catalogs are shared with the Python HTTP adapter. Add a catalog here to
+// expose another language; resolution, settings and formatting are data-driven.
+export const translations = {en, ru, es, "pt-BR": ptBR, de, fr, pl};
+export const supportedLanguages = Object.entries(translations).map(([code, catalog]) => ({code, name: catalog.languageName}));
+export const LANGUAGE_KEY = "ptm.language";
+
+export function normalizeLanguage(value) {
+  if (typeof value !== "string") return null;
+  const tag = value.split(",")[0].split(";")[0].trim().replaceAll("_", "-").toLowerCase();
+  const exact = supportedLanguages.find(item => item.code.toLowerCase() === tag);
+  if (exact) return exact.code;
+  const base = tag.split("-")[0];
+  if (base === "pt") return "pt-BR";
+  return Object.hasOwn(translations, base) ? base : null;
+}
+export function browserLanguages() {
+  const nav = globalThis.window?.navigator || globalThis.navigator;
+  return nav?.languages?.length ? [...nav.languages] : nav?.language ? [nav.language] : [];
+}
+export function languageStorage() {try {return globalThis.localStorage || globalThis.window?.localStorage;} catch {return undefined;}}
+export function languagePreference(storage = languageStorage()) {
+  try {return normalizeLanguage(storage?.getItem(LANGUAGE_KEY));} catch {return null;}
+}
+export function resolveLanguage({manual, hermes, browser = browserLanguages()} = {}) {
+  const selected = normalizeLanguage(manual);
+  if (selected) return {language: selected, source: "Manual"};
+  if (typeof hermes === "string" && hermes.trim() && hermes.toLowerCase() !== "auto") {
+    const inherited = normalizeLanguage(hermes);
+    return {language: inherited || "en", source: inherited ? "Hermes" : "Fallback"};
   }
-};
-export function savedLanguage() { try { const value=localStorage.getItem("ptm.language"); return Object.hasOwn(translations,value)?value:"en"; } catch { return "en"; } }
-export function translate(language,key,values={}) {const c=Object.hasOwn(translations,language)?translations[language]:translations.en; return (c[key]||translations.en[key]||key).replace(/\{(\w+)\}/g,(_,name)=>String(values[name]??`{${name}}`));}
+  for (const candidate of Array.isArray(browser) ? browser : [browser]) {
+    const inherited = normalizeLanguage(candidate);
+    if (inherited) return {language: inherited, source: "Browser"};
+  }
+  return {language: "en", source: "Fallback"};
+}
+export function savedLanguage() {return resolveLanguage({manual: languagePreference()}).language;}
+export function localeFor(language) {return translations[normalizeLanguage(language) || "en"].locale;}
+export function formatNumber(language, value) {return new Intl.NumberFormat(localeFor(language)).format(value);}
+export function formatDateTime(language, stamp) {
+  const date = new Date(stamp);
+  return Number.isNaN(date.valueOf()) ? "—" : new Intl.DateTimeFormat(localeFor(language), {dateStyle: "medium", timeStyle: "short"}).format(date);
+}
+export function translate(language, key, values = {}) {
+  const code = normalizeLanguage(language) || "en", catalog = translations[code];
+  const message = (Object.hasOwn(catalog, key) && catalog[key]) || (Object.hasOwn(en, key) && en[key]) || key;
+  return message.replace(/\{(\w+)\}/g, (_, name) => {
+    const value = values[name];
+    if (value === undefined) return `{${name}}`;
+    if (name === "field") return catalog[`field.${value}`] || en[`field.${value}`] || String(value);
+    return typeof value === "number" ? formatNumber(code, value) : String(value);
+  });
+}
+export class LocalizedError extends Error {
+  constructor(key, values = {}) {super(translate("en", key, values)); this.key = key; this.values = values;}
+}
+const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+// Both Hermes transports surface HTTP details as Error.message. Recognize our
+// catalog messages, retain their semantic key, and re-render even if a response
+// in the previous language arrives after the user has changed the language.
+const errorPatterns = Object.values(translations).flatMap(catalog => Object.entries(catalog)
+  .filter(([key]) => key.startsWith("error") || ["connectionChanged", "requestError", "saveError"].includes(key))
+  .map(([key, message]) => {
+    const names = [];
+    const pattern = message.split(/(\{\w+\})/).map(part => {
+      if (/^\{\w+\}$/.test(part)) {names.push(part.slice(1, -1)); return "(.+?)";}
+      return escape(part);
+    }).join("");
+    return {key, names, pattern: new RegExp(`^${pattern}$`), catalog};
+  }));
+export function describeError(error, fallback = "requestError") {
+  if (error instanceof LocalizedError && Object.hasOwn(en, error.key)) return {key: error.key, values: error.values};
+  for (const entry of errorPatterns) {
+    const match = entry.pattern.exec(error?.message || "");
+    if (!match) continue;
+    const values = {};
+    entry.names.forEach((name, index) => {
+      const value = match[index + 1];
+      if (name === "field") values[name] = Object.keys(entry.catalog).find(key => key.startsWith("field.") && entry.catalog[key] === value)?.slice(6) || value;
+      else if (["minimum", "maximum", "count"].includes(name)) values[name] = Number(value.replace(/[,\.\s\u00a0\u202f]/g, ""));
+      else values[name] = value;
+    });
+    return {key: entry.key, values};
+  }
+  return {key: fallback, values: {}};
+}
