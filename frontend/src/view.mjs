@@ -143,7 +143,7 @@ export function createTasksView(React, kit = {}) {
         state.view === "trash" && trashRoots.length > 0 && act(withIcon("trash", t("emptyTrash")), () => controller.confirm("empty"), {className: "ptm-danger", disabled: state.pending})),
       state.view === "active" && h("form", {className: "ptm-add", onSubmit: event => {event.preventDefault(); controller.add();}},
         h(Input, {value: state.newTitle, placeholder: t("taskPlaceholder"), "aria-label": t("newTask"), maxLength: 300, required: true,
-          onChange: event => controller.set({newTitle: event.target.value})}), h(Button, {type: "submit", disabled: state.pending}, withIcon("plus", t("add")))),
+          onChange: event => controller.set({newTitle: event.target.value})}), h(Button, {type: "submit", className: "ptm-add-task", disabled: state.pending}, withIcon("plus", t("add")))),
       h("div", {className: "ptm-message", role: "status", "aria-live": "polite"}, state.error || (state.pending ? t("syncing") : "")),
       h("div", {className: "ptm-list"}, roots.length ? roots.map(task => h(TaskRow, {key: task.id, task, state, controller, t, children: items.filter(child => child.parent_id === task.id)})) :
         h("p", {className: "ptm-empty"}, t(state.query || state.starred ? "noResults" : state.view === "trash" ? "emptyTrashHint" : state.view === "archive" ? "archiveHint" : "noTasks"))),

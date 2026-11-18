@@ -735,7 +735,7 @@ var PTMDashboard = (() => {
             required: true,
             onChange: (event) => controller.set({ newTitle: event.target.value })
           }),
-          h(Button, { type: "submit", disabled: state.pending }, withIcon("plus", t("add")))
+          h(Button, { type: "submit", className: "ptm-add-task", disabled: state.pending }, withIcon("plus", t("add")))
         ),
         h("div", { className: "ptm-message", role: "status", "aria-live": "polite" }, state.error || (state.pending ? t("syncing") : "")),
         h("div", { className: "ptm-list" }, roots.length ? roots.map((task) => h(TaskRow, { key: task.id, task, state, controller, t, children: items.filter((child) => child.parent_id === task.id) })) : h("p", { className: "ptm-empty" }, t(state.query || state.starred ? "noResults" : state.view === "trash" ? "emptyTrashHint" : state.view === "archive" ? "archiveHint" : "noTasks"))),

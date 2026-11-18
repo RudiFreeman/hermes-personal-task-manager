@@ -59,7 +59,8 @@
 .ptm .is-done .ptm-title-text {text-decoration:line-through;color:var(--ptm-muted);}
 .ptm-children {margin-left:24px;border-left:1px solid var(--ptm-line);padding-left:7px;}
 .ptm-children {border-left-color:color-mix(in srgb,var(--ptm-line) 50%,transparent);}
-.ptm .ptm-add-child {background:transparent;border:0!important;color:var(--ptm-muted);font-size:12px;margin:4px 0 4px 32px;}
+.ptm .ptm-add-task,.ptm .ptm-add-child {background:transparent;border:0!important;color:var(--ptm-muted);font-size:12px;flex-shrink:0;}
+.ptm .ptm-add-child {margin:4px 0 4px 32px;}
 .ptm-menu {position:relative;flex:0 0 32px;}
 .ptm-menu summary {list-style:none;text-align:center;cursor:pointer;border-radius:4px;min-width:32px;min-height:36px;font-size:20px;}
 .ptm-menu summary::-webkit-details-marker {display:none;}
