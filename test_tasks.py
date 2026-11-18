@@ -44,6 +44,39 @@ def test_task_and_subtasks_survive_reopening(store):
     assert snapshot["progress"] == {"done": 0, "total": 1, "percent": 0}
 
 
+def test_equal_timestamp_items_keep_original_creation_order(store, monkeypatch):
+    ids = iter(range(1000, 900, -1))
+    monkeypatch.setattr(storage.uuid, "uuid4", lambda: storage.uuid.UUID(int=next(ids)))
+    monkeypatch.setattr(storage, "now", lambda: "2026-11-18T00:00:00+00:00")
+    first = store.add("First", subtasks=[{"title": f"1.{i}"} for i in range(1, 10)])
+    second = store.add("Second", subtasks=[{"title": "2.1"}, {"title": "2.2"}])
+    expected = ["First", *[f"1.{i}" for i in range(1, 10)], "Second", "2.1", "2.2"]
+
+    # snapshot() also handles databases populated before this sorting fix.
+    assert [t["title"] for t in Store(store.path).snapshot()["tasks"]] == expected
+    snapshot = json.loads(tools.personal_tasks_list({}))["result"]
+    assert [t["title"] for t in snapshot["tasks"]] == expected
+    child = next(t for t in snapshot["tasks"] if t["parent_id"] == first["id"])
+    store.update(child["id"], {"description": "Edited later"}, expected_revision=child["revision"])
+    trashed = store.lifecycle(second["id"], "trash", expected_revision=second["revision"])
+    assert [t["title"] for t in store.snapshot()["trash"]] == ["Second", "2.1", "2.2"]
+    store.lifecycle(second["id"], "restore", expected_revision=trashed["revision"])
+    assert [t["title"] for t in Store(store.path).snapshot()["tasks"]] == expected
+
+
+def test_tool_unicode_description_needs_no_ascii_escaping(store):
+    description = 'Проверить «ёлочки», "JSON quotes", путь C:\\notes\nВторая строка'
+    task = store.add("Unicode")
+    payload = {"task_id": task["id"], "revision": task["revision"], "description": description}
+    for ensure_ascii in (False, True):
+        args = json.loads(json.dumps(payload, ensure_ascii=ensure_ascii))
+        response = json.loads(tools.personal_tasks_update(args))
+        assert response["ok"]
+        assert response["result"]["description"] == description
+        payload["revision"] = response["result"]["revision"]
+    assert Store(store.path).snapshot()["tasks"][0]["description"] == description
+
+
 def test_parent_completion_cascades_and_children_do_not_complete_parent(store):
     parent = store.add("Почта", subtasks=[{"title": "Доступ"}])
     child = next(t for t in store.snapshot()["tasks"] if t["parent_id"])

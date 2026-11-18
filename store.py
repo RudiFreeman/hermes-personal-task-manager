@@ -127,7 +127,17 @@ class Store:
     def snapshot(self):
         with self.connection() as db:
             db.execute("BEGIN")
-            tasks = [dict(row) for row in db.execute("SELECT * FROM tasks ORDER BY created_at, id")]
+            # A batch shares one timestamp. Random UUIDs are not creation order;
+            # the durable creation-event sequence preserves that batch's order,
+            # including items written by older versions. No data migration needed.
+            tasks = [dict(row) for row in db.execute("""
+                SELECT task.* FROM tasks AS task
+                LEFT JOIN (
+                    SELECT task_id, MIN(id) AS creation_order FROM events
+                    WHERE action='created' GROUP BY task_id
+                ) AS creation ON creation.task_id=task.id
+                ORDER BY task.created_at, COALESCE(creation.creation_order, task.rowid), task.id
+            """)]
             comments = [dict(row) for row in db.execute("SELECT * FROM comments ORDER BY id")]
             events = [dict(row) for row in db.execute("SELECT * FROM events ORDER BY id")]
         for task in tasks:

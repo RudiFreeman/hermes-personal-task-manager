@@ -2,6 +2,44 @@
 
 Review date: 2026-11-17. Project: `C:\python\Personal_Task_Manager`.
 
+## Owner acceptance feedback — 2026-11-18
+
+### BUG-07 — Equal-timestamp tasks are sorted by random UUID
+
+**Confirmed:** snapshot() ordered by created_at and id. Items created in one
+atomic add share a timestamp, so UUID order shuffled siblings and could shuffle
+same-timestamp parents. A deterministic fixture with descending UUIDs returned
+1.9 through 1.1 after receiving 1.1 through 1.9.
+
+**Working-tree fix:** use the existing durable created-event sequence to break
+timestamp ties. This restores order for previously-created data, keeps the same
+snapshot fields, and requires no schema or real-data migration. A stable rowid
+fallback applies to records without a creation event. Timestamps are not altered.
+
+**Regression coverage:** test_equal_timestamp_items_keep_original_creation_order
+checks parent/sibling order through reopening, the Hermes list handler, edits,
+Trash and restoration with deliberately reverse-sorted UUIDs and one timestamp.
+test_tool_unicode_description_needs_no_ascii_escaping checks both raw Unicode
+and escaped JSON descriptions with Cyrillic, guillemets, quotes, backslashes
+and newlines through the real update handler and persistence.
+
+**Checks:** local Python **25 passed, one optional API module skipped**;
+translation, Dashboard/controller and WebApp SDK Node suites passed. These
+checks use temporary databases only. This working-tree follow-up is not yet a
+published release, a VPS deployment, or new owner acceptance of the catalog pin.
+
+The reported tool_call batch-size/JSON parsing errors are outside these native
+handlers. Valid raw-Unicode JSON passes the plugin. The exact cause of the failed
+wrapper payloads cannot be established without the actual failing arguments;
+escaping all Cyrillic is not a demonstrated plugin requirement.
+
+The root-only progress total is intentional existing behavior. Subtask totals,
+filtered/compact list responses, atomic batch editing and safe clickable links
+are enhancement candidates. Any batch update should retain per-item revisions
+and roll back on conflict; removing revision checks or adding force is not part
+of this fix. Descriptions can already be supplied in personal_tasks_add for the
+parent and each child, avoiding a second update per newly-created item.
+
 ## Implementation status — 2026-11-17
 
 ### Version 0.2.0 follow-up

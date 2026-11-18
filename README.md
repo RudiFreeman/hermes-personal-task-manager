@@ -141,11 +141,13 @@ older releases work. The plugin requires host `ctx.register_tool`,
 `plugins.plugin_storage.plugin_data_dir`, Dashboard SDK/manifest/API support,
 and Desktop SDK routes, profile state, REST and lifecycle hooks.
 
-See [release validation](V020_VALIDATION.md), the [initial catalog audit](CATALOG_COMPLIANCE.md)
-and [catalog preparation results](CATALOG_PREPARATION.md) for tested versions,
+See [release validation](docs/reports/V020_VALIDATION.md), the [initial catalog audit](docs/reports/CATALOG_COMPLIANCE.md)
+and [catalog preparation results](docs/reports/CATALOG_PREPARATION.md) for tested versions,
 commands and limits. Physical iOS/Safari, Firefox and messaging-channel workflows
 are outside the browser checks so far. Human catalog review and the owner's
 normal-installer acceptance are separate from automated validation.
+
+See the [bug report](docs/reports/BUG_REPORT.md) and [installer checklist](docs/INSTALLER_ACCEPTANCE.md).
 
 ## Development
 
