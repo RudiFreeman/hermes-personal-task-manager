@@ -595,7 +595,15 @@ var PTMDashboard = (() => {
             children.length ? h("span", { className: "ptm-chevron", "aria-hidden": true }, expanded ? "\u25BE" : "\u25B8") : null,
             h("span", { className: "ptm-title-text" }, task.title)
           ),
-          task.starred && h("span", { className: "ptm-important", title: t("star"), "aria-label": t("star") }, "\u2605"),
+          !trashed && h("button", {
+            type: "button",
+            className: "ptm-star-toggle",
+            title: t(task.starred ? "unstar" : "star"),
+            "aria-label": t("star"),
+            "aria-pressed": task.starred,
+            disabled: state.pending,
+            onClick: () => controller.star(task)
+          }, task.starred ? "\u2605" : "\u2606"),
           children.length ? h(
             "small",
             { className: "ptm-step-count", "aria-label": t("stepsProgress", { done: children.filter((c) => c.done).length, total: children.length }) },

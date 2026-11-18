@@ -66,6 +66,11 @@ async function domTests(){
  const click=selector=>flush(()=>one(selector).click());
  const type=(selector,value)=>flush(()=>{const node=one(selector),proto=node.tagName==="TEXTAREA"?dom.window.HTMLTextAreaElement.prototype:dom.window.HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(proto,"value").set.call(node,value);node.dispatchEvent(new dom.window.Event("input",{bubbles:true}));});
  await click('[data-task-id="a"] > .ptm-row .ptm-task-title');assert.ok(document.querySelector('[data-task-id="child"]'));
+ const star = '[data-task-id="child"] > .ptm-row .ptm-star-toggle';
+ await click(star);
+ assert.equal(one(star).getAttribute("aria-pressed"), "true");
+ await click(star);
+ assert.equal(one(star).getAttribute("aria-pressed"), "false");
  await click('[data-task-id="a"] > .ptm-row .ptm-menu [role="menuitem"]');
  const desc='[data-task-id="a"] [data-draft-key="description"]';await type(desc,"DOM draft");assert.equal(one(desc).value,"DOM draft");
  const same=one(desc);same.focus();s.data.tasks[0].title="Remote title";s.data.tasks[0].revision++;

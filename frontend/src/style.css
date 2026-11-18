@@ -40,7 +40,10 @@
 .ptm-title-text {overflow-wrap:anywhere;}
 .ptm-chevron {font-size:11px;color:var(--ptm-muted);flex:0 0 12px;}
 .ptm-step-count {font-size:11px;color:var(--ptm-muted);white-space:nowrap;}
-.ptm-important {color:var(--ptm-accent);font-size:12px;}
+.ptm button.ptm-star-toggle {flex:0 0 32px;min-height:36px;padding:0;border:0;border-radius:4px;background:transparent;color:var(--ptm-muted);font-size:18px;}
+.ptm button.ptm-star-toggle[aria-pressed=true] {background:transparent!important;color:var(--ptm-accent);}
+.ptm button.ptm-star-toggle:hover:not(:disabled) {background:var(--ptm-soft)!important;}
+@media(max-width:600px) {.ptm button.ptm-star-toggle {flex-basis:44px;min-height:44px;}}
 .ptm .is-done .ptm-title-text {text-decoration:line-through;color:var(--ptm-muted);}
 .ptm-children {margin-left:24px;border-left:1px solid var(--ptm-line);padding-left:7px;}
 .ptm .ptm-add-child {background:transparent;border:0!important;color:var(--ptm-muted);font-size:12px;margin:4px 0 4px 32px;}
