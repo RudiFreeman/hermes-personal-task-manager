@@ -111,5 +111,7 @@
   "field.description": "description",
   "field.subtask title": "titre de la sous-tâche",
   "field.comment": "commentaire",
-  "requiredField": "Renseignez ce champ."
+  "requiredField": "Renseignez ce champ.",
+  "detailsWidth": "Largeur initiale du panneau",
+  "detailsWidthHelp": "Largeur à l’ouverture sur ordinateur. Sur mobile, le panneau occupe toute la largeur."
 }

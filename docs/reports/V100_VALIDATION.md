@@ -1,6 +1,6 @@
 # Version 1.0.0 release preparation
 
-Validated on 2026-11-18. Source push and updating existing catalog PR [#157264](https://github.com/NousResearch/hermes-agent/pull/157264) require owner confirmation.
+Validated on 2026-11-18. The owner authorized source publication and updating existing catalog PR [#157264](https://github.com/NousResearch/hermes-agent/pull/157264).
 
 ## Build and automated checks
 
@@ -10,9 +10,11 @@ Validated on 2026-11-18. Source push and updating existing catalog PR [#157264](
 - Chromium layout checks: **28 passed** (seven locales × two adapters × actual 1200/360 px viewports). Includes automatic Hermes language inheritance, manual override/reset, persistence, English fallback, localized required fields and dates, close-button position and horizontal overflow.
 - All version declarations agree on **1.0.0**: plugin manifest, Dashboard manifest, package metadata, lockfile and README.
 
+The final update adds a saved default details-panel width (30–70%, initially 50%) below Language, translated into all seven languages. Controller-session persistence, reopening/reset behavior and WebApp gateway-epoch/profile isolation are covered by Node tests. Mobile details remain full width.
+
 ## Native host review
 
-Eight fresh [screenshots](../screenshots/README.md) were captured from separate native Hermes Dashboard and WebApp test hosts using synthetic English/Russian tasks. Light/dark themes and a 390 px mobile viewport were reviewed. No production task data was read or changed; task mutation requests were blocked. All eight images were visually checked for private data and unrelated host overlays.
+Eight fresh [screenshots](../screenshots/README.md) were captured from separate native Hermes Dashboard and WebApp test hosts using synthetic English/Russian tasks. Light/dark themes and a 390 px mobile viewport were reviewed. Desktop images demonstrate the 30% setting. No production task data was read or changed; task mutation requests were blocked. All eight images were visually checked for private data and unrelated host overlays.
 
 Primary controls inherit the host theme accent, including Hermes Teal. Plugin controls use a common 6 px corner radius; secondary controls and the details close button no longer inherit inconsistent WebApp fills. Native computed-style checks pass for both light/dark themes in both surfaces. Disabled actions remain visibly muted.
 
@@ -26,4 +28,4 @@ Automatic language selection uses the existing optional `useI18n().locale` provi
 
 ## Publication status
 
-The release is prepared locally. Generated YAML and the proposed PR description live under ignored `.local/catalog-submission/` and pin the complete source commit containing code and images. After owner-approved publication, run `scripts/verify_catalog_links.py --sha <full-sha>` to check the public source commit and immutable image URLs. Public URL availability and normal-installer acceptance of that published commit must not be claimed before those steps are performed.
+The owner approved publishing the source and updating the existing PR after the width-setting addition. Generated YAML and the proposed PR description live under ignored `.local/catalog-submission/` and pin the complete source commit containing code and images. After owner-approved publication, run `scripts/verify_catalog_links.py --sha <full-sha>` to check the public source commit and immutable image URLs. Public URL availability and normal-installer acceptance of that published commit must not be claimed before those steps are performed.

@@ -5,6 +5,7 @@ bundle, captured with Playwright on separate loopback-only test hosts. The hosts
 use Hermes 0.23.1 (`3b421578588243f920886e6fe79a6faa87ea026e`), real host React/SDK
 components, assets and themes. They are not standalone preview/mockup images.
 
+Desktop images demonstrate the saved 30% details-panel width setting.
 Every task, description, note and result is synthetic. The capture script
 intercepts all task API GET responses and refuses task mutations. Only the plugin
 panel is included: no account names, email addresses, tokens, hosts, real task

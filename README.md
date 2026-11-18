@@ -67,7 +67,7 @@ Dashboard adapter uses Hermes's FastAPI and Pydantic 2 environment.
 Do not expose the plugin API outside Hermes's authentication gate. Removing the
 plugin's code does not constitute a task-data backup.
 
-## Language settings
+## App settings
 
 Open the gear menu in My Tasks and select **Language**. **Automatic** follows the
 active Hermes UI language through the public `useI18n().locale` SDK hook. On hosts
@@ -83,6 +83,12 @@ Task text, identifiers and product names are never translated.
 
 See [localization architecture and verification](docs/I18N.md) for the source
 contracts, shared catalogs, fallback rules and browser verification command.
+
+In app settings, below Language, choose the default desktop details-panel width
+(30–70%, initially 50%). The choice is saved per browser/profile and applied
+when the panel opens. Dragging the divider temporarily adjusts it; double-click
+restores your preferred width. Mobile details continue to use the full width.
+
 
 ## Ask Hermes to help
 
@@ -144,7 +150,7 @@ capture. They show the native Hermes host and actual plugin bundle, not user tas
 
 - **Storage:** SQLite tasks, revisions, notes and event history in the active
   profile's durable `plugin_data_dir('personal-task-manager')`, separate from
-  source files. Only language and expansion preferences go in browser storage.
+  source files. Only language, panel width and expansion preferences go in browser storage.
 - **Network:** authenticated calls to the current Hermes instance's plugin API.
   No third-party runtime API, telemetry, external fonts or CDN. No credentials
   are stored or read by the plugin. No self-updater or remote executable loader.

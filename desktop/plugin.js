@@ -116,7 +116,9 @@ var en_default = {
   "field.description": "description",
   "field.subtask title": "subtask title",
   "field.comment": "comment",
-  requiredField: "Fill in this field."
+  requiredField: "Fill in this field.",
+  detailsWidth: "Default details width",
+  detailsWidthHelp: "Desktop panel width when opened. On mobile, details use the full width."
 };
 
 // locales/ru.json
@@ -233,7 +235,9 @@ var ru_default = {
   "field.description": "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435",
   "field.subtask title": "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438",
   "field.comment": "\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439",
-  requiredField: "\u0417\u0430\u043F\u043E\u043B\u043D\u0438\u0442\u0435 \u044D\u0442\u043E \u043F\u043E\u043B\u0435."
+  requiredField: "\u0417\u0430\u043F\u043E\u043B\u043D\u0438\u0442\u0435 \u044D\u0442\u043E \u043F\u043E\u043B\u0435.",
+  detailsWidth: "\u041D\u0430\u0447\u0430\u043B\u044C\u043D\u0430\u044F \u0448\u0438\u0440\u0438\u043D\u0430 \u043F\u0430\u043D\u0435\u043B\u0438",
+  detailsWidthHelp: "\u0428\u0438\u0440\u0438\u043D\u0430 \u043F\u0430\u043D\u0435\u043B\u0438 \u043F\u0440\u0438 \u043E\u0442\u043A\u0440\u044B\u0442\u0438\u0438 \u043D\u0430 \u043A\u043E\u043C\u043F\u044C\u044E\u0442\u0435\u0440\u0435. \u041D\u0430 \u0442\u0435\u043B\u0435\u0444\u043E\u043D\u0435 \u043F\u0430\u043D\u0435\u043B\u044C \u0437\u0430\u043D\u0438\u043C\u0430\u0435\u0442 \u0432\u0441\u044E \u0448\u0438\u0440\u0438\u043D\u0443."
 };
 
 // locales/es.json
@@ -350,7 +354,9 @@ var es_default = {
   "field.description": "descripci\xF3n",
   "field.subtask title": "t\xEDtulo de la subtarea",
   "field.comment": "comentario",
-  requiredField: "Rellena este campo."
+  requiredField: "Rellena este campo.",
+  detailsWidth: "Ancho inicial del panel",
+  detailsWidthHelp: "Ancho del panel al abrirlo en el escritorio. En el m\xF3vil, ocupa todo el ancho."
 };
 
 // locales/pt-BR.json
@@ -467,7 +473,9 @@ var pt_BR_default = {
   "field.description": "descri\xE7\xE3o",
   "field.subtask title": "t\xEDtulo da subtarefa",
   "field.comment": "coment\xE1rio",
-  requiredField: "Preencha este campo."
+  requiredField: "Preencha este campo.",
+  detailsWidth: "Largura inicial do painel",
+  detailsWidthHelp: "Largura do painel ao abrir no computador. No celular, ocupa toda a largura."
 };
 
 // locales/de.json
@@ -584,7 +592,9 @@ var de_default = {
   "field.description": "Beschreibung",
   "field.subtask title": "Titel der Unteraufgabe",
   "field.comment": "Kommentar",
-  requiredField: "F\xFClle dieses Feld aus."
+  requiredField: "F\xFClle dieses Feld aus.",
+  detailsWidth: "Standardbreite des Detailbereichs",
+  detailsWidthHelp: "Breite beim \xD6ffnen auf dem Desktop. Auf dem Smartphone wird die volle Breite genutzt."
 };
 
 // locales/fr.json
@@ -701,7 +711,9 @@ var fr_default = {
   "field.description": "description",
   "field.subtask title": "titre de la sous-t\xE2che",
   "field.comment": "commentaire",
-  requiredField: "Renseignez ce champ."
+  requiredField: "Renseignez ce champ.",
+  detailsWidth: "Largeur initiale du panneau",
+  detailsWidthHelp: "Largeur \xE0 l\u2019ouverture sur ordinateur. Sur mobile, le panneau occupe toute la largeur."
 };
 
 // locales/pl.json
@@ -818,7 +830,9 @@ var pl_default = {
   "field.description": "opis",
   "field.subtask title": "tytu\u0142 podzadania",
   "field.comment": "komentarz",
-  requiredField: "Wype\u0142nij to pole."
+  requiredField: "Wype\u0142nij to pole.",
+  detailsWidth: "Pocz\u0105tkowa szeroko\u015B\u0107 panelu",
+  detailsWidthHelp: "Szeroko\u015B\u0107 panelu po otwarciu na komputerze. Na telefonie panel zajmuje ca\u0142\u0105 szeroko\u015B\u0107."
 };
 
 // frontend/src/i18n.mjs
@@ -941,6 +955,7 @@ function createController({ transport, scope = "default", storage, hermesLanguag
     language: initialLanguage.language,
     languagePreference: manualLanguage || "auto",
     languageSource: initialLanguage.source,
+    detailsWidth: Number.isInteger(prefs.detailsWidth) && prefs.detailsWidth >= 30 && prefs.detailsWidth <= 70 ? prefs.detailsWidth : 50,
     view: "active",
     query: "",
     starred: false,
@@ -978,7 +993,7 @@ function createController({ transport, scope = "default", storage, hermesLanguag
   const request = (path, options = {}) => transport(path, { ...options, language: state.language });
   function persist() {
     try {
-      storage?.setItem(key, JSON.stringify({ expanded: [...state.expanded] }));
+      storage?.setItem(key, JSON.stringify({ expanded: [...state.expanded], detailsWidth: state.detailsWidth }));
     } catch {
     }
   }
@@ -1100,6 +1115,12 @@ function createController({ transport, scope = "default", storage, hermesLanguag
       const expanded = new Set(state.expanded);
       expanded.has(id) ? expanded.delete(id) : expanded.add(id);
       emit({ expanded });
+      persist();
+    },
+    detailsWidth(value) {
+      const width = Number(value);
+      if (!Number.isInteger(width) || width < 30 || width > 70) return;
+      emit({ detailsWidth: width });
       persist();
     },
     language(language) {
@@ -1413,11 +1434,11 @@ function createTasksView(React2, kit = {}) {
       )
     );
   }
-  return function TasksView({ transport, scope = "default", surface = "dashboard", schedule, controller: supplied, hermesLanguage }) {
+  return function TasksView({ transport, scope = "default", preferenceScope = scope, surface = "dashboard", schedule, controller: supplied, hermesLanguage }) {
     const controllers = React2.useRef(/* @__PURE__ */ new Map());
     const transportRef = React2.useRef(transport);
     transportRef.current = transport;
-    if (!controllers.current.has(scope)) controllers.current.set(scope, supplied || createController({ scope, hermesLanguage, transport: (...args) => transportRef.current(...args) }));
+    if (!controllers.current.has(scope)) controllers.current.set(scope, supplied || createController({ scope: preferenceScope, hermesLanguage, transport: (...args) => transportRef.current(...args) }));
     const controller = controllers.current.get(scope);
     const state = React2.useSyncExternalStore(controller.subscribe, controller.getSnapshot);
     const t = (name, values) => translate(state.language, name, values);
@@ -1474,7 +1495,7 @@ function createTasksView(React2, kit = {}) {
         });
       };
     }, []);
-    const [split, setSplit] = React2.useState(50);
+    const [split, setSplit] = React2.useState(100 - state.detailsWidth);
     const [addingAtEnd, setAddingAtEnd] = React2.useState(false);
     const bottomForm = React2.useRef(null);
     React2.useEffect(() => {
@@ -1499,6 +1520,9 @@ function createTasksView(React2, kit = {}) {
     React2.useEffect(() => {
       if (state.editing && !selected && !state.pending) controller.set({ editing: null });
     }, [controller, state.editing, selected?.id, state.pending]);
+    React2.useEffect(() => {
+      setSplit(100 - state.detailsWidth);
+    }, [controller, state.detailsWidth, Boolean(selected)]);
     const trashRoots = state.data.trash.filter((task) => !state.data.trash.some((parent) => parent.id === task.parent_id));
     return h(
       "section",
@@ -1530,7 +1554,28 @@ function createTasksView(React2, kit = {}) {
                 supportedLanguages.map(({ code, name }) => h("option", { key: code, value: code, lang: code }, name))
               )),
               h("small", { className: "ptm-muted" }, t(`languageSource${state.languageSource}`)),
-              h("small", { className: "ptm-muted" }, t("languageHelp"))
+              h("small", { className: "ptm-muted" }, t("languageHelp")),
+              h(
+                "label",
+                {},
+                h(
+                  "span",
+                  { className: "ptm-width-label" },
+                  t("detailsWidth"),
+                  h("output", {}, new Intl.NumberFormat(state.language, { style: "percent" }).format(state.detailsWidth / 100))
+                ),
+                h("input", {
+                  type: "range",
+                  className: "ptm-details-width",
+                  min: 30,
+                  max: 70,
+                  step: 5,
+                  value: state.detailsWidth,
+                  "aria-label": t("detailsWidth"),
+                  onChange: (event) => controller.detailsWidth(event.target.value)
+                })
+              ),
+              h("small", { className: "ptm-muted" }, t("detailsWidthHelp"))
             )
           ),
           act(t("refresh"), () => controller.refresh(), { disabled: state.pending })
@@ -1642,7 +1687,7 @@ function createTasksView(React2, kit = {}) {
           onPointerUp: (event) => {
             if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
           },
-          onDoubleClick: () => setSplit(50),
+          onDoubleClick: () => setSplit(100 - state.detailsWidth),
           onKeyDown: (event) => {
             const next = { ArrowLeft: split - 5, ArrowRight: split + 5, Home: 30, End: 70 }[event.key];
             if (next !== void 0) {
@@ -1659,7 +1704,7 @@ function createTasksView(React2, kit = {}) {
 }
 
 // frontend/src/style.css
-var style_default = '.ptm { container-type:inline-size; --ptm-bg:var(--background-base,var(--color-background,#fff)); --ptm-soft:var(--color-muted,#f4f4f5); --ptm-line:var(--color-border,#dedee3); --ptm-text:var(--foreground-base,var(--color-foreground,#242428)); --ptm-muted:var(--color-muted-foreground,#71717a); --ptm-accent:var(--color-primary,#52525b); --ptm-on-accent:var(--color-primary-foreground,var(--ptm-bg)); --ptm-radius:6px; --ptm-danger:var(--color-destructive,#b42318); color:var(--ptm-text); font:inherit; font-size:14px; line-height:1.45; width:100%; min-width:0; padding:16px; box-sizing:border-box; }\r\n.ptm[data-surface=webapp] { --ptm-bg:var(--ui-bg-editor); --ptm-soft:var(--ui-bg-hover,var(--ui-bg-elevated)); --ptm-line:var(--ui-stroke-secondary); --ptm-text:var(--ui-text-primary); --ptm-muted:var(--ui-text-secondary); --ptm-accent:var(--ui-accent); --ptm-on-accent:var(--ui-text-on-accent,#fff); --ptm-danger:var(--ui-danger,var(--ui-red,var(--ui-accent))); }\r\n.ptm *, .ptm *::before, .ptm *::after {box-sizing:border-box;}\r\n.ptm button,.ptm input,.ptm textarea,.ptm select {font:inherit; color:inherit; max-width:100%;}\r\n.ptm button {cursor:pointer;}\r\n.ptm button:disabled,.ptm input:disabled {cursor:default; opacity:.55;}\r\n.ptm button.ptm-control {appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:34px;padding:5px 9px;border:1px solid var(--ptm-line);border-radius:var(--ptm-radius);background:transparent;color:var(--ptm-text);box-shadow:none;letter-spacing:normal;text-transform:none;font:inherit;font-weight:500;line-height:1.4;}\r\n.ptm button.ptm-control.ptm-primary {background:var(--ptm-accent);border-color:var(--ptm-accent);color:var(--ptm-on-accent);}\r\n.ptm button.ptm-control.ptm-primary:hover:not(:disabled) {background:color-mix(in srgb,var(--ptm-accent) 88%,var(--ptm-text));border-color:color-mix(in srgb,var(--ptm-accent) 88%,var(--ptm-text));}\r\n.ptm button.ptm-control[aria-pressed=true] {border-color:var(--ptm-accent);}\r\n.ptm button:hover:not(:disabled),.ptm summary:hover {background:var(--ptm-soft);}\r\n.ptm :focus-visible {outline:2px solid var(--ptm-accent);outline-offset:2px;}\r\n.ptm-header,.ptm-header-actions,.ptm-toolbar,.ptm-add,.ptm-progress,.ptm-editor-header,.ptm-subtask-add {display:flex;align-items:center;gap:8px;min-width:0;}\r\n.ptm-header {justify-content:space-between;flex-wrap:wrap;margin-bottom:12px;}\r\n.ptm h1 {font-size:18px;font-weight:600;margin:0;line-height:1.4;}\r\n.ptm h2 {font-size:16px;margin:0;}\r\n.ptm h3 {font-size:13px;margin:8px 0;}\r\n.ptm-count {color:var(--ptm-muted);font-size:13px;font-weight:400;margin-left:8px;}\r\n.ptm .ptm-language {background:var(--ptm-bg);border:1px solid var(--ptm-line);border-radius:6px;padding:5px;min-height:32px;}\r\n.ptm-progress {color:var(--ptm-muted);font-size:12px;justify-content:space-between;margin-bottom:12px;}\r\n.ptm progress {appearance:none;border:0;width:100px;height:4px;background:var(--ptm-line);color:var(--ptm-accent);border-radius:var(--ptm-radius);overflow:hidden;}\r\n.ptm progress::-webkit-progress-bar {background:var(--ptm-line);}\r\n.ptm progress::-webkit-progress-value {background:var(--ptm-accent);}\r\n.ptm progress::-moz-progress-bar {background:var(--ptm-accent);}\r\n.ptm-tabs {display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--ptm-line);padding-bottom:8px;}\r\n.ptm [aria-pressed=true] {background:var(--ptm-soft)!important;font-weight:600;}\r\n.ptm-toolbar {margin:10px 0;flex-wrap:wrap;}\r\n.ptm-search {position:relative;flex:1 1 140px;min-width:0;}\r\n.ptm .ptm-search input[type=search] {padding-inline-start:30px;}\r\n.ptm-icon-label {display:inline-flex;align-items:center;gap:6px;}\r\n.ptm-icon {display:inline-grid;place-items:center;position:relative;width:14px;height:14px;flex:none;line-height:1;}\r\n.ptm-icon-plus {font-size:17px;}\r\n.ptm-search .ptm-icon {position:absolute;inset-inline-start:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--ptm-muted);z-index:1;}\r\n.ptm-icon-search::before {content:"";position:absolute;top:1px;left:1px;width:9px;height:9px;border:1.5px solid currentColor;border-radius:50%;}\r\n.ptm-icon-search::after {content:"";position:absolute;top:9px;left:9px;width:5px;height:1.5px;background:currentColor;transform:rotate(45deg);transform-origin:left center;}\r\n.ptm-icon-trash::before {content:"";position:absolute;top:4px;left:3px;width:8px;height:9px;border:1.5px solid currentColor;border-radius:0 0 2px 2px;}\r\n.ptm-icon-trash::after {content:"";position:absolute;top:2px;left:1px;width:12px;height:2px;background:currentColor;border-radius:1px;}\r\n.ptm input:not([type=checkbox]),.ptm textarea {width:100%;min-width:0;background:var(--ptm-bg);border:1px solid var(--ptm-line);border-radius:6px;padding:7px 9px;}\r\n.ptm textarea {resize:vertical;min-height:60px;}\r\n.ptm input::placeholder,.ptm textarea::placeholder {color:var(--ptm-muted);}\r\n.ptm-add {margin:8px 0;}\r\n.ptm-add input,.ptm-subtask-add input {flex:1;}\r\n.ptm-message {min-height:22px;font-size:12px;color:var(--ptm-danger);overflow-wrap:anywhere;}\r\n.ptm-group {min-width:0;}\r\n.ptm-row {display:flex;align-items:center;gap:5px;min-height:40px;border-bottom:1px solid var(--ptm-line);position:relative;}\r\n.ptm-row {border-bottom-color:color-mix(in srgb,var(--ptm-line) 50%,transparent);}\r\n.ptm-row:hover {background:var(--ptm-soft);}\r\n.ptm-check-hit {display:grid;place-items:center;flex:0 0 34px;min-height:38px;cursor:pointer;}\r\n.ptm .ptm-check {appearance:none;width:19px;height:19px;border:1.5px solid var(--ptm-muted);border-radius:50%;margin:0;display:grid;place-content:center;cursor:pointer;flex-shrink:0;background:transparent;}\r\n.ptm .ptm-check:checked {background:var(--ptm-accent);border-color:var(--ptm-accent);}\r\n.ptm .ptm-check:checked::after {content:"\u2713";font-size:13px;line-height:1;color:var(--ptm-bg);}\r\n.ptm .ptm-task-title {display:flex;align-items:center;gap:5px;flex:1;min-width:0;min-height:38px;text-align:left;border:0;background:none;padding:6px 2px;}\r\n.ptm-title-text {overflow-wrap:anywhere;}\r\n.ptm .ptm-expand {display:grid;place-items:center;flex:0 0 24px;align-self:stretch;padding:0;border:0;border-radius:var(--ptm-radius);background:transparent;color:var(--ptm-muted);}\r\n.ptm-icon-chevron::before {content:"";width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);}\r\n.ptm-expand[aria-expanded=true] .ptm-icon-chevron::before {transform:rotate(45deg);}\r\n.ptm-step-count {font-size:11px;color:var(--ptm-muted);white-space:nowrap;}\r\n.ptm button.ptm-star-toggle {flex:0 0 32px;min-height:36px;padding:0;border:0;border-radius:var(--ptm-radius);background:transparent;color:var(--ptm-muted);font-size:18px;}\r\n.ptm button.ptm-star-toggle[aria-pressed=true] {background:transparent!important;color:var(--ptm-accent);}\r\n.ptm button.ptm-star-toggle:hover:not(:disabled) {background:var(--ptm-soft)!important;}\r\n@media(max-width:600px) {.ptm button.ptm-star-toggle {flex-basis:44px;min-height:44px;}}\r\n.ptm .is-done .ptm-title-text {text-decoration:line-through;color:var(--ptm-muted);}\r\n.ptm-children {margin-left:24px;border-left:1px solid var(--ptm-line);padding-left:7px;}\r\n.ptm-children {border-left-color:color-mix(in srgb,var(--ptm-line) 50%,transparent);}\r\n.ptm button.ptm-control.ptm-add-task {flex-shrink:0;padding:6px 12px;font-size:13px;}\r\n.ptm button.ptm-control.ptm-add-child,.ptm button.ptm-control.ptm-add-root {background:transparent;border:0!important;color:var(--ptm-muted);font-size:12px;flex-shrink:0;}\r\n.ptm .ptm-add-root {margin:4px 0 4px 34px;}\r\n.ptm-add-bottom {display:grid;gap:8px;margin:8px 0;padding:8px 0 8px 34px;}\r\n.ptm-add-bottom-actions {display:flex;gap:8px;align-items:center;}\r\n.ptm .ptm-add-child {margin:4px 0 4px 32px;}\r\n.ptm-menu {position:relative;flex:0 0 32px;}\r\n.ptm-menu summary {list-style:none;text-align:center;cursor:pointer;border-radius:var(--ptm-radius);min-width:32px;min-height:36px;font-size:20px;}\r\n.ptm-menu summary::-webkit-details-marker {display:none;}\r\n.ptm-menu-items {position:absolute;z-index:20;right:0;top:100%;display:grid;min-width:180px;max-width:min(260px,calc(100vw - 50px));padding:4px;background:var(--ptm-bg);border:1px solid var(--ptm-line);border-radius:7px;box-shadow:0 4px 14px #0002;}\r\n.ptm .ptm-menu-items button {border:0!important;text-align:left;white-space:normal;justify-content:flex-start;}\r\n.ptm .ptm-danger {color:var(--ptm-danger);}\r\n.ptm-workspace {display:flex;min-width:0;height:clamp(360px,72dvh,860px);margin-top:8px;}\r\n.ptm-list-pane {display:flex;flex-direction:column;flex:1;min-width:0;min-height:0;}\r\n.ptm-list {flex:1;min-height:0;overflow:auto;scrollbar-gutter:stable;padding:2px;}\r\n.ptm-workspace.has-details .ptm-list-pane {flex:0 0 calc(var(--ptm-list-width) - 5px);}\r\n.ptm .ptm-divider {flex:0 0 10px;position:relative;cursor:col-resize;touch-action:none;}\r\n.ptm-divider::before {content:"";position:absolute;inset:0 4px;background:var(--ptm-line);border-radius:2px;}\r\n.ptm-divider:hover::before,.ptm-divider:focus-visible::before {background:var(--ptm-accent);}\r\n.ptm-editor {background:var(--ptm-bg);padding:0 16px 16px;min-width:0;flex:1;overflow:auto;display:flex;flex-direction:column;gap:16px;scrollbar-gutter:stable;}\r\n.ptm-editor:focus {outline:none;}\r\n.ptm-editor-header {justify-content:space-between;font-size:14px;position:sticky;top:0;z-index:2;background:var(--ptm-bg);padding:8px 0;border-bottom:1px solid var(--ptm-line);}\r\n.ptm button.ptm-control.ptm-close {display:inline-flex;align-items:center;justify-content:center;flex:0 0 36px;width:36px;height:36px;min-height:36px;padding:0;border:1px solid var(--ptm-line);border-radius:6px;line-height:1;}\r\n.ptm .ptm-close .ptm-icon-close {display:block;position:relative;flex:0 0 16px;width:16px;height:16px;}\r\n.ptm-icon-close::before,.ptm-icon-close::after {content:"";position:absolute;left:50%;top:50%;width:14px;height:2px;border-radius:1px;background:currentColor;transform:translate(-50%,-50%) rotate(45deg);}\r\n.ptm-icon-close::after {transform:translate(-50%,-50%) rotate(-45deg);}\r\n.ptm .ptm-title-input {font-size:15px;font-weight:600;line-height:1.5;min-height:64px;}\r\n.ptm .ptm-row.is-selected {background:color-mix(in srgb,var(--ptm-accent) 12%,var(--ptm-bg));box-shadow:inset 3px 0 var(--ptm-accent);border-radius:6px;}\r\n.ptm .ptm-row.is-selected .ptm-task-title {font-weight:600;}\r\n.ptm-workspace.has-details .ptm-title-text {white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}\r\n.ptm-editor .ptm-subtask-add {flex-wrap:wrap;}\r\n.ptm-editor .ptm-subtask-add input {flex-basis:100%;}\r\n@container (max-width:700px) {\r\n  .ptm-workspace.has-details .ptm-list-pane,.ptm-workspace.has-details .ptm-divider {display:none;}\r\n  .ptm-workspace.has-details .ptm-editor {padding:0 4px 16px;}\r\n  .ptm button.ptm-control.ptm-close {flex-basis:44px;width:44px;height:44px;min-height:44px;}\r\n}\r\n.ptm-edit,.ptm-notes form {display:grid;gap:8px;}\r\n.ptm-edit label {display:grid;gap:4px;color:var(--ptm-muted);font-size:12px;}\r\n.ptm-edit button,.ptm-notes form button {justify-self:start;}\r\n.ptm-note {padding:6px 0;border-bottom:1px solid var(--ptm-line);}\r\n.ptm-note p {margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere;}\r\n.ptm-note small,.ptm-muted {color:var(--ptm-muted);font-size:11px;}\r\n.ptm-stale {display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--ptm-muted);}\r\n.ptm-empty {padding:24px 8px;text-align:center;color:var(--ptm-muted);font-size:13px;}\r\n.ptm-dialog {background:var(--ptm-bg);color:var(--ptm-text);border:1px solid var(--ptm-line);border-radius:10px;padding:20px;width:420px;max-width:calc(100vw - 32px);}\r\n.ptm-dialog p {overflow-wrap:anywhere;}\r\n.ptm-dialog::backdrop {background:#0006;}\r\n.ptm-dialog-actions {display:flex;justify-content:flex-end;gap:8px;}\r\n@media(max-width:600px) { .ptm {padding:10px 8px;} .ptm-children {margin-left:16px;padding-left:4px;} .ptm-editor {padding-left:12px;} .ptm-check-hit {flex-basis:38px;min-height:44px;} .ptm-row {min-height:44px;} .ptm-menu summary {min-height:44px;padding-top:3px;} .ptm-task-title {min-height:44px;} .ptm-subtask-add {align-items:stretch;flex-wrap:wrap;} .ptm-subtask-add input {flex-basis:100%;} }\r\n.ptm[data-surface=preview] {max-width:960px;margin:auto;background:var(--ptm-bg);}\r\n@media(prefers-color-scheme:dark) { .ptm[data-surface=preview] {--ptm-bg:#202024;--ptm-soft:#2c2c32;--ptm-line:#414148;--ptm-text:#eeeef0;--ptm-muted:#aaaab3;--ptm-accent:#c4c4d0;--ptm-danger:#f29c96;} }\r\n.ptm-header-actions {position:relative;flex-wrap:wrap;margin-inline-start:auto;}\r\n.ptm-settings {position:static;}\r\n.ptm-settings summary {box-shadow:none;letter-spacing:normal;display:flex;align-items:center;justify-content:center;list-style:none;cursor:pointer;width:34px;height:34px;border:1px solid var(--ptm-line);border-radius:6px;}\r\n.ptm-settings summary::-webkit-details-marker {display:none;}\r\n.ptm-icon-settings {font-size:18px;width:20px;height:20px;}\r\n.ptm-settings-panel {position:absolute;inset-inline-end:0;top:calc(100% + 6px);z-index:30;display:grid;gap:10px;width:280px;max-width:calc(100vw - 32px);padding:14px;border:1px solid var(--ptm-line);border-radius:8px;background:var(--ptm-bg);box-shadow:0 4px 14px #0002;overflow-wrap:anywhere;}\r\n.ptm-settings-panel label {display:grid;gap:6px;}\r\n.ptm-settings-panel .ptm-language {width:100%;}\r\n.ptm-tabs button,.ptm-toolbar button,.ptm-subtask-add button,.ptm-add-bottom-actions button {white-space:normal;overflow-wrap:anywhere;}\r\n.ptm-editor-header strong {overflow-wrap:anywhere;}\r\n';
+var style_default = '.ptm { container-type:inline-size; --ptm-bg:var(--background-base,var(--color-background,#fff)); --ptm-soft:var(--color-muted,#f4f4f5); --ptm-line:var(--color-border,#dedee3); --ptm-text:var(--foreground-base,var(--color-foreground,#242428)); --ptm-muted:var(--color-muted-foreground,#71717a); --ptm-accent:var(--color-primary,#52525b); --ptm-on-accent:var(--color-primary-foreground,var(--ptm-bg)); --ptm-radius:6px; --ptm-danger:var(--color-destructive,#b42318); color:var(--ptm-text); font:inherit; font-size:14px; line-height:1.45; width:100%; min-width:0; padding:16px; box-sizing:border-box; }\r\n.ptm[data-surface=webapp] { --ptm-bg:var(--ui-bg-editor); --ptm-soft:var(--ui-bg-hover,var(--ui-bg-elevated)); --ptm-line:var(--ui-stroke-secondary); --ptm-text:var(--ui-text-primary); --ptm-muted:var(--ui-text-secondary); --ptm-accent:var(--ui-accent); --ptm-on-accent:var(--ui-text-on-accent,#fff); --ptm-danger:var(--ui-danger,var(--ui-red,var(--ui-accent))); }\r\n.ptm *, .ptm *::before, .ptm *::after {box-sizing:border-box;}\r\n.ptm button,.ptm input,.ptm textarea,.ptm select {font:inherit; color:inherit; max-width:100%;}\r\n.ptm button {cursor:pointer;}\r\n.ptm button:disabled,.ptm input:disabled {cursor:default; opacity:.55;}\r\n.ptm button.ptm-control {appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:34px;padding:5px 9px;border:1px solid var(--ptm-line);border-radius:var(--ptm-radius);background:transparent;color:var(--ptm-text);box-shadow:none;letter-spacing:normal;text-transform:none;font:inherit;font-weight:500;line-height:1.4;}\r\n.ptm button.ptm-control.ptm-primary {background:var(--ptm-accent);border-color:var(--ptm-accent);color:var(--ptm-on-accent);}\r\n.ptm button.ptm-control.ptm-primary:hover:not(:disabled) {background:color-mix(in srgb,var(--ptm-accent) 88%,var(--ptm-text));border-color:color-mix(in srgb,var(--ptm-accent) 88%,var(--ptm-text));}\r\n.ptm button.ptm-control[aria-pressed=true] {border-color:var(--ptm-accent);}\r\n.ptm button:hover:not(:disabled),.ptm summary:hover {background:var(--ptm-soft);}\r\n.ptm :focus-visible {outline:2px solid var(--ptm-accent);outline-offset:2px;}\r\n.ptm-header,.ptm-header-actions,.ptm-toolbar,.ptm-add,.ptm-progress,.ptm-editor-header,.ptm-subtask-add {display:flex;align-items:center;gap:8px;min-width:0;}\r\n.ptm-header {justify-content:space-between;flex-wrap:wrap;margin-bottom:12px;}\r\n.ptm h1 {font-size:18px;font-weight:600;margin:0;line-height:1.4;}\r\n.ptm h2 {font-size:16px;margin:0;}\r\n.ptm h3 {font-size:13px;margin:8px 0;}\r\n.ptm-count {color:var(--ptm-muted);font-size:13px;font-weight:400;margin-left:8px;}\r\n.ptm .ptm-language {background:var(--ptm-bg);border:1px solid var(--ptm-line);border-radius:6px;padding:5px;min-height:32px;}\r\n.ptm-progress {color:var(--ptm-muted);font-size:12px;justify-content:space-between;margin-bottom:12px;}\r\n.ptm progress {appearance:none;border:0;width:100px;height:4px;background:var(--ptm-line);color:var(--ptm-accent);border-radius:var(--ptm-radius);overflow:hidden;}\r\n.ptm progress::-webkit-progress-bar {background:var(--ptm-line);}\r\n.ptm progress::-webkit-progress-value {background:var(--ptm-accent);}\r\n.ptm progress::-moz-progress-bar {background:var(--ptm-accent);}\r\n.ptm-tabs {display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--ptm-line);padding-bottom:8px;}\r\n.ptm [aria-pressed=true] {background:var(--ptm-soft)!important;font-weight:600;}\r\n.ptm-toolbar {margin:10px 0;flex-wrap:wrap;}\r\n.ptm-search {position:relative;flex:1 1 140px;min-width:0;}\r\n.ptm .ptm-search input[type=search] {padding-inline-start:30px;}\r\n.ptm-icon-label {display:inline-flex;align-items:center;gap:6px;}\r\n.ptm-icon {display:inline-grid;place-items:center;position:relative;width:14px;height:14px;flex:none;line-height:1;}\r\n.ptm-icon-plus {font-size:17px;}\r\n.ptm-search .ptm-icon {position:absolute;inset-inline-start:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--ptm-muted);z-index:1;}\r\n.ptm-icon-search::before {content:"";position:absolute;top:1px;left:1px;width:9px;height:9px;border:1.5px solid currentColor;border-radius:50%;}\r\n.ptm-icon-search::after {content:"";position:absolute;top:9px;left:9px;width:5px;height:1.5px;background:currentColor;transform:rotate(45deg);transform-origin:left center;}\r\n.ptm-icon-trash::before {content:"";position:absolute;top:4px;left:3px;width:8px;height:9px;border:1.5px solid currentColor;border-radius:0 0 2px 2px;}\r\n.ptm-icon-trash::after {content:"";position:absolute;top:2px;left:1px;width:12px;height:2px;background:currentColor;border-radius:1px;}\r\n.ptm input:not([type=checkbox]),.ptm textarea {width:100%;min-width:0;background:var(--ptm-bg);border:1px solid var(--ptm-line);border-radius:6px;padding:7px 9px;}\r\n.ptm textarea {resize:vertical;min-height:60px;}\r\n.ptm input::placeholder,.ptm textarea::placeholder {color:var(--ptm-muted);}\r\n.ptm-add {margin:8px 0;}\r\n.ptm-add input,.ptm-subtask-add input {flex:1;}\r\n.ptm-message {min-height:22px;font-size:12px;color:var(--ptm-danger);overflow-wrap:anywhere;}\r\n.ptm-group {min-width:0;}\r\n.ptm-row {display:flex;align-items:center;gap:5px;min-height:40px;border-bottom:1px solid var(--ptm-line);position:relative;}\r\n.ptm-row {border-bottom-color:color-mix(in srgb,var(--ptm-line) 50%,transparent);}\r\n.ptm-row:hover {background:var(--ptm-soft);}\r\n.ptm-check-hit {display:grid;place-items:center;flex:0 0 34px;min-height:38px;cursor:pointer;}\r\n.ptm .ptm-check {appearance:none;width:19px;height:19px;border:1.5px solid var(--ptm-muted);border-radius:50%;margin:0;display:grid;place-content:center;cursor:pointer;flex-shrink:0;background:transparent;}\r\n.ptm .ptm-check:checked {background:var(--ptm-accent);border-color:var(--ptm-accent);}\r\n.ptm .ptm-check:checked::after {content:"\u2713";font-size:13px;line-height:1;color:var(--ptm-bg);}\r\n.ptm .ptm-task-title {display:flex;align-items:center;gap:5px;flex:1;min-width:0;min-height:38px;text-align:left;border:0;background:none;padding:6px 2px;}\r\n.ptm-title-text {overflow-wrap:anywhere;}\r\n.ptm .ptm-expand {display:grid;place-items:center;flex:0 0 24px;align-self:stretch;padding:0;border:0;border-radius:var(--ptm-radius);background:transparent;color:var(--ptm-muted);}\r\n.ptm-icon-chevron::before {content:"";width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);}\r\n.ptm-expand[aria-expanded=true] .ptm-icon-chevron::before {transform:rotate(45deg);}\r\n.ptm-step-count {font-size:11px;color:var(--ptm-muted);white-space:nowrap;}\r\n.ptm button.ptm-star-toggle {flex:0 0 32px;min-height:36px;padding:0;border:0;border-radius:var(--ptm-radius);background:transparent;color:var(--ptm-muted);font-size:18px;}\r\n.ptm button.ptm-star-toggle[aria-pressed=true] {background:transparent!important;color:var(--ptm-accent);}\r\n.ptm button.ptm-star-toggle:hover:not(:disabled) {background:var(--ptm-soft)!important;}\r\n@media(max-width:600px) {.ptm button.ptm-star-toggle {flex-basis:44px;min-height:44px;}}\r\n.ptm .is-done .ptm-title-text {text-decoration:line-through;color:var(--ptm-muted);}\r\n.ptm-children {margin-left:24px;border-left:1px solid var(--ptm-line);padding-left:7px;}\r\n.ptm-children {border-left-color:color-mix(in srgb,var(--ptm-line) 50%,transparent);}\r\n.ptm button.ptm-control.ptm-add-task {flex-shrink:0;padding:6px 12px;font-size:13px;}\r\n.ptm button.ptm-control.ptm-add-child,.ptm button.ptm-control.ptm-add-root {background:transparent;border:0!important;color:var(--ptm-muted);font-size:12px;flex-shrink:0;}\r\n.ptm .ptm-add-root {margin:4px 0 4px 34px;}\r\n.ptm-add-bottom {display:grid;gap:8px;margin:8px 0;padding:8px 0 8px 34px;}\r\n.ptm-add-bottom-actions {display:flex;gap:8px;align-items:center;}\r\n.ptm .ptm-add-child {margin:4px 0 4px 32px;}\r\n.ptm-menu {position:relative;flex:0 0 32px;}\r\n.ptm-menu summary {list-style:none;text-align:center;cursor:pointer;border-radius:var(--ptm-radius);min-width:32px;min-height:36px;font-size:20px;}\r\n.ptm-menu summary::-webkit-details-marker {display:none;}\r\n.ptm-menu-items {position:absolute;z-index:20;right:0;top:100%;display:grid;min-width:180px;max-width:min(260px,calc(100vw - 50px));padding:4px;background:var(--ptm-bg);border:1px solid var(--ptm-line);border-radius:7px;box-shadow:0 4px 14px #0002;}\r\n.ptm .ptm-menu-items button {border:0!important;text-align:left;white-space:normal;justify-content:flex-start;}\r\n.ptm .ptm-danger {color:var(--ptm-danger);}\r\n.ptm-workspace {display:flex;min-width:0;height:clamp(360px,72dvh,860px);margin-top:8px;}\r\n.ptm-list-pane {display:flex;flex-direction:column;flex:1;min-width:0;min-height:0;}\r\n.ptm-list {flex:1;min-height:0;overflow:auto;scrollbar-gutter:stable;padding:2px;}\r\n.ptm-workspace.has-details .ptm-list-pane {flex:0 0 calc(var(--ptm-list-width) - 5px);}\r\n.ptm .ptm-divider {flex:0 0 10px;position:relative;cursor:col-resize;touch-action:none;}\r\n.ptm-divider::before {content:"";position:absolute;inset:0 4px;background:var(--ptm-line);border-radius:2px;}\r\n.ptm-divider:hover::before,.ptm-divider:focus-visible::before {background:var(--ptm-accent);}\r\n.ptm-editor {background:var(--ptm-bg);padding:0 16px 16px;min-width:0;flex:1;overflow:auto;display:flex;flex-direction:column;gap:16px;scrollbar-gutter:stable;}\r\n.ptm-editor:focus {outline:none;}\r\n.ptm-editor-header {justify-content:space-between;font-size:14px;position:sticky;top:0;z-index:2;background:var(--ptm-bg);padding:8px 0;border-bottom:1px solid var(--ptm-line);}\r\n.ptm button.ptm-control.ptm-close {display:inline-flex;align-items:center;justify-content:center;flex:0 0 36px;width:36px;height:36px;min-height:36px;padding:0;border:1px solid var(--ptm-line);border-radius:6px;line-height:1;}\r\n.ptm .ptm-close .ptm-icon-close {display:block;position:relative;flex:0 0 16px;width:16px;height:16px;}\r\n.ptm-icon-close::before,.ptm-icon-close::after {content:"";position:absolute;left:50%;top:50%;width:14px;height:2px;border-radius:1px;background:currentColor;transform:translate(-50%,-50%) rotate(45deg);}\r\n.ptm-icon-close::after {transform:translate(-50%,-50%) rotate(-45deg);}\r\n.ptm .ptm-title-input {font-size:15px;font-weight:600;line-height:1.5;min-height:64px;}\r\n.ptm .ptm-row.is-selected {background:color-mix(in srgb,var(--ptm-accent) 12%,var(--ptm-bg));box-shadow:inset 3px 0 var(--ptm-accent);border-radius:6px;}\r\n.ptm .ptm-row.is-selected .ptm-task-title {font-weight:600;}\r\n.ptm-workspace.has-details .ptm-title-text {white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}\r\n.ptm-editor .ptm-subtask-add {flex-wrap:wrap;}\r\n.ptm-editor .ptm-subtask-add input {flex-basis:100%;}\r\n@container (max-width:700px) {\r\n  .ptm-workspace.has-details .ptm-list-pane,.ptm-workspace.has-details .ptm-divider {display:none;}\r\n  .ptm-workspace.has-details .ptm-editor {padding:0 4px 16px;}\r\n  .ptm button.ptm-control.ptm-close {flex-basis:44px;width:44px;height:44px;min-height:44px;}\r\n}\r\n.ptm-edit,.ptm-notes form {display:grid;gap:8px;}\r\n.ptm-edit label {display:grid;gap:4px;color:var(--ptm-muted);font-size:12px;}\r\n.ptm-edit button,.ptm-notes form button {justify-self:start;}\r\n.ptm-note {padding:6px 0;border-bottom:1px solid var(--ptm-line);}\r\n.ptm-note p {margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere;}\r\n.ptm-note small,.ptm-muted {color:var(--ptm-muted);font-size:11px;}\r\n.ptm-stale {display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--ptm-muted);}\r\n.ptm-empty {padding:24px 8px;text-align:center;color:var(--ptm-muted);font-size:13px;}\r\n.ptm-dialog {background:var(--ptm-bg);color:var(--ptm-text);border:1px solid var(--ptm-line);border-radius:10px;padding:20px;width:420px;max-width:calc(100vw - 32px);}\r\n.ptm-dialog p {overflow-wrap:anywhere;}\r\n.ptm-dialog::backdrop {background:#0006;}\r\n.ptm-dialog-actions {display:flex;justify-content:flex-end;gap:8px;}\r\n@media(max-width:600px) { .ptm {padding:10px 8px;} .ptm-children {margin-left:16px;padding-left:4px;} .ptm-editor {padding-left:12px;} .ptm-check-hit {flex-basis:38px;min-height:44px;} .ptm-row {min-height:44px;} .ptm-menu summary {min-height:44px;padding-top:3px;} .ptm-task-title {min-height:44px;} .ptm-subtask-add {align-items:stretch;flex-wrap:wrap;} .ptm-subtask-add input {flex-basis:100%;} }\r\n.ptm[data-surface=preview] {max-width:960px;margin:auto;background:var(--ptm-bg);}\r\n@media(prefers-color-scheme:dark) { .ptm[data-surface=preview] {--ptm-bg:#202024;--ptm-soft:#2c2c32;--ptm-line:#414148;--ptm-text:#eeeef0;--ptm-muted:#aaaab3;--ptm-accent:#c4c4d0;--ptm-danger:#f29c96;} }\r\n.ptm-header-actions {position:relative;flex-wrap:wrap;margin-inline-start:auto;}\r\n.ptm-settings {position:static;}\r\n.ptm-settings summary {box-shadow:none;letter-spacing:normal;display:flex;align-items:center;justify-content:center;list-style:none;cursor:pointer;width:34px;height:34px;border:1px solid var(--ptm-line);border-radius:6px;}\r\n.ptm-settings summary::-webkit-details-marker {display:none;}\r\n.ptm-icon-settings {font-size:18px;width:20px;height:20px;}\r\n.ptm-settings-panel {position:absolute;inset-inline-end:0;top:calc(100% + 6px);z-index:30;display:grid;gap:10px;width:280px;max-width:calc(100vw - 32px);padding:14px;border:1px solid var(--ptm-line);border-radius:8px;background:var(--ptm-bg);box-shadow:0 4px 14px #0002;overflow-wrap:anywhere;}\r\n.ptm-settings-panel label {display:grid;gap:6px;}\r\n.ptm-settings-panel .ptm-language {width:100%;}\r\n.ptm-tabs button,.ptm-toolbar button,.ptm-subtask-add button,.ptm-add-bottom-actions button {white-space:normal;overflow-wrap:anywhere;}\r\n.ptm-editor-header strong {overflow-wrap:anywhere;}\r\n\r\n.ptm-width-label {display:flex;justify-content:space-between;gap:12px;}\r\n.ptm .ptm-details-width {width:100%;min-width:0;padding:0;accent-color:var(--ptm-accent);cursor:pointer;}\r\n';
 
 // frontend/src/webapp.mjs
 var View = createTasksView(React, SDK);
@@ -1684,7 +1729,7 @@ var webapp_default = {
         if (epoch !== SDK.gatewayActivationEpoch()) throw new LocalizedError("connectionChanged");
         return result;
       }, [profile, epoch]);
-      return React.createElement(View, { transport, scope: `${profile}:${epoch}`, surface: "webapp", hermesLanguage: hostLanguage, schedule: ctx.setInterval });
+      return React.createElement(View, { transport, scope: `${profile}:${epoch}`, preferenceScope: profile, surface: "webapp", hermesLanguage: hostLanguage, schedule: ctx.setInterval });
     }
     ctx.registerMany([
       { id: "page", area: SDK.ROUTES_AREA, data: { path: "/personal-tasks" }, render: () => React.createElement(TasksPage) },

@@ -111,5 +111,7 @@
   "field.description": "opis",
   "field.subtask title": "tytuł podzadania",
   "field.comment": "komentarz",
-  "requiredField": "Wypełnij to pole."
+  "requiredField": "Wypełnij to pole.",
+  "detailsWidth": "Początkowa szerokość panelu",
+  "detailsWidthHelp": "Szerokość panelu po otwarciu na komputerze. Na telefonie panel zajmuje całą szerokość."
 }

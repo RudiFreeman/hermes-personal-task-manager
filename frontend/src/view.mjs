@@ -126,10 +126,10 @@ export function createTasksView(React, kit = {}) {
         !trashed && !task.done && act(withIcon("plus", t("addSubtask")), () => controller.set({editing: task.id}), {className: "ptm-add-child"})));
   }
 
-  return function TasksView({transport, scope = "default", surface = "dashboard", schedule, controller: supplied, hermesLanguage}) {
+  return function TasksView({transport, scope = "default", preferenceScope = scope, surface = "dashboard", schedule, controller: supplied, hermesLanguage}) {
     const controllers = React.useRef(new Map());
     const transportRef = React.useRef(transport); transportRef.current = transport;
-    if (!controllers.current.has(scope)) controllers.current.set(scope, supplied || createController({scope, hermesLanguage, transport: (...args) => transportRef.current(...args)}));
+    if (!controllers.current.has(scope)) controllers.current.set(scope, supplied || createController({scope: preferenceScope, hermesLanguage, transport: (...args) => transportRef.current(...args)}));
     const controller = controllers.current.get(scope);
     const state = React.useSyncExternalStore(controller.subscribe, controller.getSnapshot);
     const t = (name, values) => translate(state.language, name, values);
@@ -159,7 +159,7 @@ export function createTasksView(React, kit = {}) {
       mounted.current = true;
       return () => {mounted.current = false; queueMicrotask(() => {if (!mounted.current) for (const c of controllers.current.values()) c.dispose();});};
     }, []);
-    const [split, setSplit] = React.useState(50);
+    const [split, setSplit] = React.useState(100 - state.detailsWidth);
     const [addingAtEnd, setAddingAtEnd] = React.useState(false);
     const bottomForm = React.useRef(null);
     React.useEffect(() => {setAddingAtEnd(false);}, [controller, state.view]);
@@ -179,6 +179,7 @@ export function createTasksView(React, kit = {}) {
     const selected = state.view !== "trash" && items.find(task => task.id === state.editing && !task.trashed_at &&
       roots.some(root => root.id === task.id || root.id === task.parent_id));
     React.useEffect(() => {if (state.editing && !selected && !state.pending) controller.set({editing: null});}, [controller, state.editing, selected?.id, state.pending]);
+    React.useEffect(() => {setSplit(100 - state.detailsWidth);}, [controller, state.detailsWidth, Boolean(selected)]);
     const trashRoots = state.data.trash.filter(task => !state.data.trash.some(parent => parent.id === task.parent_id));
     return h("section", {className: "ptm", "data-surface": surface, "data-scope": scope, "data-loaded": String(state.loaded), lang: state.language, "aria-busy": state.pending ? "true" : undefined},
       h("header", {className: "ptm-header"}, h("h1", {}, t("heading"), h("span", {className: "ptm-count"}, formatNumber(state.language, state.data.progress.total))),
@@ -191,7 +192,12 @@ export function createTasksView(React, kit = {}) {
                 h("option", {value: "auto"}, t("autoLanguage")),
                 supportedLanguages.map(({code, name}) => h("option", {key: code, value: code, lang: code}, name)))),
               h("small", {className: "ptm-muted"}, t(`languageSource${state.languageSource}`)),
-              h("small", {className: "ptm-muted"}, t("languageHelp")))),
+              h("small", {className: "ptm-muted"}, t("languageHelp")),
+              h("label", {}, h("span", {className: "ptm-width-label"}, t("detailsWidth"),
+                h("output", {}, new Intl.NumberFormat(state.language, {style: "percent"}).format(state.detailsWidth / 100))),
+                h("input", {type: "range", className: "ptm-details-width", min: 30, max: 70, step: 5, value: state.detailsWidth,
+                  "aria-label": t("detailsWidth"), onChange: event => controller.detailsWidth(event.target.value)})),
+              h("small", {className: "ptm-muted"}, t("detailsWidthHelp")))),
           act(t("refresh"), () => controller.refresh(), {disabled: state.pending}))),
       h("div", {className: "ptm-progress"}, h("span", {className: "ptm-stats"}, t("progress", state.data.progress)),
         h("progress", {max: 100, value: state.data.progress.percent, "aria-label": t("overallProgress")})),
@@ -223,7 +229,7 @@ export function createTasksView(React, kit = {}) {
         "aria-label": t("resizePanels"), "aria-orientation": "vertical", "aria-valuemin": 30, "aria-valuemax": 70, "aria-valuenow": Math.round(split),
         onPointerDown: event => {if (event.button === 0) {event.preventDefault(); event.currentTarget.focus(); event.currentTarget.setPointerCapture(event.pointerId);}},
         onPointerMove: resize, onPointerUp: event => {if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);},
-        onDoubleClick: () => setSplit(50),
+        onDoubleClick: () => setSplit(100 - state.detailsWidth),
         onKeyDown: event => {
           const next = {ArrowLeft: split - 5, ArrowRight: split + 5, Home: 30, End: 70}[event.key];
           if (next !== undefined) {event.preventDefault(); setSplit(Math.max(30, Math.min(70, next)));}

@@ -25,7 +25,7 @@ export default {
         if (epoch !== SDK.gatewayActivationEpoch()) throw new LocalizedError("connectionChanged");
         return result;
       }, [profile, epoch]);
-      return React.createElement(View, {transport, scope: `${profile}:${epoch}`, surface: "webapp", hermesLanguage: hostLanguage, schedule: ctx.setInterval});
+      return React.createElement(View, {transport, scope: `${profile}:${epoch}`, preferenceScope: profile, surface: "webapp", hermesLanguage: hostLanguage, schedule: ctx.setInterval});
     }
     ctx.registerMany([
       {id: "page", area: SDK.ROUTES_AREA, data: {path: "/personal-tasks"}, render: () => React.createElement(TasksPage)},

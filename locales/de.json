@@ -111,5 +111,7 @@
   "field.description": "Beschreibung",
   "field.subtask title": "Titel der Unteraufgabe",
   "field.comment": "Kommentar",
-  "requiredField": "Fülle dieses Feld aus."
+  "requiredField": "Fülle dieses Feld aus.",
+  "detailsWidth": "Standardbreite des Detailbereichs",
+  "detailsWidthHelp": "Breite beim Öffnen auf dem Desktop. Auf dem Smartphone wird die volle Breite genutzt."
 }

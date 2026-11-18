@@ -111,5 +111,7 @@
   "field.description": "descrição",
   "field.subtask title": "título da subtarefa",
   "field.comment": "comentário",
-  "requiredField": "Preencha este campo."
+  "requiredField": "Preencha este campo.",
+  "detailsWidth": "Largura inicial do painel",
+  "detailsWidthHelp": "Largura do painel ao abrir no computador. No celular, ocupa toda a largura."
 }

@@ -43,6 +43,10 @@ const atom = initial => {let value = initial; const listeners = new Set(); retur
   await flush(()=>{const select=document.querySelector(".ptm-language");select.value="auto";select.dispatchEvent(new dom.window.Event("change",{bubbles:true}));});
   assert.equal(document.querySelector(".ptm").lang,"de");
   await flush(()=>locale.set("en"));
+  await flush(()=>{const slider=document.querySelector(".ptm-details-width");Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype,"value").set.call(slider,"30");slider.dispatchEvent(new dom.window.Event("input",{bubbles:true}));});
+  assert.equal(JSON.parse(dom.window.localStorage.getItem("ptm.view:one")).detailsWidth,30);
+  await flush(()=>epoch.set(2));
+  assert.equal(document.querySelector(".ptm-details-width").value,"30","WebApp width survives gateway activation epochs");
   const title = document.querySelector(".ptm-add input");
   await flush(() => {Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype, "value").set.call(title, "Created from WebApp"); title.dispatchEvent(new dom.window.Event("input", {bubbles: true}));});
   await flush(() => document.querySelector(".ptm-add").dispatchEvent(new dom.window.Event("submit", {bubbles: true, cancelable: true})));
@@ -60,6 +64,7 @@ const atom = initial => {let value = initial; const listeners = new Set(); retur
   hold = true; await flush(() => [...timers.values()][0].fn());
   await flush(() => {profile.set("two"); epoch.set(2);});
   assert.match(document.querySelector(".ptm-list").textContent, /Profile two/);
+  assert.equal(document.querySelector(".ptm-details-width").value,"50","Width preferences are profile scoped");
   await flush(() => release()); assert.doesNotMatch(document.querySelector(".ptm-list").textContent, /Profile one/);
   assert.doesNotMatch(document.querySelector(".ptm-list").textContent, /Created from WebApp/);
   await flush(() => root.unmount()); for (const stop of disposers) stop();

@@ -111,8 +111,13 @@ def run(args):
                 expect(widget).to_have_attribute("lang", code)
                 expect(widget).not_to_have_attribute("aria-busy", "true")
             language("en")
+            widget.locator(".ptm-settings summary").click()
+            widget.locator(".ptm-details-width").press("Home")
+            expect(widget.locator(".ptm-details-width")).to_have_value("30")
+            widget.locator("h1").click()
             title = widget.locator('[data-task-id="review"] > .ptm-row .ptm-task-title')
             title.click()
+            assert widget.locator(".ptm-workspace").evaluate("n => n.style.getPropertyValue('--ptm-list-width')") == "70%"
             expect(widget.locator('[data-task-id="outline"]')).to_be_visible()
             expected = {"desktop/plugin.js"} if surface == "webapp" else {"dashboard/dist/index.js", "dashboard/dist/style.css"}
             assert expected <= overridden, (surface, "Candidate bundle was not loaded", overridden)
@@ -196,7 +201,7 @@ def run(args):
                    for name in ("dashboard/dist/index.js", "dashboard/dist/style.css", "desktop/plugin.js")}
     bundles = {name: hashlib.sha256(data.replace(b"\r\n", b"\n")).hexdigest() for name, data in raw_bundles.items()}
     record = {"plugin_version": json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"],
-              "captured_at": datetime.now(timezone.utc).isoformat(), "native_host": True,
+              "captured_at": datetime.now(timezone.utc).isoformat(), "native_host": True, "details_width_percent": 30,
               "synthetic_data": True, "task_mutations": 0, "privacy_reviewed": False, "theme_checks": theme_checks,
               "bundle_hash_normalization": "LF", "bundles": bundles,
               "captured_bundle_bytes": {name: hashlib.sha256(data).hexdigest() for name, data in raw_bundles.items()},

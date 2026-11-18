@@ -46,6 +46,10 @@ async function controllerTests(){
  s.delay();const pending=c.refresh();s.fail();await c.star(s.data.tasks[0]);s.delayed[2].resolve();await pending;s.data.tasks[0].title="Recovered";await c.refresh();assert.equal(c.getSnapshot().data.tasks[0].title,"Recovered");
  s.delay();const stale=c.refresh();s.delay();const failed=c.refresh();s.delayed[4].reject(Error("failed GET"));await failed;s.delayed[3].resolve();await stale;assert.equal(c.getSnapshot().data.tasks[0].title,"Recovered");
  s.delay();const disposed=c.refresh();c.dispose();const final=c.getSnapshot();s.delayed[5].resolve();await disposed;assert.equal(c.getSnapshot(),final);
+ const savedPrefs=new Map();const widthStorage={getItem:k=>savedPrefs.get(k),setItem:(k,v)=>savedPrefs.set(k,v)};
+ const widthController=createController({transport:server().transport,storage:widthStorage});widthController.detailsWidth(30);
+ assert.equal(createController({transport:server().transport,storage:widthStorage}).getSnapshot().detailsWidth,30,"Width persists across controller sessions");
+ widthController.detailsWidth(0);assert.equal(widthController.getSnapshot().detailsWidth,30,"Invalid widths ignored");
  const blocked=createController({transport:server().transport,storage:{getItem(){throw Error("blocked");},setItem(){throw Error("blocked");}}});await blocked.refresh();blocked.language("ru");blocked.expand("a");assert.equal(blocked.getSnapshot().language,"ru");
  for(const stored of ["null","[]","broken JSON"]){const safe=createController({transport:server().transport,storage:{getItem:()=>stored,setItem(){}}});await safe.refresh();assert.equal(safe.getSnapshot().data.tasks.length,3);}
  console.log("PASS: draft revisions, independent forms, request ordering, failures, disposal and storage fallback");
@@ -105,6 +109,15 @@ async function domTests(){
  assert.equal(one(".ptm-divider").getAttribute("aria-valuenow"),"55");
  await flush(()=>divider.dispatchEvent(new dom.window.MouseEvent("dblclick",{bubbles:true})));
  assert.equal(one(".ptm-divider").getAttribute("aria-valuenow"),"50");
+ await type(".ptm-details-width","30");
+ assert.equal(one(".ptm-workspace").style.getPropertyValue("--ptm-list-width"),"70%","Setting is details width, not list width");
+ assert.equal(JSON.parse(dom.window.localStorage.getItem("ptm.view:http://ptm.test:test")).detailsWidth,30);
+ await flush(()=>divider.dispatchEvent(new dom.window.KeyboardEvent("keydown",{key:"ArrowLeft",bubbles:true})));
+ await flush(()=>divider.dispatchEvent(new dom.window.MouseEvent("dblclick",{bubbles:true})));
+ assert.equal(one(".ptm-divider").getAttribute("aria-valuenow"),"70","Divider reset uses preferred width");
+ await click(".ptm-close");await click('[data-task-id="a"] > .ptm-row .ptm-task-title');
+ assert.equal(one(".ptm-divider").getAttribute("aria-valuenow"),"70","Reopened panel uses preferred width");
+ await type(".ptm-details-width","50");
  const star = '[data-task-id="child"] > .ptm-row .ptm-star-toggle';
  await click(star);
  assert.equal(one(star).getAttribute("aria-pressed"), "true");

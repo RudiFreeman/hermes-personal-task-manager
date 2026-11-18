@@ -111,5 +111,7 @@
   "field.description": "Описание",
   "field.subtask title": "Название подзадачи",
   "field.comment": "Комментарий",
-  "requiredField": "Заполните это поле."
+  "requiredField": "Заполните это поле.",
+  "detailsWidth": "Начальная ширина панели",
+  "detailsWidthHelp": "Ширина панели при открытии на компьютере. На телефоне панель занимает всю ширину."
 }

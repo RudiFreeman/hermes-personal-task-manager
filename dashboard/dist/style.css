@@ -124,3 +124,6 @@
 .ptm-settings-panel .ptm-language {width:100%;}
 .ptm-tabs button,.ptm-toolbar button,.ptm-subtask-add button,.ptm-add-bottom-actions button {white-space:normal;overflow-wrap:anywhere;}
 .ptm-editor-header strong {overflow-wrap:anywhere;}
+
+.ptm-width-label {display:flex;justify-content:space-between;gap:12px;}
+.ptm .ptm-details-width {width:100%;min-width:0;padding:0;accent-color:var(--ptm-accent);cursor:pointer;}

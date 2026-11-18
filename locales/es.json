@@ -111,5 +111,7 @@
   "field.description": "descripción",
   "field.subtask title": "título de la subtarea",
   "field.comment": "comentario",
-  "requiredField": "Rellena este campo."
+  "requiredField": "Rellena este campo.",
+  "detailsWidth": "Ancho inicial del panel",
+  "detailsWidthHelp": "Ancho del panel al abrirlo en el escritorio. En el móvil, ocupa todo el ancho."
 }

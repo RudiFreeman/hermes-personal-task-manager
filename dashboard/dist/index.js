@@ -140,7 +140,9 @@ var PTMDashboard = (() => {
     "field.description": "description",
     "field.subtask title": "subtask title",
     "field.comment": "comment",
-    requiredField: "Fill in this field."
+    requiredField: "Fill in this field.",
+    detailsWidth: "Default details width",
+    detailsWidthHelp: "Desktop panel width when opened. On mobile, details use the full width."
   };
 
   // locales/ru.json
@@ -257,7 +259,9 @@ var PTMDashboard = (() => {
     "field.description": "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435",
     "field.subtask title": "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u043E\u0434\u0437\u0430\u0434\u0430\u0447\u0438",
     "field.comment": "\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439",
-    requiredField: "\u0417\u0430\u043F\u043E\u043B\u043D\u0438\u0442\u0435 \u044D\u0442\u043E \u043F\u043E\u043B\u0435."
+    requiredField: "\u0417\u0430\u043F\u043E\u043B\u043D\u0438\u0442\u0435 \u044D\u0442\u043E \u043F\u043E\u043B\u0435.",
+    detailsWidth: "\u041D\u0430\u0447\u0430\u043B\u044C\u043D\u0430\u044F \u0448\u0438\u0440\u0438\u043D\u0430 \u043F\u0430\u043D\u0435\u043B\u0438",
+    detailsWidthHelp: "\u0428\u0438\u0440\u0438\u043D\u0430 \u043F\u0430\u043D\u0435\u043B\u0438 \u043F\u0440\u0438 \u043E\u0442\u043A\u0440\u044B\u0442\u0438\u0438 \u043D\u0430 \u043A\u043E\u043C\u043F\u044C\u044E\u0442\u0435\u0440\u0435. \u041D\u0430 \u0442\u0435\u043B\u0435\u0444\u043E\u043D\u0435 \u043F\u0430\u043D\u0435\u043B\u044C \u0437\u0430\u043D\u0438\u043C\u0430\u0435\u0442 \u0432\u0441\u044E \u0448\u0438\u0440\u0438\u043D\u0443."
   };
 
   // locales/es.json
@@ -374,7 +378,9 @@ var PTMDashboard = (() => {
     "field.description": "descripci\xF3n",
     "field.subtask title": "t\xEDtulo de la subtarea",
     "field.comment": "comentario",
-    requiredField: "Rellena este campo."
+    requiredField: "Rellena este campo.",
+    detailsWidth: "Ancho inicial del panel",
+    detailsWidthHelp: "Ancho del panel al abrirlo en el escritorio. En el m\xF3vil, ocupa todo el ancho."
   };
 
   // locales/pt-BR.json
@@ -491,7 +497,9 @@ var PTMDashboard = (() => {
     "field.description": "descri\xE7\xE3o",
     "field.subtask title": "t\xEDtulo da subtarefa",
     "field.comment": "coment\xE1rio",
-    requiredField: "Preencha este campo."
+    requiredField: "Preencha este campo.",
+    detailsWidth: "Largura inicial do painel",
+    detailsWidthHelp: "Largura do painel ao abrir no computador. No celular, ocupa toda a largura."
   };
 
   // locales/de.json
@@ -608,7 +616,9 @@ var PTMDashboard = (() => {
     "field.description": "Beschreibung",
     "field.subtask title": "Titel der Unteraufgabe",
     "field.comment": "Kommentar",
-    requiredField: "F\xFClle dieses Feld aus."
+    requiredField: "F\xFClle dieses Feld aus.",
+    detailsWidth: "Standardbreite des Detailbereichs",
+    detailsWidthHelp: "Breite beim \xD6ffnen auf dem Desktop. Auf dem Smartphone wird die volle Breite genutzt."
   };
 
   // locales/fr.json
@@ -725,7 +735,9 @@ var PTMDashboard = (() => {
     "field.description": "description",
     "field.subtask title": "titre de la sous-t\xE2che",
     "field.comment": "commentaire",
-    requiredField: "Renseignez ce champ."
+    requiredField: "Renseignez ce champ.",
+    detailsWidth: "Largeur initiale du panneau",
+    detailsWidthHelp: "Largeur \xE0 l\u2019ouverture sur ordinateur. Sur mobile, le panneau occupe toute la largeur."
   };
 
   // locales/pl.json
@@ -842,7 +854,9 @@ var PTMDashboard = (() => {
     "field.description": "opis",
     "field.subtask title": "tytu\u0142 podzadania",
     "field.comment": "komentarz",
-    requiredField: "Wype\u0142nij to pole."
+    requiredField: "Wype\u0142nij to pole.",
+    detailsWidth: "Pocz\u0105tkowa szeroko\u015B\u0107 panelu",
+    detailsWidthHelp: "Szeroko\u015B\u0107 panelu po otwarciu na komputerze. Na telefonie panel zajmuje ca\u0142\u0105 szeroko\u015B\u0107."
   };
 
   // frontend/src/i18n.mjs
@@ -968,6 +982,7 @@ var PTMDashboard = (() => {
       language: initialLanguage.language,
       languagePreference: manualLanguage || "auto",
       languageSource: initialLanguage.source,
+      detailsWidth: Number.isInteger(prefs.detailsWidth) && prefs.detailsWidth >= 30 && prefs.detailsWidth <= 70 ? prefs.detailsWidth : 50,
       view: "active",
       query: "",
       starred: false,
@@ -1005,7 +1020,7 @@ var PTMDashboard = (() => {
     const request = (path, options = {}) => transport(path, { ...options, language: state.language });
     function persist() {
       try {
-        storage?.setItem(key, JSON.stringify({ expanded: [...state.expanded] }));
+        storage?.setItem(key, JSON.stringify({ expanded: [...state.expanded], detailsWidth: state.detailsWidth }));
       } catch {
       }
     }
@@ -1127,6 +1142,12 @@ var PTMDashboard = (() => {
         const expanded = new Set(state.expanded);
         expanded.has(id) ? expanded.delete(id) : expanded.add(id);
         emit({ expanded });
+        persist();
+      },
+      detailsWidth(value) {
+        const width = Number(value);
+        if (!Number.isInteger(width) || width < 30 || width > 70) return;
+        emit({ detailsWidth: width });
         persist();
       },
       language(language) {
@@ -1440,11 +1461,11 @@ var PTMDashboard = (() => {
         )
       );
     }
-    return function TasksView({ transport, scope = "default", surface = "dashboard", schedule, controller: supplied, hermesLanguage }) {
+    return function TasksView({ transport, scope = "default", preferenceScope = scope, surface = "dashboard", schedule, controller: supplied, hermesLanguage }) {
       const controllers = React.useRef(/* @__PURE__ */ new Map());
       const transportRef = React.useRef(transport);
       transportRef.current = transport;
-      if (!controllers.current.has(scope)) controllers.current.set(scope, supplied || createController({ scope, hermesLanguage, transport: (...args) => transportRef.current(...args) }));
+      if (!controllers.current.has(scope)) controllers.current.set(scope, supplied || createController({ scope: preferenceScope, hermesLanguage, transport: (...args) => transportRef.current(...args) }));
       const controller = controllers.current.get(scope);
       const state = React.useSyncExternalStore(controller.subscribe, controller.getSnapshot);
       const t = (name, values) => translate(state.language, name, values);
@@ -1501,7 +1522,7 @@ var PTMDashboard = (() => {
           });
         };
       }, []);
-      const [split, setSplit] = React.useState(50);
+      const [split, setSplit] = React.useState(100 - state.detailsWidth);
       const [addingAtEnd, setAddingAtEnd] = React.useState(false);
       const bottomForm = React.useRef(null);
       React.useEffect(() => {
@@ -1526,6 +1547,9 @@ var PTMDashboard = (() => {
       React.useEffect(() => {
         if (state.editing && !selected && !state.pending) controller.set({ editing: null });
       }, [controller, state.editing, selected?.id, state.pending]);
+      React.useEffect(() => {
+        setSplit(100 - state.detailsWidth);
+      }, [controller, state.detailsWidth, Boolean(selected)]);
       const trashRoots = state.data.trash.filter((task) => !state.data.trash.some((parent) => parent.id === task.parent_id));
       return h(
         "section",
@@ -1557,7 +1581,28 @@ var PTMDashboard = (() => {
                   supportedLanguages.map(({ code, name }) => h("option", { key: code, value: code, lang: code }, name))
                 )),
                 h("small", { className: "ptm-muted" }, t(`languageSource${state.languageSource}`)),
-                h("small", { className: "ptm-muted" }, t("languageHelp"))
+                h("small", { className: "ptm-muted" }, t("languageHelp")),
+                h(
+                  "label",
+                  {},
+                  h(
+                    "span",
+                    { className: "ptm-width-label" },
+                    t("detailsWidth"),
+                    h("output", {}, new Intl.NumberFormat(state.language, { style: "percent" }).format(state.detailsWidth / 100))
+                  ),
+                  h("input", {
+                    type: "range",
+                    className: "ptm-details-width",
+                    min: 30,
+                    max: 70,
+                    step: 5,
+                    value: state.detailsWidth,
+                    "aria-label": t("detailsWidth"),
+                    onChange: (event) => controller.detailsWidth(event.target.value)
+                  })
+                ),
+                h("small", { className: "ptm-muted" }, t("detailsWidthHelp"))
               )
             ),
             act(t("refresh"), () => controller.refresh(), { disabled: state.pending })
@@ -1669,7 +1714,7 @@ var PTMDashboard = (() => {
             onPointerUp: (event) => {
               if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
             },
-            onDoubleClick: () => setSplit(50),
+            onDoubleClick: () => setSplit(100 - state.detailsWidth),
             onKeyDown: (event) => {
               const next = { ArrowLeft: split - 5, ArrowRight: split + 5, Home: 30, End: 70 }[event.key];
               if (next !== void 0) {

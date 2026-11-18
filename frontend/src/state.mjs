@@ -11,7 +11,7 @@ export function createController({transport, scope = "default", storage, hermesL
   let manualLanguage = languagePreference(storage);
   let inheritedLanguage = hermesLanguage, machineLanguages = browserLanguages;
   const initialLanguage = resolveLanguage({manual: manualLanguage, hermes: inheritedLanguage, browser: machineLanguages});
-  let state = {data: empty(), language: initialLanguage.language, languagePreference: manualLanguage || "auto", languageSource: initialLanguage.source, view: "active", query: "", starred: false,
+  let state = {data: empty(), language: initialLanguage.language, languagePreference: manualLanguage || "auto", languageSource: initialLanguage.source, detailsWidth: Number.isInteger(prefs.detailsWidth) && prefs.detailsWidth >= 30 && prefs.detailsWidth <= 70 ? prefs.detailsWidth : 50, view: "active", query: "", starred: false,
     expanded: new Set(Array.isArray(prefs.expanded) ? prefs.expanded.filter(id => typeof id === "string") : []), editing: null,
     drafts: new Map(), newTitle: "", pending: false, loaded: false, error: "", errorDetail: null, confirmation: null};
   let sequence = 0, generation = 0, disposed = false;
@@ -28,7 +28,7 @@ export function createController({transport, scope = "default", storage, hermesL
       ...(state.errorDetail ? {error: translate(next.language, state.errorDetail.key, state.errorDetail.values)} : {})});
   }
   const request = (path, options = {}) => transport(path, {...options, language: state.language});
-  function persist() {try {storage?.setItem(key, JSON.stringify({expanded: [...state.expanded]}));} catch { /* Session state still works. */ }}
+  function persist() {try {storage?.setItem(key, JSON.stringify({expanded: [...state.expanded], detailsWidth: state.detailsWidth}));} catch { /* Session state still works. */ }}
   async function refresh(internal = false) {
     if (disposed || (state.pending && !internal)) return;
     const id = ++sequence, epoch = generation;
@@ -128,6 +128,11 @@ export function createController({transport, scope = "default", storage, hermesL
     star: task => mutate(() => patch(task, {starred: !task.starred})),
     discard(id, form) {const drafts = new Map(state.drafts); drafts.delete(formKey(id, form)); emit({drafts});},
     expand(id) {const expanded = new Set(state.expanded); expanded.has(id) ? expanded.delete(id) : expanded.add(id); emit({expanded}); persist();},
+    detailsWidth(value) {
+      const width = Number(value);
+      if (!Number.isInteger(width) || width < 30 || width > 70) return;
+      emit({detailsWidth: width}); persist();
+    },
     language(language) {
       if (language !== "auto" && !normalizeLanguage(language)) return;
       manualLanguage = language === "auto" ? null : normalizeLanguage(language);

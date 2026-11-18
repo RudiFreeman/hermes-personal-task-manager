@@ -13,7 +13,8 @@ Pinned source: https://github.com/RudiFreeman/hermes-personal-task-manager/tree/
 - Desktop SDK route/sidebar, ctx.rest and lifecycle cleanup. No core overrides,
   raw native bridge, remote executable imports or self-updater.
 - Resizable list/details layout, a visible close button, independent scrolling
-  and full-width mobile details. Root tasks can be added below the list.
+  and full-width mobile details. A saved 30–70% default details width is configurable
+  below Language in app settings (initially 50%). Root tasks can be added below the list.
 - Seven languages: English, Russian, Spanish, Brazilian Portuguese, German,
   French and Polish. Automatic mode inherits `useI18n().locale` from either
   Hermes SDK, with browser/system and English fallback; manual choice persists.
