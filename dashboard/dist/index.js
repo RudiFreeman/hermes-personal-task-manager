@@ -424,6 +424,8 @@ var PTMDashboard = (() => {
       className: [!kit.Button && "ptm-button", className].filter(Boolean).join(" ") || void 0
     });
     const act = (label, onClick, props = {}) => h(Button, { type: "button", onClick, ...props }, label);
+    const icon = (name, glyph) => h("span", { className: `ptm-icon ptm-icon-${name}`, "aria-hidden": true }, glyph);
+    const withIcon = (name, label) => h("span", { className: "ptm-icon-label" }, icon(name, name === "plus" ? "+" : void 0), label);
     function Confirmation({ state, controller, t }) {
       const ref = React.useRef(null), previous = React.useRef(null);
       React.useEffect(() => {
@@ -522,7 +524,7 @@ var PTMDashboard = (() => {
             maxLength: 300,
             onChange: change("child", "title")
           }),
-          h(Button, { type: "submit", disabled: state.pending }, t("addSubtask"))
+          h(Button, { type: "submit", disabled: state.pending }, withIcon("plus", t("addSubtask")))
         ),
         h(
           "section",
@@ -623,9 +625,9 @@ var PTMDashboard = (() => {
               { role: "menu", className: "ptm-menu-items" },
               !trashed && menuAction(t("edit"), () => controller.set({ editing: state.editing === task.id ? null : task.id })),
               !trashed && menuAction(t(task.starred ? "unstar" : "star"), () => controller.star(task), { disabled: state.pending }),
-              !trashed && menuAction(t("moveTrash"), () => controller.confirm("trash", task), { disabled: state.pending }),
+              !trashed && menuAction(withIcon("trash", t("moveTrash")), () => controller.confirm("trash", task), { disabled: state.pending }),
               trashed && menuAction(t("restore"), () => controller.restore(task), { disabled: state.pending || Boolean(parent?.trashed_at), title: parent?.trashed_at ? t("restoreParent") : void 0 }),
-              trashed && menuAction(t("purge"), () => controller.confirm("purge", task), { className: "ptm-danger", disabled: state.pending })
+              trashed && menuAction(withIcon("trash", t("purge")), () => controller.confirm("purge", task), { className: "ptm-danger", disabled: state.pending })
             )
           )
         ),
@@ -634,7 +636,7 @@ var PTMDashboard = (() => {
           "div",
           { className: "ptm-children" },
           children.map((item) => h(TaskRow, { key: item.id, task: item, children: [], state, controller, t, child: true })),
-          !trashed && !task.done && act(t("addSubtask"), () => controller.set({ editing: task.id }), { className: "ptm-add-child" })
+          !trashed && !task.done && act(withIcon("plus", t("addSubtask")), () => controller.set({ editing: task.id }), { className: "ptm-add-child" })
         )
       );
     }
@@ -700,19 +702,24 @@ var PTMDashboard = (() => {
           h("span", { className: "ptm-stats" }, t("progress", state.data.progress)),
           h("progress", { max: 100, value: state.data.progress.percent, "aria-label": t("overallProgress") })
         ),
-        h("nav", { className: "ptm-tabs", "aria-label": t("filters") }, ["active", "archive", "trash"].map((view) => act(view === "trash" ? t("trashCount", { count: trashRoots.length }) : t(view), () => controller.set({ view, editing: null }), { key: view, "aria-pressed": state.view === view }))),
+        h("nav", { className: "ptm-tabs", "aria-label": t("filters") }, ["active", "archive", "trash"].map((view) => act(view === "trash" ? withIcon("trash", t("trashCount", { count: trashRoots.length })) : t(view), () => controller.set({ view, editing: null }), { key: view, "aria-pressed": state.view === view }))),
         h(
           "div",
           { className: "ptm-toolbar" },
-          h(Input, {
-            type: "search",
-            value: state.query,
-            placeholder: t("search"),
-            "aria-label": t("search"),
-            onChange: (event) => controller.set({ query: event.target.value })
-          }),
+          h(
+            "div",
+            { className: "ptm-search" },
+            icon("search"),
+            h(Input, {
+              type: "search",
+              value: state.query,
+              placeholder: t("search"),
+              "aria-label": t("search"),
+              onChange: (event) => controller.set({ query: event.target.value })
+            })
+          ),
           act(t("starred"), () => controller.set({ starred: !state.starred }), { "aria-pressed": state.starred }),
-          state.view === "trash" && trashRoots.length > 0 && act(t("emptyTrash"), () => controller.confirm("empty"), { className: "ptm-danger", disabled: state.pending })
+          state.view === "trash" && trashRoots.length > 0 && act(withIcon("trash", t("emptyTrash")), () => controller.confirm("empty"), { className: "ptm-danger", disabled: state.pending })
         ),
         state.view === "active" && h(
           "form",
@@ -728,7 +735,7 @@ var PTMDashboard = (() => {
             required: true,
             onChange: (event) => controller.set({ newTitle: event.target.value })
           }),
-          h(Button, { type: "submit", disabled: state.pending }, t("add"))
+          h(Button, { type: "submit", disabled: state.pending }, withIcon("plus", t("add")))
         ),
         h("div", { className: "ptm-message", role: "status", "aria-live": "polite" }, state.error || (state.pending ? t("syncing") : "")),
         h("div", { className: "ptm-list" }, roots.length ? roots.map((task) => h(TaskRow, { key: task.id, task, state, controller, t, children: items.filter((child) => child.parent_id === task.id) })) : h("p", { className: "ptm-empty" }, t(state.query || state.starred ? "noResults" : state.view === "trash" ? "emptyTrashHint" : state.view === "archive" ? "archiveHint" : "noTasks"))),

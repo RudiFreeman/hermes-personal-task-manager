@@ -8,6 +8,8 @@ export function createTasksView(React, kit = {}) {
   const Button = ({className, ...props}) => h(kit.Button || "button", {...props,
     className: [!kit.Button && "ptm-button", className].filter(Boolean).join(" ") || undefined});
   const act = (label, onClick, props = {}) => h(Button, {type: "button", onClick, ...props}, label);
+  const icon = (name, glyph) => h("span", {className: `ptm-icon ptm-icon-${name}`, "aria-hidden": true}, glyph);
+  const withIcon = (name, label) => h("span", {className: "ptm-icon-label"}, icon(name, name === "plus" ? "+" : undefined), label);
 
   function Confirmation({state, controller, t}) {
     const ref = React.useRef(null), previous = React.useRef(null);
@@ -55,7 +57,7 @@ export function createTasksView(React, kit = {}) {
       !task.parent_id && !task.done && h("form", {className: "ptm-subtask-add", onSubmit: submit("child")},
         h(Input, {value: input("child", "title", ""), "data-draft-key": "new-subtask", placeholder: t("addStep"),
           "aria-label": t("newSubtask"), required: true, maxLength: 300, onChange: change("child", "title")}),
-        h(Button, {type: "submit", disabled: state.pending}, t("addSubtask"))),
+        h(Button, {type: "submit", disabled: state.pending}, withIcon("plus", t("addSubtask")))),
       h("section", {className: "ptm-notes"}, h("h3", {}, t("notes")),
         ...notes.map(note => h("article", {className: "ptm-note", key: note.id},
           h("small", {}, `${note.actor === "hermes" ? "Hermes" : t("you")} · ${date(note.created_at)}`), h("p", {}, note.body))),
@@ -94,13 +96,13 @@ export function createTasksView(React, kit = {}) {
           h("div", {role: "menu", className: "ptm-menu-items"},
             !trashed && menuAction(t("edit"), () => controller.set({editing: state.editing === task.id ? null : task.id})),
             !trashed && menuAction(t(task.starred ? "unstar" : "star"), () => controller.star(task), {disabled: state.pending}),
-            !trashed && menuAction(t("moveTrash"), () => controller.confirm("trash", task), {disabled: state.pending}),
+            !trashed && menuAction(withIcon("trash", t("moveTrash")), () => controller.confirm("trash", task), {disabled: state.pending}),
             trashed && menuAction(t("restore"), () => controller.restore(task), {disabled: state.pending || Boolean(parent?.trashed_at), title: parent?.trashed_at ? t("restoreParent") : undefined}),
-            trashed && menuAction(t("purge"), () => controller.confirm("purge", task), {className: "ptm-danger", disabled: state.pending})))),
+            trashed && menuAction(withIcon("trash", t("purge")), () => controller.confirm("purge", task), {className: "ptm-danger", disabled: state.pending})))),
       state.editing === task.id && !trashed && h(Editor, {task, state, controller, t}),
       expanded && !child && h("div", {className: "ptm-children"},
         children.map(item => h(TaskRow, {key: item.id, task: item, children: [], state, controller, t, child: true})),
-        !trashed && !task.done && act(t("addSubtask"), () => controller.set({editing: task.id}), {className: "ptm-add-child"})));
+        !trashed && !task.done && act(withIcon("plus", t("addSubtask")), () => controller.set({editing: task.id}), {className: "ptm-add-child"})));
   }
 
   return function TasksView({transport, scope = "default", surface = "dashboard", schedule, controller: supplied}) {
@@ -134,13 +136,14 @@ export function createTasksView(React, kit = {}) {
       h("div", {className: "ptm-progress"}, h("span", {className: "ptm-stats"}, t("progress", state.data.progress)),
         h("progress", {max: 100, value: state.data.progress.percent, "aria-label": t("overallProgress")})),
       h("nav", {className: "ptm-tabs", "aria-label": t("filters")}, ["active", "archive", "trash"].map(view =>
-        act(view === "trash" ? t("trashCount", {count: trashRoots.length}) : t(view), () => controller.set({view, editing: null}), {key: view, "aria-pressed": state.view === view}))),
-      h("div", {className: "ptm-toolbar"}, h(Input, {type: "search", value: state.query, placeholder: t("search"), "aria-label": t("search"),
-        onChange: event => controller.set({query: event.target.value})}), act(t("starred"), () => controller.set({starred: !state.starred}), {"aria-pressed": state.starred}),
-        state.view === "trash" && trashRoots.length > 0 && act(t("emptyTrash"), () => controller.confirm("empty"), {className: "ptm-danger", disabled: state.pending})),
+        act(view === "trash" ? withIcon("trash", t("trashCount", {count: trashRoots.length})) : t(view), () => controller.set({view, editing: null}), {key: view, "aria-pressed": state.view === view}))),
+      h("div", {className: "ptm-toolbar"}, h("div", {className: "ptm-search"}, icon("search"),
+        h(Input, {type: "search", value: state.query, placeholder: t("search"), "aria-label": t("search"),
+          onChange: event => controller.set({query: event.target.value})})), act(t("starred"), () => controller.set({starred: !state.starred}), {"aria-pressed": state.starred}),
+        state.view === "trash" && trashRoots.length > 0 && act(withIcon("trash", t("emptyTrash")), () => controller.confirm("empty"), {className: "ptm-danger", disabled: state.pending})),
       state.view === "active" && h("form", {className: "ptm-add", onSubmit: event => {event.preventDefault(); controller.add();}},
         h(Input, {value: state.newTitle, placeholder: t("taskPlaceholder"), "aria-label": t("newTask"), maxLength: 300, required: true,
-          onChange: event => controller.set({newTitle: event.target.value})}), h(Button, {type: "submit", disabled: state.pending}, t("add"))),
+          onChange: event => controller.set({newTitle: event.target.value})}), h(Button, {type: "submit", disabled: state.pending}, withIcon("plus", t("add")))),
       h("div", {className: "ptm-message", role: "status", "aria-live": "polite"}, state.error || (state.pending ? t("syncing") : "")),
       h("div", {className: "ptm-list"}, roots.length ? roots.map(task => h(TaskRow, {key: task.id, task, state, controller, t, children: items.filter(child => child.parent_id === task.id)})) :
         h("p", {className: "ptm-empty"}, t(state.query || state.starred ? "noResults" : state.view === "trash" ? "emptyTrashHint" : state.view === "archive" ? "archiveHint" : "noTasks"))),
