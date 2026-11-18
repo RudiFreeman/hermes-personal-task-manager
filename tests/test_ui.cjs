@@ -26,7 +26,7 @@ function server(){
  return {data,writes,delayed,transport,delay:()=>{hold=true;},fail:()=>{fail=true;}};
 }
 async function controllerTests(){
- const {createController}=await import("./frontend/src/state.mjs");
+ const {createController}=await import("../frontend/src/state.mjs");
  const setup=async()=>{const s=server(),c=createController({transport:s.transport,storage:{getItem:()=>null,setItem(){}}});await c.refresh();return{s,c};};
  for(const id of ["a","child"]){
   const {s,c}=await setup(),item=s.data.tasks.find(t=>t.id===id);
@@ -80,8 +80,8 @@ async function domTests(){
  assert.equal(document.querySelectorAll(".ptm-button").length,0,"Host buttons must not use the standalone fallback class");
  assert.ok(document.querySelector(".ptm-add button.ptm-compact-button"),"Dashboard compact styling uses its own class");
  await flush(()=>root.unmount());assert.equal(timers.size,0);
- const {createTasksView}=await import("./frontend/src/view.mjs");
- const {createController}=await import("./frontend/src/state.mjs");
+ const {createTasksView}=await import("../frontend/src/view.mjs");
+ const {createController}=await import("../frontend/src/state.mjs");
  const fallbackRoot=createRoot(document.getElementById("app"));
  const fallback=createController({transport:server().transport});
  await flush(()=>fallbackRoot.render(React.createElement(createTasksView(React),{controller:fallback})));

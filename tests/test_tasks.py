@@ -15,16 +15,16 @@ import pytest
 # GitHub's repository name contains hyphens, so load the plugin under an explicit
 # package name rather than relying on the checkout directory being importable.
 spec = importlib.util.spec_from_file_location(
-    "ptm_test_plugin", Path(__file__).with_name("__init__.py"),
-    submodule_search_locations=[str(Path(__file__).parent)],
+    "ptm_test_plugin", Path(__file__).resolve().parents[1] / "__init__.py",
+    submodule_search_locations=[str(Path(__file__).resolve().parents[1])],
 )
 plugin = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = plugin
 spec.loader.exec_module(plugin)
 register = plugin.register
-tools = __import__("ptm_test_plugin.tools", fromlist=["tools"])
-storage = __import__("ptm_test_plugin.store", fromlist=["Store"])
-preview = __import__("ptm_test_plugin.preview", fromlist=["make_server"])
+tools = __import__("ptm_test_plugin.backend.tools", fromlist=["tools"])
+storage = __import__("ptm_test_plugin.backend.store", fromlist=["Store"])
+preview = __import__("ptm_test_plugin.backend.preview", fromlist=["make_server"])
 Store, TaskError = storage.Store, storage.TaskError
 API, make_server = preview.API, preview.make_server
 

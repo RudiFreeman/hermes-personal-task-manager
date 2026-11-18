@@ -13,7 +13,7 @@ from fastapi.testclient import TestClient
 @pytest.fixture
 def client(tmp_path, monkeypatch):
     monkeypatch.setenv("PTM_DATA_DIR", str(tmp_path))
-    spec = importlib.util.spec_from_file_location("ptm_api_check", Path(__file__).parent / "dashboard/plugin_api.py")
+    spec = importlib.util.spec_from_file_location("ptm_api_check", Path(__file__).resolve().parents[1] / "dashboard/plugin_api.py")
     api = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(api)
     app = FastAPI()

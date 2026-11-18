@@ -25,6 +25,6 @@ python scripts/capture_screenshots.py \
 
 An optional --chromium path selects an existing browser installation. Save both
 localStorage and sessionStorage if the host requires them; the accepted envelope
-is the same as test_browser.py. Never commit those state files or screenshots
+is the same as tests/test_browser.py. Never commit those state files or screenshots
 of real task data. This capture tool demonstrates layout, not storage or mutation
 correctness; those are covered by the separate regression suites.

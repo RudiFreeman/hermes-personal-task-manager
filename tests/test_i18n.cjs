@@ -1,6 +1,6 @@
 "use strict";
 const assert = require("node:assert/strict");
-const {translations, savedLanguage, translate} = require("./dashboard/dist/index.js");
+const {translations, savedLanguage, translate} = require("../dashboard/dist/index.js");
 
 assert.deepEqual(Object.keys(translations.en).sort(), Object.keys(translations.ru).sort());
 for (const key of Object.keys(translations.en)) {

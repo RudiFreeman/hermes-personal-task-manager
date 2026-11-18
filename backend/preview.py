@@ -10,7 +10,7 @@ if __package__:
 else:
     from store import Store, TaskError
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 API = "/api/plugins/personal-task-manager/tasks"
 
 

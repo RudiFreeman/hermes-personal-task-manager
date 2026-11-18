@@ -154,7 +154,7 @@ See the [bug report](docs/reports/BUG_REPORT.md) and [installer checklist](docs/
 Python 3.10+ is sufficient for the optional local preview:
 
 ```sh
-python preview.py
+python backend/preview.py
 ```
 
 Open http://127.0.0.1:8765. It binds loopback; development tasks are stored in
@@ -172,11 +172,11 @@ python -m pytest -q --basetemp=.local/dev-tests
 
 Edit `frontend/src/*`, especially `i18n.mjs` for translations, then rebuild.
 `dashboard/dist/*` and `desktop/plugin.js` are generated, readable deliverables.
-The two host adapters share `state.mjs`, `view.mjs` and `store.py`; they use host
+The two host adapters share `state.mjs`, `view.mjs` and `backend/store.py`; they use host
 React. Only the standalone preview bundles React.
 
 Tests use temporary databases. FastAPI/httpx tests are optional locally and must
-also pass in the Hermes runtime. `test_browser.py --help` documents the optional
+also pass in the Hermes runtime. `python tests/test_browser.py --help` documents the optional
 real-host regression with operator-supplied authentication files and an explicit
 disposable profile. It creates and purges only its own UUID-named test group.
 

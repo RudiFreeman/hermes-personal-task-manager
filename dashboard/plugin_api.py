@@ -7,7 +7,7 @@ from typing import Literal
 
 # Dashboard imports API files independently of native plugin packages.
 # Load our own standalone storage module by path, without modifying sys.path.
-spec = importlib.util.spec_from_file_location("ptm_dashboard_store", Path(__file__).resolve().parents[1] / "store.py")
+spec = importlib.util.spec_from_file_location("ptm_dashboard_store", Path(__file__).resolve().parents[1] / "backend" / "store.py")
 storage = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(storage)
 router = APIRouter()
