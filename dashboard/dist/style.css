@@ -40,6 +40,7 @@
 .ptm-message {min-height:22px;font-size:12px;color:var(--ptm-danger);overflow-wrap:anywhere;}
 .ptm-group {min-width:0;}
 .ptm-row {display:flex;align-items:center;gap:5px;min-height:40px;border-bottom:1px solid var(--ptm-line);position:relative;}
+.ptm-row {border-bottom-color:color-mix(in srgb,var(--ptm-line) 50%,transparent);}
 .ptm-row:hover {background:var(--ptm-soft);}
 .ptm-check-hit {display:grid;place-items:center;flex:0 0 34px;min-height:38px;cursor:pointer;}
 .ptm .ptm-check {appearance:none;width:19px;height:19px;border:1.5px solid var(--ptm-muted);border-radius:50%;margin:0;display:grid;place-content:center;cursor:pointer;flex-shrink:0;background:transparent;}
@@ -47,8 +48,8 @@
 .ptm .ptm-check:checked::after {content:"✓";font-size:13px;line-height:1;color:var(--ptm-bg);}
 .ptm .ptm-task-title {display:flex;align-items:center;gap:5px;flex:1;min-width:0;min-height:38px;text-align:left;border:0;background:none;padding:6px 2px;}
 .ptm-title-text {overflow-wrap:anywhere;}
-.ptm-chevron {display:grid;place-items:center;flex:0 0 22px;color:var(--ptm-text);}
-.ptm-chevron::before {content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);}
+.ptm-chevron {display:grid;place-items:center;flex:0 0 26px;color:var(--ptm-text);}
+.ptm-chevron::before {content:"";width:11px;height:11px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);}
 .ptm-task-title[aria-expanded=true] .ptm-chevron::before {transform:rotate(45deg);}
 .ptm-step-count {font-size:11px;color:var(--ptm-muted);white-space:nowrap;}
 .ptm button.ptm-star-toggle {flex:0 0 32px;min-height:36px;padding:0;border:0;border-radius:4px;background:transparent;color:var(--ptm-muted);font-size:18px;}
@@ -57,6 +58,7 @@
 @media(max-width:600px) {.ptm button.ptm-star-toggle {flex-basis:44px;min-height:44px;}}
 .ptm .is-done .ptm-title-text {text-decoration:line-through;color:var(--ptm-muted);}
 .ptm-children {margin-left:24px;border-left:1px solid var(--ptm-line);padding-left:7px;}
+.ptm-children {border-left-color:color-mix(in srgb,var(--ptm-line) 50%,transparent);}
 .ptm .ptm-add-child {background:transparent;border:0!important;color:var(--ptm-muted);font-size:12px;margin:4px 0 4px 32px;}
 .ptm-menu {position:relative;flex:0 0 32px;}
 .ptm-menu summary {list-style:none;text-align:center;cursor:pointer;border-radius:4px;min-width:32px;min-height:36px;font-size:20px;}

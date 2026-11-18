@@ -4,7 +4,7 @@ A personal checklist shared by **Hermes chat, Dashboard and Desktop/WebApp**.
 Capture tasks with one level of subtasks, keep notes and confirmed results,
 and return to the same list from either interface.
 
-Version **0.2.2**. Requires **Hermes >=0.23.1**. English is the default UI
+Version **0.2.3**. Requires **Hermes >=0.23.1**. English is the default UI
 language; Russian is optional. This is a community project, not a NousResearch
 maintained or verified plugin. Catalog submission is being prepared; it is not
 currently available by catalog name.
