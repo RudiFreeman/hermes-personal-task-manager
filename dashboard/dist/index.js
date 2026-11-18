@@ -592,7 +592,7 @@ var PTMDashboard = (() => {
               "aria-expanded": !child ? expanded : void 0,
               onClick: () => !child ? controller.expand(task.id) : controller.set({ editing: state.editing === task.id ? null : task.id })
             },
-            children.length ? h("span", { className: "ptm-chevron", "aria-hidden": true }, expanded ? "\u25BE" : "\u25B8") : null,
+            children.length ? h("span", { className: "ptm-chevron", "aria-hidden": true }) : null,
             h("span", { className: "ptm-title-text" }, task.title)
           ),
           !trashed && h("button", {

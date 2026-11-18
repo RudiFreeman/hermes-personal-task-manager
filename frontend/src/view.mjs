@@ -82,7 +82,7 @@ export function createTasksView(React, kit = {}) {
             "aria-label": t(task.done ? "reopenLabel" : "completeLabel") + task.title, onChange: () => controller.toggle(task)})),
         h("button", {type: "button", className: "ptm-task-title", "aria-expanded": !child ? expanded : undefined,
           onClick: () => !child ? controller.expand(task.id) : controller.set({editing: state.editing === task.id ? null : task.id})},
-        children.length ? h("span", {className: "ptm-chevron", "aria-hidden": true}, expanded ? "▾" : "▸") : null,
+        children.length ? h("span", {className: "ptm-chevron", "aria-hidden": true}) : null,
         h("span", {className: "ptm-title-text"}, task.title)),
         !trashed && h("button", {type: "button", className: "ptm-star-toggle",
           title: t(task.starred ? "unstar" : "star"), "aria-label": t("star"), "aria-pressed": task.starred,

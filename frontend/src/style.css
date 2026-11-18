@@ -38,7 +38,9 @@
 .ptm .ptm-check:checked::after {content:"✓";font-size:13px;line-height:1;color:var(--ptm-bg);}
 .ptm .ptm-task-title {display:flex;align-items:center;gap:5px;flex:1;min-width:0;min-height:38px;text-align:left;border:0;background:none;padding:6px 2px;}
 .ptm-title-text {overflow-wrap:anywhere;}
-.ptm-chevron {font-size:11px;color:var(--ptm-muted);flex:0 0 12px;}
+.ptm-chevron {display:grid;place-items:center;flex:0 0 22px;color:var(--ptm-text);}
+.ptm-chevron::before {content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);}
+.ptm-task-title[aria-expanded=true] .ptm-chevron::before {transform:rotate(45deg);}
 .ptm-step-count {font-size:11px;color:var(--ptm-muted);white-space:nowrap;}
 .ptm button.ptm-star-toggle {flex:0 0 32px;min-height:36px;padding:0;border:0;border-radius:4px;background:transparent;color:var(--ptm-muted);font-size:18px;}
 .ptm button.ptm-star-toggle[aria-pressed=true] {background:transparent!important;color:var(--ptm-accent);}
